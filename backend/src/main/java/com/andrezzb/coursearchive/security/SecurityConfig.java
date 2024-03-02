@@ -2,6 +2,9 @@ package com.andrezzb.coursearchive.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -9,6 +12,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
@@ -42,10 +47,25 @@ public class SecurityConfig {
             .anyRequest().authenticated())
         .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
         .sessionManagement(
-            session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .httpBasic(Customizer.withDefaults());
+            session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
     return http.build();
+  }
+
+  @Bean
+  AuthenticationManager authenticationManager(
+      UserDetailsService userDetailsService,
+      PasswordEncoder passwordEncoder) {
+    DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+    authenticationProvider.setUserDetailsService(userDetailsService);
+    authenticationProvider.setPasswordEncoder(passwordEncoder);
+
+    return new ProviderManager(authenticationProvider);
+  }
+
+  @Bean
+  PasswordEncoder passwordEncoder() {
+    return PasswordEncoderFactories.createDelegatingPasswordEncoder();
   }
 
   @Bean
@@ -67,14 +87,7 @@ public class SecurityConfig {
         .password("password")
         .roles("ADMIN")
         .build();
-
-    UserDetails user = User.withDefaultPasswordEncoder()
-        .username("user")
-        .password("password")
-        .roles("USER")
-        .build();
-
-    return new InMemoryUserDetailsManager(admin, user);
+    return new InMemoryUserDetailsManager(admin);
   }
 
 }
