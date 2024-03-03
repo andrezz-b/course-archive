@@ -1,4 +1,4 @@
-package com.andrezzb.coursearchive.security;
+package com.andrezzb.coursearchive.security.services;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
