@@ -5,12 +5,14 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.andrezzb.coursearchive.security.dto.RegisterDTO;
+import com.andrezzb.coursearchive.security.dto.RegisterDto;
 import com.andrezzb.coursearchive.security.models.UserEntity;
 import com.andrezzb.coursearchive.security.repository.UserRepository;
 
 @Service
 public class AuthService {
+
+  public static final String PASSWORD_REGEX = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,30}$";
 
   private final TokenService tokenService;
   private final AuthenticationManager authenticationManager;
@@ -34,10 +36,13 @@ public class AuthService {
     return token;
   }
 
-  public UserEntity register(RegisterDTO registerData) {
+  public UserEntity register(RegisterDto registerData) {
     UserEntity user = new UserEntity();
     user.setUsername(registerData.getUsername());
     user.setPassword(passwordEncoder.encode(registerData.getPassword()));
+    user.setFirstName(registerData.getFirstName());
+    user.setLastName(registerData.getLastName());
+    user.setEmail(registerData.getEmail());
     return userRepository.save(user);
   }
 
