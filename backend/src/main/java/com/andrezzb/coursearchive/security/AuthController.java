@@ -1,5 +1,6 @@
 package com.andrezzb.coursearchive.security;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,12 +22,14 @@ public class AuthController {
   }
 
   @PostMapping("/login")
-  public String login(@Valid @RequestBody LoginDto loginData) {
-    return authService.login(loginData.getUsername(), loginData.getPassword());
+  public ResponseEntity<String> login(@Valid @RequestBody LoginDto loginData) {
+    final String token = authService.login(loginData.getUsername(), loginData.getPassword());
+    return ResponseEntity.ok(token);
   }
 
   @PostMapping("/register")
-  public UserEntity register(@Valid @RequestBody RegisterDto registerData) {
-    return authService.register(registerData);
+  public ResponseEntity<Long> register(@Valid @RequestBody RegisterDto registerData) {
+    final UserEntity user = authService.register(registerData);
+    return ResponseEntity.ok(user.getId());
   }
 }

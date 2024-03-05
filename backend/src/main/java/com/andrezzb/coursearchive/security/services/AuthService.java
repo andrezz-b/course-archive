@@ -6,6 +6,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.andrezzb.coursearchive.security.dto.RegisterDto;
+import com.andrezzb.coursearchive.security.exceptions.EmailTakenException;
+import com.andrezzb.coursearchive.security.exceptions.UsernameTakenException;
 import com.andrezzb.coursearchive.security.models.UserEntity;
 import com.andrezzb.coursearchive.security.repository.UserRepository;
 
@@ -37,6 +39,12 @@ public class AuthService {
   }
 
   public UserEntity register(RegisterDto registerData) {
+    userRepository.findByEmail(registerData.getEmail()).ifPresent(user -> {
+      throw new EmailTakenException(registerData.getEmail());
+    });
+    userRepository.findByUsername(registerData.getUsername()).ifPresent(user -> {
+      throw new UsernameTakenException(registerData.getUsername());
+    });
     UserEntity user = new UserEntity();
     user.setUsername(registerData.getUsername());
     user.setPassword(passwordEncoder.encode(registerData.getPassword()));
