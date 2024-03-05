@@ -1,5 +1,6 @@
 package com.andrezzb.coursearchive.security;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,6 +31,6 @@ public class AuthController {
   @PostMapping("/register")
   public ResponseEntity<Long> register(@Valid @RequestBody RegisterDto registerData) {
     final UserEntity user = authService.register(registerData);
-    return ResponseEntity.ok(user.getId());
+    return ResponseEntity.status(HttpStatus.CREATED).body(user.getId());
   }
 }
