@@ -28,10 +28,13 @@ public class College {
     private String city;
 
     @Column(nullable = false)
-    private Short postcode;
+    private Integer postcode;
 
     @Column(nullable = false, length = 128)
     private String address;
+
+    @Column(length = 128)
+    private String website;
 
     @Column(length = 512)
     private String description;

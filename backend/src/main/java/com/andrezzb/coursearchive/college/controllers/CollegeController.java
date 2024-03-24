@@ -1,13 +1,21 @@
 package com.andrezzb.coursearchive.college.controllers;
 
+import com.andrezzb.coursearchive.college.dto.CollegeCreateDto;
+import com.andrezzb.coursearchive.college.dto.CollegeUpdateDto;
 import com.andrezzb.coursearchive.college.models.College;
 import com.andrezzb.coursearchive.college.services.CollegeService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
+
 
 @RestController
 @RequestMapping("api/college")
@@ -32,10 +40,23 @@ public class CollegeController {
         return ResponseEntity.ok(collegesPaged);
     }
 
+    @PostMapping("/")
+    public ResponseEntity<College> createCollege(@Valid @RequestBody CollegeCreateDto college) {
+        final var createdCollege = collegeService.createCollege(college);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdCollege);
+    }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<College> getCollegeById(@PathVariable Long id) {
         final var college = collegeService.findCollegeById(id);
         return ResponseEntity.ok(college);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<College> updateCollegeById(@PathVariable Long id, 
+    @Valid @RequestBody CollegeUpdateDto collegeUpdateDto) {
+        var updateCollege = collegeService.updateCollege(id, collegeUpdateDto);
+        return ResponseEntity.status(HttpStatus.OK).body(updateCollege);
     }
 }
