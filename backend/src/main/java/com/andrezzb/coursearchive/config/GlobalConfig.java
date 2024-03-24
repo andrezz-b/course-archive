@@ -10,7 +10,7 @@ public class GlobalConfig {
 
   @Bean
   @Qualifier("globalModelMapper")
-  ModelMapper modelMapper() {
+  public ModelMapper modelMapper() {
     var modelMapper = new ModelMapper();
     modelMapper.getConfiguration().setSkipNullEnabled(true);
     return modelMapper;
