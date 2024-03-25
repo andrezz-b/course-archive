@@ -32,9 +32,9 @@ public class CollegeController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
             @RequestParam(defaultValue = "asc") String sortDirection,
-            @RequestParam(defaultValue = "id") String sortField
-    ) {
-        Sort.Direction direction = sortDirection.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
+            @RequestParam(defaultValue = "id") String sortField) {
+        Sort.Direction direction =
+                sortDirection.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
         Pageable p = PageRequest.of(page, size, Sort.by(direction, sortField));
         final var collegesPaged = collegeService.findAllCollegesPaged(p);
         return ResponseEntity.ok(collegesPaged);
@@ -54,9 +54,15 @@ public class CollegeController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<College> updateCollegeById(@PathVariable Long id, 
-    @Valid @RequestBody CollegeUpdateDto collegeUpdateDto) {
+    public ResponseEntity<College> updateCollegeById(@PathVariable Long id,
+            @Valid @RequestBody CollegeUpdateDto collegeUpdateDto) {
         var updateCollege = collegeService.updateCollege(id, collegeUpdateDto);
         return ResponseEntity.status(HttpStatus.OK).body(updateCollege);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCollegeById(@PathVariable Long id) {
+        collegeService.deleteCollegeById(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

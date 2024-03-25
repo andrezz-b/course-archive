@@ -39,4 +39,8 @@ public class CollegeService {
         modelMapper.map(collegeDto, college);
         return collegeRepository.save(college);
     }
+
+    public void deleteCollegeById(Long id) {
+        collegeRepository.deleteById(id);
+    }
 }
