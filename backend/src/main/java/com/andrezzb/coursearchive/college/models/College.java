@@ -5,8 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
+import com.andrezzb.coursearchive.program.models.Program;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -46,4 +47,17 @@ public class College {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "program", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Program> programs;
+
+    public void addProgram(Program program) {
+        programs.add(program);
+        program.setCollege(this);
+    }
+
+    public void removeProgram(Program program) {
+        programs.remove(program);
+        program.setCollege(null);
+    }
 }
