@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import com.andrezzb.coursearchive.program.models.Program;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -48,8 +49,8 @@ public class College {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "program", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Program> programs;
+    @OneToMany(mappedBy = "college", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Program> programs = new ArrayList<>();
 
     public void addProgram(Program program) {
         programs.add(program);
