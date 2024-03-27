@@ -27,7 +27,7 @@ public class ProgramService {
     this.modelMapper = modelMapper;
   }
 
-  public Page<Program> getAllProgramsPaged(Pageable p) {
+  public Page<Program> findAllProgramsPaged(Pageable p) {
     return programRepository.findAll(p);
   }
 

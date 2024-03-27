@@ -40,7 +40,7 @@ public class ProgramController {
     Sort.Direction direction =
         sortDirection.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
     Pageable p = PageRequest.of(page, size, Sort.by(direction, sortField));
-    final var programsPaged = programService.getAllProgramsPaged(p);
+    final var programsPaged = programService.findAllProgramsPaged(p);
     return ResponseEntity.ok(programsPaged);
   }
 
