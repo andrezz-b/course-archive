@@ -20,6 +20,7 @@ import org.springframework.security.acls.jdbc.BasicLookupStrategy;
 import org.springframework.security.acls.jdbc.JdbcMutableAclService;
 import org.springframework.security.acls.jdbc.LookupStrategy;
 import org.springframework.security.acls.model.AclService;
+import org.springframework.security.acls.model.MutableAclService;
 import org.springframework.security.acls.model.PermissionGrantingStrategy;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -71,10 +72,10 @@ public class AclMethodSecurityConfig {
   }
 
   @Bean
-  AclService aclService(LookupStrategy lookupStrategy, SpringCacheBasedAclCache aclCache) {
+  MutableAclService aclService(LookupStrategy lookupStrategy, SpringCacheBasedAclCache aclCache) {
     var aclService = new JdbcMutableAclService(dataSource, lookupStrategy, aclCache);
-    aclService.setClassIdentityQuery("select currval(pg_get_serial_sequence('acl_class', 'id')");
-    aclService.setSidIdentityQuery("select currval(pg_get_serial_sequence('acl_sid', 'id')))");
+    aclService.setClassIdentityQuery("select currval(pg_get_serial_sequence('acl_class', 'id'))");
+    aclService.setSidIdentityQuery("select currval(pg_get_serial_sequence('acl_sid', 'id'))");
     return aclService;
   }
 
