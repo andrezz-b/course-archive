@@ -9,6 +9,8 @@ import org.springframework.security.access.PermissionCacheOptimizer;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.acls.AclPermissionCacheOptimizer;
 import org.springframework.security.acls.AclPermissionEvaluator;
 import org.springframework.security.acls.domain.AclAuthorizationStrategy;
@@ -24,6 +26,7 @@ import org.springframework.security.acls.model.MutableAclService;
 import org.springframework.security.acls.model.PermissionGrantingStrategy;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import com.andrezzb.coursearchive.security.models.Role;
 
 @Configuration
 @EnableMethodSecurity
@@ -40,10 +43,11 @@ public class AclMethodSecurityConfig {
 
   @Bean
   static MethodSecurityExpressionHandler expressionHandler(PermissionEvaluator permissionEvaluator,
-      PermissionCacheOptimizer permissionCacheOptimizer) {
+      PermissionCacheOptimizer permissionCacheOptimizer, RoleHierarchy roleHierarchy) {
     var expressionHandler = new DefaultMethodSecurityExpressionHandler();
     expressionHandler.setPermissionEvaluator(permissionEvaluator);
     expressionHandler.setPermissionCacheOptimizer(permissionCacheOptimizer);
+    expressionHandler.setRoleHierarchy(roleHierarchy);
     return expressionHandler;
   }
 
@@ -80,8 +84,16 @@ public class AclMethodSecurityConfig {
   }
 
   @Bean
-  LookupStrategy lookupStrategy(SpringCacheBasedAclCache aclCache, AclAuthorizationStrategy aclAuthorizationStrategy) {
+  LookupStrategy lookupStrategy(SpringCacheBasedAclCache aclCache,
+      AclAuthorizationStrategy aclAuthorizationStrategy) {
     return new BasicLookupStrategy(dataSource, aclCache, aclAuthorizationStrategy,
         new ConsoleAuditLogger());
+  }
+
+  @Bean
+  static RoleHierarchy roleHierarchy() {
+    RoleHierarchyImpl hierarchy = new RoleHierarchyImpl();
+    hierarchy.setHierarchy("ROLE_ADMIN > ROLE_USER");
+    return hierarchy;
   }
 }

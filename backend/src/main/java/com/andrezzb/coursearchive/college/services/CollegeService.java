@@ -20,7 +20,6 @@ import org.springframework.security.acls.model.ObjectIdentity;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.acls.model.Sid;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -36,7 +35,7 @@ public class CollegeService {
         this.aclService = aclService;
     }
 
-    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    @PreAuthorize("hasRole('USER')")
     public Page<College> findAllCollegesPaged(Pageable p) {
         return collegeRepository.findAll(p);
     }
