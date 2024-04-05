@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.andrezzb.coursearchive.security.dto.GrantPermissionDto;
 import com.andrezzb.coursearchive.security.dto.LoginDto;
 import com.andrezzb.coursearchive.security.dto.RegisterDto;
 import com.andrezzb.coursearchive.security.models.UserEntity;
@@ -32,5 +33,11 @@ public class AuthController {
   public ResponseEntity<Long> register(@Valid @RequestBody RegisterDto registerData) {
     final UserEntity user = authService.register(registerData);
     return ResponseEntity.status(HttpStatus.CREATED).body(user.getId());
+  }
+
+  @PostMapping("/grant-permission")
+  public ResponseEntity<Void> grantPermission(@Valid @RequestBody GrantPermissionDto grantPermissionDto) {
+    authService.grantPermission(grantPermissionDto);
+    return ResponseEntity.ok().build();
   }
 }

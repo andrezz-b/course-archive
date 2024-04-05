@@ -26,7 +26,6 @@ import org.springframework.security.acls.model.MutableAclService;
 import org.springframework.security.acls.model.PermissionGrantingStrategy;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import com.andrezzb.coursearchive.security.models.Role;
 
 @Configuration
 @EnableMethodSecurity
