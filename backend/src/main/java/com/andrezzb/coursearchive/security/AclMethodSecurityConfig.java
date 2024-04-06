@@ -58,7 +58,7 @@ public class AclMethodSecurityConfig {
 
   @Bean
   AclAuthorizationStrategy aclAuthorizationStrategy() {
-    return new AclAuthorizationStrategyImpl(new SimpleGrantedAuthority("ROLE_ACL_ADMIN"));
+    return new AclAuthorizationStrategyImpl(new SimpleGrantedAuthority("ROLE_ADMIN"));
   }
 
   @Bean
