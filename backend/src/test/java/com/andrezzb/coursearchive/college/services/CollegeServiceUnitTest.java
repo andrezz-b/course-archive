@@ -3,9 +3,11 @@ package com.andrezzb.coursearchive.college.services;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -16,12 +18,18 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.acls.domain.BasePermission;
 import com.andrezzb.coursearchive.college.dto.CollegeCreateDto;
 import com.andrezzb.coursearchive.college.dto.CollegeUpdateDto;
 import com.andrezzb.coursearchive.college.exceptions.CollegeNotFoundException;
 import com.andrezzb.coursearchive.college.models.College;
 import com.andrezzb.coursearchive.college.repository.CollegeRepository;
 import com.andrezzb.coursearchive.config.GlobalConfig;
+import com.andrezzb.coursearchive.security.services.AclUtilService;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
 
 @ExtendWith(MockitoExtension.class)
 public class CollegeServiceUnitTest {
@@ -31,6 +39,9 @@ public class CollegeServiceUnitTest {
 
   @Mock
   private CollegeRepository collegeRepository;
+
+  @Mock
+  private AclUtilService aclUtilService;
 
   @InjectMocks
   private CollegeService collegeService;
@@ -44,34 +55,59 @@ public class CollegeServiceUnitTest {
         .isInstanceOf(CollegeNotFoundException.class);
   }
 
-  @Test
-  void givenValidCollege_whenCreateCollege_thenCollegeCreated() {
-    CollegeCreateDto collegeDto = CollegeCreateDto.builder()
-        .name("Test College")
-        .acronym("TC")
-        .address("Test Address")
-        .city("Test City")
-        .postcode(1234)
-        .website("testsite")
-        .description("Test Description")
-        .build();
+  @Nested
+  @DisplayName("Create college")
+  class CreateCollege {
+
+    @BeforeEach
+    public void setUp() {
+      // Create a dummy Authentication
+      Authentication authentication =
+          new UsernamePasswordAuthenticationToken("dummyUsername", "dummyPassword");
+
+      // Create a SecurityContext
+      SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+      securityContext.setAuthentication(authentication);
+
+      // Set the SecurityContextHolder to use the SecurityContext
+      SecurityContextHolder.setContext(securityContext);
+    }
 
 
-    when(collegeRepository.save(any(College.class))).thenReturn(null);
-    collegeService.createCollege(collegeDto);
-    ArgumentCaptor<College> collegeCaptor = ArgumentCaptor.forClass(College.class);
-    verify(collegeRepository).save(collegeCaptor.capture());
+    @Test
+    void givenValidCollege_whenCreateCollege_thenCollegeCreated() {
+      // Arrange
+      CollegeCreateDto collegeDto = CollegeCreateDto.builder()
+          .name("Test College")
+          .acronym("TC")
+          .address("Test Address")
+          .city("Test City")
+          .postcode(1234)
+          .website("testsite")
+          .description("Test Description")
+          .build();
 
-    assertThat(collegeCaptor.getValue()).isNotNull();
-    assertThat(collegeCaptor.getValue().getName()).isEqualTo(collegeDto.getName());
-    assertThat(collegeCaptor.getValue().getAcronym()).isEqualTo(collegeDto.getAcronym());
-    assertThat(collegeCaptor.getValue().getAddress()).isEqualTo(collegeDto.getAddress());
-    assertThat(collegeCaptor.getValue().getCity()).isEqualTo(collegeDto.getCity());
-    assertThat(collegeCaptor.getValue().getPostcode()).isEqualTo(collegeDto.getPostcode());
-    assertThat(collegeCaptor.getValue().getWebsite()).isEqualTo(collegeDto.getWebsite());
-    assertThat(collegeCaptor.getValue().getDescription()).isEqualTo(collegeDto.getDescription());
+      when(collegeRepository.save(any(College.class))).thenReturn(null);
+
+      // Act
+      collegeService.createCollege(collegeDto);
+      // Assert
+      ArgumentCaptor<College> collegeCaptor = ArgumentCaptor.forClass(College.class);
+      verify(collegeRepository).save(collegeCaptor.capture());
+      verify(aclUtilService).grantPermission(eq(null), any(String.class),
+          eq(BasePermission.ADMINISTRATION));
+
+      assertThat(collegeCaptor.getValue()).isNotNull();
+      assertThat(collegeCaptor.getValue().getName()).isEqualTo(collegeDto.getName());
+      assertThat(collegeCaptor.getValue().getAcronym()).isEqualTo(collegeDto.getAcronym());
+      assertThat(collegeCaptor.getValue().getAddress()).isEqualTo(collegeDto.getAddress());
+      assertThat(collegeCaptor.getValue().getCity()).isEqualTo(collegeDto.getCity());
+      assertThat(collegeCaptor.getValue().getPostcode()).isEqualTo(collegeDto.getPostcode());
+      assertThat(collegeCaptor.getValue().getWebsite()).isEqualTo(collegeDto.getWebsite());
+      assertThat(collegeCaptor.getValue().getDescription()).isEqualTo(collegeDto.getDescription());
+    }
+
   }
-
 
   @Nested
   @DisplayName("Update college")
