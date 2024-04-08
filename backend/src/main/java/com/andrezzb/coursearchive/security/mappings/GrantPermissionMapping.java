@@ -10,6 +10,7 @@ import com.andrezzb.coursearchive.college.models.College;
 import com.andrezzb.coursearchive.college.repository.CollegeRepository;
 import com.andrezzb.coursearchive.program.models.Program;
 import com.andrezzb.coursearchive.program.repository.ProgramRepository;
+import com.andrezzb.coursearchive.security.models.AclSecured;
 
 
 @Component
@@ -17,9 +18,10 @@ public class GrantPermissionMapping {
 
   private final ApplicationContext applicationContext;
 
-  private final Map<String, Class<? extends JpaRepository<?, Long>>> repositoryMap = Map.of(
-      "college", CollegeRepository.class,
-      "program", ProgramRepository.class);
+  private final Map<String, Class<? extends JpaRepository<? extends AclSecured, Long>>> repositoryMap =
+      Map.of(
+          "college", CollegeRepository.class,
+          "program", ProgramRepository.class);
 
   private final Map<String, Class<?>> objectMap = Map.of(
       "college", College.class,

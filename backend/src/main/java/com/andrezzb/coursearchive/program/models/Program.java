@@ -6,6 +6,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
 import com.andrezzb.coursearchive.college.models.College;
+import com.andrezzb.coursearchive.security.models.AclSecured;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,7 +24,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(name = "program")
-public class Program {
+public class Program implements AclSecured {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -60,4 +61,9 @@ public class Program {
   @UpdateTimestamp
   @Column(name = "updated_at")
   private LocalDateTime updatedAt;
+
+  @Override
+  public Object getParent() {
+    return college;
+  }
 }

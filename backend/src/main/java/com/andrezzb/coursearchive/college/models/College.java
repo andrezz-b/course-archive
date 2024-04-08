@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import com.andrezzb.coursearchive.program.models.Program;
+import com.andrezzb.coursearchive.security.models.AclSecured;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "college")
-public class College {
+public class College implements AclSecured {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -60,5 +61,10 @@ public class College {
     public void removeProgram(Program program) {
         programs.remove(program);
         program.setCollege(null);
+    }
+
+    @Override
+    public Object getParent() {
+        return null;
     }
 }

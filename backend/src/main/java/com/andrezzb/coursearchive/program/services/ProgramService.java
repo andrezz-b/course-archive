@@ -9,21 +9,12 @@ import com.andrezzb.coursearchive.program.dto.ProgramUpdateDto;
 import com.andrezzb.coursearchive.program.exceptions.ProgramNotFoundException;
 import com.andrezzb.coursearchive.program.models.Program;
 import com.andrezzb.coursearchive.program.repository.ProgramRepository;
+import com.andrezzb.coursearchive.security.services.AclUtilService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.acls.domain.ObjectIdentityImpl;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.acls.domain.BasePermission;
-import org.springframework.security.acls.domain.PrincipalSid;
-import org.springframework.security.acls.model.Acl;
-import org.springframework.security.acls.model.MutableAcl;
-import org.springframework.security.acls.model.MutableAclService;
-import org.springframework.security.acls.model.NotFoundException;
-import org.springframework.security.acls.model.ObjectIdentity;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.acls.model.Sid;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 @Service
@@ -32,15 +23,15 @@ public class ProgramService {
   private final ProgramRepository programRepository;
   private final CollegeService collegeService;
   private final ModelMapper modelMapper;
+  private final AclUtilService aclUtilService;
 
-  @Autowired
-  private MutableAclService aclService;
 
   public ProgramService(ProgramRepository programRepository, CollegeService collegeService,
-      ModelMapper modelMapper) {
+      ModelMapper modelMapper, AclUtilService aclUtilService) {
     this.programRepository = programRepository;
     this.collegeService = collegeService;
     this.modelMapper = modelMapper;
+    this.aclUtilService = aclUtilService;
   }
 
   public Page<Program> findAllProgramsPaged(Pageable p) {
@@ -58,26 +49,9 @@ public class ProgramService {
     Program program = modelMapper.map(programDto, Program.class);
     program.setCollege(college);
     Program savedProgram = programRepository.save(program);
-    /* ACL - Move to advice */
-    var username = SecurityContextHolder.getContext().getAuthentication().getName();
-    ObjectIdentity oi = new ObjectIdentityImpl(savedProgram);
-    Sid sid = new PrincipalSid(username);
-    Permission p = BasePermission.ADMINISTRATION;
-    MutableAcl acl = null;
-    try {
-        acl = (MutableAcl) aclService.readAclById(oi);
-    } catch (NotFoundException nfe) {
-        acl = aclService.createAcl(oi);
-    }
 
-    // Now grant some permissions via an access control entry (ACE)
-    acl.insertAce(acl.getEntries().size(), p, sid, true);
-    // Set parent ACL
-    acl.setEntriesInheriting(true);
-    Acl parentAcl = aclService.readAclById(new ObjectIdentityImpl(college));
-    acl.setParent(parentAcl);
-    aclService.updateAcl(acl);
-    /* ACL - Move to advice */
+    String username = SecurityContextHolder.getContext().getAuthentication().getName();
+    aclUtilService.grantPermission(savedProgram, username, BasePermission.ADMINISTRATION);
     return savedProgram;
   }
 
