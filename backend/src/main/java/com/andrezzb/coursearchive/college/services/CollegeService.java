@@ -22,7 +22,8 @@ public class CollegeService {
     private final ModelMapper modelMapper;
     private final AclUtilService aclUtilService;
 
-    public CollegeService(CollegeRepository collegeRepository, ModelMapper modelMapper, AclUtilService aclUtilService) {
+    public CollegeService(CollegeRepository collegeRepository, ModelMapper modelMapper,
+            AclUtilService aclUtilService) {
         this.collegeRepository = collegeRepository;
         this.modelMapper = modelMapper;
         this.aclUtilService = aclUtilService;
@@ -33,12 +34,13 @@ public class CollegeService {
         return collegeRepository.findAll(p);
     }
 
-    @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.college.models.College', admin)")
+    @PreAuthorize("hasRole('USER')")
     public College findCollegeById(Long id) {
         return collegeRepository.findById(id).orElseThrow(() -> new CollegeNotFoundException(id));
     }
 
     @Transactional
+    @PreAuthorize("hasRole('MANAGER')")
     public College createCollege(CollegeCreateDto collegeDto) {
         College newCollege = modelMapper.map(collegeDto, College.class);
         College savedCollege = collegeRepository.save(newCollege);
@@ -47,12 +49,14 @@ public class CollegeService {
         return savedCollege;
     }
 
+    @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.college.models.College', write) || hasRole('MANAGER')")
     public College updateCollege(Long id, CollegeUpdateDto collegeDto) {
         College college = findCollegeById(id);
         modelMapper.map(collegeDto, college);
         return collegeRepository.save(college);
     }
 
+    @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.college.models.College', delete) || hasRole('MANAGER')")
     public void deleteCollegeById(Long id) {
         collegeRepository.deleteById(id);
     }

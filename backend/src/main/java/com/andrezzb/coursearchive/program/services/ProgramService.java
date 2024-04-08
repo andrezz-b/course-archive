@@ -34,16 +34,18 @@ public class ProgramService {
     this.aclUtilService = aclUtilService;
   }
 
+  @PreAuthorize("hasRole('USER')")
   public Page<Program> findAllProgramsPaged(Pageable p) {
     return programRepository.findAll(p);
   }
 
-  @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.program.models.Program', admin)")
+  @PreAuthorize("hasRole('USER')")
   public Program findProgramById(Long id) {
     return programRepository.findById(id).orElseThrow(() -> new ProgramNotFoundException(id));
   }
 
   @Transactional
+  @PreAuthorize("hasPermission(#programDto.collegeId, 'com.andrezzb.coursearchive.college.models.College', create) || hasRole('MANAGER')")
   public Program createProgram(ProgramCreateDto programDto) {
     var college = collegeService.findCollegeById(programDto.getCollegeId());
     Program program = modelMapper.map(programDto, Program.class);
@@ -55,12 +57,14 @@ public class ProgramService {
     return savedProgram;
   }
 
+  @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.program.models.Program', write) || hasRole('MANAGER')")
   public Program updateProgram(Long id, @Valid ProgramUpdateDto programUpdateDto) {
     Program program = findProgramById(id);
     modelMapper.map(programUpdateDto, program);
     return programRepository.save(program);
   }
 
+  @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.program.models.Program', delete) || hasRole('MANAGER')")
   public void deleteProgramById(Long id) {
     programRepository.deleteById(id);
   }

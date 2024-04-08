@@ -16,7 +16,7 @@ public class ProgramCreateDto {
   private String name;
 
   @NotNull(message = "College id is required")
-  private Long collegeId;
+  Long collegeId;
 
   @Min(value = 1, message = "Duration must be at least 1 year")
   private Short duration;
