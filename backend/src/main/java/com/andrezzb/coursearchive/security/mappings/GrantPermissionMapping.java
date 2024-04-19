@@ -8,6 +8,8 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Component;
 import com.andrezzb.coursearchive.college.models.College;
 import com.andrezzb.coursearchive.college.repository.CollegeRepository;
+import com.andrezzb.coursearchive.course.models.Course;
+import com.andrezzb.coursearchive.course.repository.CourseRepository;
 import com.andrezzb.coursearchive.program.models.Program;
 import com.andrezzb.coursearchive.program.repository.ProgramRepository;
 import com.andrezzb.coursearchive.security.models.AclSecured;
@@ -21,11 +23,13 @@ public class GrantPermissionMapping {
   private final Map<String, Class<? extends JpaRepository<? extends AclSecured, Long>>> repositoryMap =
       Map.of(
           "college", CollegeRepository.class,
-          "program", ProgramRepository.class);
+          "program", ProgramRepository.class,
+          "course", CourseRepository.class);
 
   private final Map<String, Class<?>> objectMap = Map.of(
       "college", College.class,
-      "program", Program.class);
+      "program", Program.class,
+      "course", Course.class);
 
   private final Map<String, Permission> permissionMap = Map.of(
       "read", BasePermission.READ,
