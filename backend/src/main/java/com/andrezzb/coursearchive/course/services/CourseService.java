@@ -4,7 +4,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +13,7 @@ import com.andrezzb.coursearchive.course.exceptions.CourseNotFoundException;
 import com.andrezzb.coursearchive.course.models.Course;
 import com.andrezzb.coursearchive.course.repository.CourseRepository;
 import com.andrezzb.coursearchive.program.services.ProgramService;
+import com.andrezzb.coursearchive.security.acl.AclPermission;
 import com.andrezzb.coursearchive.security.services.AclUtilService;
 
 @Service
@@ -51,7 +51,7 @@ public class CourseService {
     Course savedCourse = courseRepository.save(course);
 
     String username = SecurityContextHolder.getContext().getAuthentication().getName();
-    aclUtilService.grantPermission(savedCourse, username, BasePermission.ADMINISTRATION);
+    aclUtilService.grantPermission(savedCourse, username, AclPermission.ADMINISTRATION);
     return savedCourse;
   }
 

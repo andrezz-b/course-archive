@@ -18,13 +18,13 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.acls.domain.BasePermission;
 import com.andrezzb.coursearchive.college.dto.CollegeCreateDto;
 import com.andrezzb.coursearchive.college.dto.CollegeUpdateDto;
 import com.andrezzb.coursearchive.college.exceptions.CollegeNotFoundException;
 import com.andrezzb.coursearchive.college.models.College;
 import com.andrezzb.coursearchive.college.repository.CollegeRepository;
 import com.andrezzb.coursearchive.config.GlobalConfig;
+import com.andrezzb.coursearchive.security.acl.AclPermission;
 import com.andrezzb.coursearchive.security.services.AclUtilService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
@@ -95,7 +95,7 @@ public class CollegeServiceUnitTest {
       ArgumentCaptor<College> collegeCaptor = ArgumentCaptor.forClass(College.class);
       verify(collegeRepository).save(collegeCaptor.capture());
       verify(aclUtilService).grantPermission(eq(null), any(String.class),
-          eq(BasePermission.ADMINISTRATION));
+          eq(AclPermission.ADMINISTRATION));
 
       assertThat(collegeCaptor.getValue()).isNotNull();
       assertThat(collegeCaptor.getValue().getName()).isEqualTo(collegeDto.getName());

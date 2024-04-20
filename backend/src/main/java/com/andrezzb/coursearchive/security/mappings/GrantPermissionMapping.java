@@ -3,7 +3,6 @@ package com.andrezzb.coursearchive.security.mappings;
 import java.util.Map;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Component;
 import com.andrezzb.coursearchive.college.models.College;
@@ -12,6 +11,7 @@ import com.andrezzb.coursearchive.course.models.Course;
 import com.andrezzb.coursearchive.course.repository.CourseRepository;
 import com.andrezzb.coursearchive.program.models.Program;
 import com.andrezzb.coursearchive.program.repository.ProgramRepository;
+import com.andrezzb.coursearchive.security.acl.AclPermission;
 import com.andrezzb.coursearchive.security.models.AclSecured;
 
 
@@ -32,11 +32,11 @@ public class GrantPermissionMapping {
       "course", Course.class);
 
   private final Map<String, Permission> permissionMap = Map.of(
-      "read", BasePermission.READ,
-      "write", BasePermission.WRITE,
-      "delete", BasePermission.DELETE,
-      "create", BasePermission.CREATE,
-      "admin", BasePermission.ADMINISTRATION);
+      "read", AclPermission.READ,
+      "write", AclPermission.WRITE,
+      "delete", AclPermission.DELETE,
+      "create", AclPermission.CREATE,
+      "admin", AclPermission.ADMINISTRATION);
 
 
   public GrantPermissionMapping(ApplicationContext applicationContext) {

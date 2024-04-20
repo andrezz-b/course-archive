@@ -27,8 +27,8 @@ import com.andrezzb.coursearchive.program.dto.ProgramUpdateDto;
 import com.andrezzb.coursearchive.program.exceptions.ProgramNotFoundException;
 import com.andrezzb.coursearchive.program.models.Program;
 import com.andrezzb.coursearchive.program.repository.ProgramRepository;
+import com.andrezzb.coursearchive.security.acl.AclPermission;
 import com.andrezzb.coursearchive.security.services.AclUtilService;
-import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -110,7 +110,7 @@ public class ProgramServiceUnitTest {
         verify(collegeService).findCollegeById(1L);
 
         verify(aclUtilService).grantPermission(eq(null), any(String.class),
-            eq(BasePermission.ADMINISTRATION));
+            eq(AclPermission.ADMINISTRATION));
         verify(programRepository).save(programCaptor.capture());
         Program program = programCaptor.getValue();
 

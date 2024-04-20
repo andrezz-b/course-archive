@@ -9,12 +9,12 @@ import com.andrezzb.coursearchive.program.dto.ProgramUpdateDto;
 import com.andrezzb.coursearchive.program.exceptions.ProgramNotFoundException;
 import com.andrezzb.coursearchive.program.models.Program;
 import com.andrezzb.coursearchive.program.repository.ProgramRepository;
+import com.andrezzb.coursearchive.security.acl.AclPermission;
 import com.andrezzb.coursearchive.security.services.AclUtilService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 @Service
@@ -53,7 +53,7 @@ public class ProgramService {
     Program savedProgram = programRepository.save(program);
 
     String username = SecurityContextHolder.getContext().getAuthentication().getName();
-    aclUtilService.grantPermission(savedProgram, username, BasePermission.ADMINISTRATION);
+    aclUtilService.grantPermission(savedProgram, username, AclPermission.ADMINISTRATION);
     return savedProgram;
   }
 

@@ -1,4 +1,4 @@
-package com.andrezzb.coursearchive.security;
+package com.andrezzb.coursearchive.security.acl;
 
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,6 @@ import org.springframework.security.acls.AclPermissionEvaluator;
 import org.springframework.security.acls.domain.AclAuthorizationStrategy;
 import org.springframework.security.acls.domain.AclAuthorizationStrategyImpl;
 import org.springframework.security.acls.domain.ConsoleAuditLogger;
-import org.springframework.security.acls.domain.DefaultPermissionGrantingStrategy;
 import org.springframework.security.acls.domain.SpringCacheBasedAclCache;
 import org.springframework.security.acls.jdbc.BasicLookupStrategy;
 import org.springframework.security.acls.jdbc.JdbcMutableAclService;
@@ -63,7 +62,7 @@ public class AclMethodSecurityConfig {
 
   @Bean
   PermissionGrantingStrategy permissionGrantingStrategy() {
-    return new DefaultPermissionGrantingStrategy(new ConsoleAuditLogger());
+    return new AclPermissionGrantingStrategy(new ConsoleAuditLogger());
   }
 
   @Bean
