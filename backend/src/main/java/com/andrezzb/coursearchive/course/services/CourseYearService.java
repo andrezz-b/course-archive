@@ -8,6 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.andrezzb.coursearchive.course.dto.CourseYearCreateDto;
+import com.andrezzb.coursearchive.course.dto.CourseYearUpdateDto;
 import com.andrezzb.coursearchive.course.exceptions.CourseYearNotFoundException;
 import com.andrezzb.coursearchive.course.models.CourseYear;
 import com.andrezzb.coursearchive.course.repository.CourseYearRepository;
@@ -53,6 +54,18 @@ public class CourseYearService {
     String username = SecurityContextHolder.getContext().getAuthentication().getName();
     aclUtilService.grantPermission(savedCourseYear, username, AclPermission.ADMINISTRATION);
     return savedCourseYear;
+  }
+
+  @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.course.models.CourseYear', write) || hasRole('MANAGER')")
+  public CourseYear updateCourseYear(Long id, CourseYearUpdateDto courseYearDto) {
+    CourseYear courseYear = findCourseYearById(id);
+    modelMapper.map(courseYearDto, courseYear);
+    return courseYearRepository.save(courseYear);
+  }
+
+  @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.course.models.CourseYear', delete) || hasRole('MANAGER')")
+  public void deleteCourseYearById(Long id) {
+    courseYearRepository.deleteById(id);
   }
 
 }

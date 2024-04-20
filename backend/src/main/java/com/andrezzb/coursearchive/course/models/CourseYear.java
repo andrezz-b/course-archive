@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(name = "course_year",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"course_id", "year"}))
+        uniqueConstraints = @UniqueConstraint(columnNames = {"course_id", "academic_year"}))
 public class CourseYear implements AclSecured {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,8 +33,8 @@ public class CourseYear implements AclSecured {
     @JsonIgnore
     private Course course;
 
-    @Column(nullable = false, length = 9)
-    private String year;
+    @Column(nullable = false, length = 9, name = "academic_year")
+    private String academicYear;
 
     private String professor;
     private String assistant;

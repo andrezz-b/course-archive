@@ -17,7 +17,7 @@ public class CourseYearCreateDto {
 
     @NotBlank(message = "Year is required")
     @Size(max = 9, message = "Year must be in the format 'yyyy/yyyy'")
-    private String year;
+    private String academicYear;
 
     @Size(max = 256, message = "Professor names must be at most 256 characters")
     private String professor;
