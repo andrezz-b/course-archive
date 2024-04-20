@@ -14,8 +14,8 @@ import org.springframework.core.Ordered;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class CourseExceptionHandler {
 
-  @ExceptionHandler(CourseNotFoundException.class)
-  public ResponseEntity<ErrorObject> handle(CourseNotFoundException ex) {
+  @ExceptionHandler({CourseNotFoundException.class, CourseYearNotFoundException.class})
+  public ResponseEntity<ErrorObject> handle(RuntimeException ex) {
     List<String> errors = Collections.singletonList(ex.getMessage());
     final ErrorObject errorObject = new ErrorObject(HttpStatus.NOT_FOUND, errors);
 
