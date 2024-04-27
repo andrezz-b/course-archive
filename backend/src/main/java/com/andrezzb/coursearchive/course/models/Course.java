@@ -64,12 +64,12 @@ public class Course implements AclSecured {
   @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<CourseYear> courseYears = new ArrayList<>();
 
-  public void addCourse(CourseYear courseYear) {
+  public void addCourseYear(CourseYear courseYear) {
     courseYears.add(courseYear);
     courseYear.setCourse(this);
   }
 
-  public void removecourseYear(CourseYear courseYear) {
+  public void removeCourseYear(CourseYear courseYear) {
     courseYears.remove(courseYear);
     courseYear.setCourse(null);
   }

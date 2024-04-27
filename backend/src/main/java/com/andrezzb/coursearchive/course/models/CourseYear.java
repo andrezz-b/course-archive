@@ -1,10 +1,14 @@
 package com.andrezzb.coursearchive.course.models;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import com.andrezzb.coursearchive.material.models.MaterialGroup;
 import com.andrezzb.coursearchive.security.models.AclSecured;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,6 +17,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.Data;
@@ -62,6 +67,19 @@ public class CourseYear implements AclSecured {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "courseYear", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MaterialGroup> materialGroups = new ArrayList<>();
+
+    public void addMaterialGroup(MaterialGroup materialGroup) {
+        materialGroups.add(materialGroup);
+        materialGroup.setCourseYear(this);
+    }
+
+    public void removeMaterialGroup(MaterialGroup materialGroup) {
+        materialGroups.remove(materialGroup);
+        materialGroup.setCourseYear(null);
+    }
 
     @Override
     public Object getParent() {
