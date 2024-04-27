@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.andrezzb.coursearchive.course.services.CourseYearService;
 import com.andrezzb.coursearchive.material.dto.MaterialGroupCreateDto;
+import com.andrezzb.coursearchive.material.dto.MaterialGroupUpdateDto;
 import com.andrezzb.coursearchive.material.exceptions.MaterialGroupNotFoundException;
 import com.andrezzb.coursearchive.material.models.MaterialGroup;
 import com.andrezzb.coursearchive.material.repository.MaterialGroupRepository;
@@ -46,15 +47,13 @@ public class MaterialGroupService {
   public MaterialGroup createMaterialGroup(MaterialGroupCreateDto materialGroupDto) {
     var courseYear = courseYearService.findCourseYearById(materialGroupDto.getCourseYearId());
 
-    if (materialGroupDto.getOrder() == null) {
-      Short maxOrder = materialGroupRepository.findMaxOrder(courseYear.getId());
-      materialGroupDto.setOrder(maxOrder != null ? (short) (maxOrder + 1) : 0);
-    } else {
-      materialGroupRepository.incrementOrder(courseYear.getId(), materialGroupDto.getOrder());
-    }
+    Short displayOrder =
+        getNewDisplayOrder(courseYear.getId(), null, materialGroupDto.getDisplayOrder());
+    materialGroupDto.setDisplayOrder(displayOrder);
 
     MaterialGroup materialGroup = modelMapper.map(materialGroupDto, MaterialGroup.class);
     materialGroup.setCourseYear(courseYear);
+    materialGroup.setId(null);
     MaterialGroup savedMaterialGroup = materialGroupRepository.save(materialGroup);
 
     String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -62,4 +61,39 @@ public class MaterialGroupService {
     return savedMaterialGroup;
   }
 
+  @Transactional
+  @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.material.models.MaterialGroup', write) || hasRole('MANAGER')")
+  public MaterialGroup updateMaterialGroup(Long id, MaterialGroupUpdateDto updateDto) {
+    MaterialGroup materialGroup = findMaterialGroupById(id);
+    Short displayOrder = getNewDisplayOrder(materialGroup.getCourseYear().getId(),
+        materialGroup.getDisplayOrder(), updateDto.getDisplayOrder());
+    updateDto.setDisplayOrder(displayOrder);
+    modelMapper.map(updateDto, materialGroup);
+    return materialGroupRepository.save(materialGroup);
+  }
+
+  @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.material.models.MaterialGroup', delete) || hasRole('MANAGER')")
+  public void deleteMaterialGroupById(Long id) {
+    materialGroupRepository.deleteById(id);
+  }
+
+  private Short getNewDisplayOrder(Long courseYearId, Short oldOrder, Short newOrder) {
+    // Order is not being changed
+    if (newOrder == null && oldOrder != null) {
+      return oldOrder;
+    }
+    Short maxOrder = materialGroupRepository.findMaxOrder(courseYearId).orElse((short) -1);
+    // No new order specified, default: add it to the end
+    if (newOrder == null) {
+      return (short) (maxOrder + 1);
+    }
+    // New order larger than the end postition, add it to the end postition
+    if (newOrder > maxOrder + 1) {
+      return (short) (maxOrder + 1);
+    }
+    // Max is -1 when this is the only element, so no point in incrementing others
+    if (maxOrder != -1)
+      materialGroupRepository.incrementDisplayOrder(courseYearId, newOrder);
+    return newOrder;
+  }
 }

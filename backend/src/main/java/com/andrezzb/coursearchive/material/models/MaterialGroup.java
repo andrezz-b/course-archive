@@ -35,7 +35,7 @@ public class MaterialGroup implements AclSecured {
     private CourseYear courseYear;
 
     @Column(nullable = false)
-    private Short order = Short.MAX_VALUE;
+    private Short displayOrder;
 
     // @Column(nullable = false, length = 32)
     // private String type;
