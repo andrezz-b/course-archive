@@ -1,6 +1,7 @@
 package com.andrezzb.coursearchive.material.services;
 
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeMap;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,6 +29,10 @@ public class MaterialService {
     this.aclUtilService = aclUtilService;
     this.modelMapper = modelMapper;
     this.materialGroupService = materialGroupService;
+
+    TypeMap<MaterialUpdateDto, Material> typeMap =
+        this.modelMapper.createTypeMap(MaterialUpdateDto.class, Material.class);
+    typeMap.addMappings(mapper -> mapper.skip(Material::setId));
   }
 
   @PreAuthorize("hasRole('USER')")
@@ -56,7 +61,7 @@ public class MaterialService {
   }
 
   @Transactional
-  @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.material.models.Material', 'update') || hasRole('MANAGER')")
+  @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.material.models.Material', 'write') || hasRole('MANAGER')")
   public Material updateMaterial(Long id, MaterialUpdateDto updateDto) {
     Material material = findMaterialById(id);
     if (updateDto.getMaterialGroupId() != null) {
