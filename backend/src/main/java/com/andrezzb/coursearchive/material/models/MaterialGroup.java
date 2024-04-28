@@ -1,8 +1,14 @@
 package com.andrezzb.coursearchive.material.models;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import com.andrezzb.coursearchive.course.models.CourseYear;
 import com.andrezzb.coursearchive.security.models.AclSecured;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -11,6 +17,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.Data;
@@ -40,8 +47,29 @@ public class MaterialGroup implements AclSecured {
     // @Column(nullable = false, length = 32)
     // private String type;
 
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
     @Column(length = 512)
     private String description;
+
+    @OneToMany(mappedBy = "materialGroup", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Material> materials = new ArrayList<>();
+
+    public void addMaterial(Material material) {
+        materials.add(material);
+        material.setMaterialGroup(this);
+    }
+
+    public void removeMaterial(Material material) {
+        materials.remove(material);
+        material.setMaterialGroup(null);
+    }
 
     @Override
     public Object getParent() {
