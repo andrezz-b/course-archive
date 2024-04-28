@@ -11,6 +11,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 @RestControllerAdvice
 @Order(Ordered.LOWEST_PRECEDENCE)
@@ -31,6 +32,15 @@ public class GlobalExceptionHandler {
     final ErrorObject errorObject = new ErrorObject(HttpStatus.INTERNAL_SERVER_ERROR, errors);
 
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorObject);
+  }
+
+  @ExceptionHandler(HandlerMethodValidationException.class)
+  public ResponseEntity<ErrorObject> onHandlerMethodValidationException(
+      HandlerMethodValidationException e) {
+    List<String> errors = e.getAllErrors().stream().map(error -> error.getDefaultMessage())
+        .toList();
+    final ErrorObject error = new ErrorObject(HttpStatus.BAD_REQUEST, errors);
+    return ResponseEntity.status(error.getStatus()).body(error);
   }
 
 }
