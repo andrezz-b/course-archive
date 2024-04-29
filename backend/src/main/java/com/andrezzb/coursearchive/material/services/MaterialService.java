@@ -8,6 +8,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import com.andrezzb.coursearchive.file.services.FileService;
 import com.andrezzb.coursearchive.material.dto.MaterialCreateDto;
 import com.andrezzb.coursearchive.material.dto.MaterialUpdateDto;
 import com.andrezzb.coursearchive.material.exceptions.MaterialNotFoundException;
@@ -22,13 +24,15 @@ public class MaterialService {
   private final AclUtilService aclUtilService;
   private final ModelMapper modelMapper;
   private final MaterialGroupService materialGroupService;
+  private final FileService fileService;
 
   public MaterialService(MaterialRepository materialRepository, AclUtilService aclUtilService,
-      ModelMapper modelMapper, MaterialGroupService materialGroupService) {
+      ModelMapper modelMapper, MaterialGroupService materialGroupService, FileService fileService) {
     this.materialRepository = materialRepository;
     this.aclUtilService = aclUtilService;
     this.modelMapper = modelMapper;
     this.materialGroupService = materialGroupService;
+    this.fileService = fileService;
 
     TypeMap<MaterialUpdateDto, Material> typeMap =
         this.modelMapper.createTypeMap(MaterialUpdateDto.class, Material.class);
@@ -48,12 +52,19 @@ public class MaterialService {
 
   @Transactional
   @PreAuthorize("hasPermission(#createDto.materialGroupId, 'com.andrezzb.coursearchive.material.models.MaterialGroup', create) || hasRole('MANAGER')")
-  public Material createMaterial(MaterialCreateDto createDto) {
+  public Material createMaterial(MaterialCreateDto createDto, MultipartFile file) {
     var materialGroup = materialGroupService.findMaterialGroupById(createDto.getMaterialGroupId());
     Material material = modelMapper.map(createDto, Material.class);
     material.setMaterialGroup(materialGroup);
     material.setId(null);
     Material savedMaterial = materialRepository.save(material);
+
+    try {
+      fileService.saveFile(file, savedMaterial);
+    } catch (Exception e) {
+      materialRepository.delete(savedMaterial);
+      throw e;
+    }
 
     String username = SecurityContextHolder.getContext().getAuthentication().getName();
     aclUtilService.grantPermission(savedMaterial, username, AclPermission.ADMINISTRATION);

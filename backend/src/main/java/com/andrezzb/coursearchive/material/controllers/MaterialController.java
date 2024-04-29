@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import com.andrezzb.coursearchive.file.services.FileService;
 import com.andrezzb.coursearchive.file.validators.ValidMaterialFile;
 import com.andrezzb.coursearchive.material.dto.MaterialCreateDto;
 import com.andrezzb.coursearchive.material.dto.MaterialUpdateDto;
@@ -29,9 +30,11 @@ import jakarta.validation.Valid;
 @RequestMapping("api/material")
 public class MaterialController {
   private final MaterialService materialService;
+  private final FileService fileService;
 
-  public MaterialController(MaterialService materialService) {
+  public MaterialController(MaterialService materialService, FileService fileService) {
     this.materialService = materialService;
+    this.fileService = fileService;
   }
 
   @GetMapping("/")
@@ -51,7 +54,7 @@ public class MaterialController {
   public ResponseEntity<Material> createMaterial(
       @Valid @RequestPart("material") MaterialCreateDto materialCreateDto,
       @ValidMaterialFile @RequestPart("file") MultipartFile file) {
-    var material = materialService.createMaterial(materialCreateDto);
+    var material = materialService.createMaterial(materialCreateDto, file);
     return ResponseEntity.status(HttpStatus.CREATED).body(material);
   }
 
@@ -59,6 +62,16 @@ public class MaterialController {
   public ResponseEntity<Material> getMaterialById(@PathVariable Long id) {
     var material = materialService.findMaterialById(id);
     return ResponseEntity.ok(material);
+  }
+
+  @GetMapping("/file/{id}")
+  public ResponseEntity<?> getMaterialFileById(@PathVariable Long id) {
+    var material = materialService.findMaterialById(id);
+    var fileDto = fileService.retreiveMaterialFile(material);
+
+    return ResponseEntity.ok()
+        .contentType(MediaType.parseMediaType(fileDto.getMaterialFile().getMimeType()))
+        .body(fileDto.getFileResource());
   }
 
   @PutMapping("/{id}")
