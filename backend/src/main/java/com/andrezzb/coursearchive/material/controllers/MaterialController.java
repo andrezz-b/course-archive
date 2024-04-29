@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import com.andrezzb.coursearchive.file.validators.MaterialFile;
+import com.andrezzb.coursearchive.file.validators.ValidMaterialFile;
 import com.andrezzb.coursearchive.material.dto.MaterialCreateDto;
 import com.andrezzb.coursearchive.material.dto.MaterialUpdateDto;
 import com.andrezzb.coursearchive.material.models.Material;
@@ -50,7 +50,7 @@ public class MaterialController {
   @PostMapping(path = "/", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<Material> createMaterial(
       @Valid @RequestPart("material") MaterialCreateDto materialCreateDto,
-      @MaterialFile @RequestPart("file") MultipartFile file) {
+      @ValidMaterialFile @RequestPart("file") MultipartFile file) {
     var material = materialService.createMaterial(materialCreateDto);
     return ResponseEntity.status(HttpStatus.CREATED).body(material);
   }
