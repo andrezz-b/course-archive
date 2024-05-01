@@ -2,9 +2,11 @@ package com.andrezzb.coursearchive.file.services;
 
 import java.io.IOException;
 import org.apache.tika.Tika;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import com.andrezzb.coursearchive.file.dto.FileDto;
+import com.andrezzb.coursearchive.file.exceptions.MaterialFileNotFoundException;
+import com.andrezzb.coursearchive.file.exceptions.StorageException;
 import com.andrezzb.coursearchive.file.models.MaterialFile;
 import com.andrezzb.coursearchive.file.repository.FileRepository;
 import com.andrezzb.coursearchive.material.models.Material;
@@ -21,13 +23,21 @@ public class FileService {
     this.tika = new Tika();
   }
 
-  public FileDto retreiveMaterialFile(Material material) {
-    MaterialFile materialFile = fileRepository.findByMaterial(material);
-    if (materialFile == null) {
-      throw new RuntimeException("Material file not found");
-    }
-    var resource = storageService.loadAsResource(materialFile.getPath());
-    return FileDto.builder().materialFile(materialFile).fileResource(resource).build();
+  public MaterialFile findMaterialFileByMaterial(Material material) {
+    return findMaterialFileByMaterialId(material.getId());
+  }
+
+  public MaterialFile findMaterialFileByMaterialId(Long materialId) {
+    return fileRepository.findByMaterialId(materialId).orElseThrow(() -> new MaterialFileNotFoundException(materialId));
+  }
+
+  public Resource loadMaterialFileResource(MaterialFile materialFile) {
+    return storageService.loadAsResource(materialFile.getPath());
+  }
+
+  public void deleteMaterialFile(MaterialFile materialFile) {
+    storageService.delete(materialFile.getPath());
+    fileRepository.delete(materialFile);
   }
 
   public void saveFile(MultipartFile file, Material material) {
@@ -36,7 +46,7 @@ public class FileService {
     try {
       materialFile.setMimeType(getFileType(file));
     } catch (Exception e) {
-      throw new RuntimeException("Failed to get file type", e);
+      throw new StorageException("Failed to get file type", e);
     }
     String filePathPrefix = generateFilePathPrefix(material);
     materialFile.setPath(filePathPrefix + "/" + file.getOriginalFilename());

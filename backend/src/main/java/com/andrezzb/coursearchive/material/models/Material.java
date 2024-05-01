@@ -1,10 +1,14 @@
 package com.andrezzb.coursearchive.material.models;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import com.andrezzb.coursearchive.file.models.MaterialFile;
 import com.andrezzb.coursearchive.security.models.AclSecured;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,6 +17,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -45,6 +50,20 @@ public class Material implements AclSecured {
   @UpdateTimestamp
   @Column(name = "updated_at")
   private LocalDateTime updatedAt;
+
+  @OneToMany(mappedBy = "material", orphanRemoval = true,
+      cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
+  private List<MaterialFile> files = new ArrayList<>();
+
+  public void addFile(MaterialFile file) {
+    files.add(file);
+    file.setMaterial(this);
+  }
+
+  public void removeFile(MaterialFile file) {
+    files.remove(file);
+    file.setMaterial(null);
+  }
 
   @Override
   public Object getParent() {

@@ -84,9 +84,18 @@ public class MaterialService {
     return materialRepository.save(material);
   }
 
+  @Transactional
   @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.material.models.Material', 'delete') || hasRole('MANAGER')")
   public void deleteMaterialById(Long id) {
-    materialRepository.deleteById(id);
+    Material material = null;
+    try {
+      material = findMaterialById(id);
+    } catch (Exception e) {
+      // Ignore if doesn't exist
+      return;
+    }
+    material.getFiles().forEach(fileService::deleteMaterialFile);
+    materialRepository.delete(material);
   }
 
 

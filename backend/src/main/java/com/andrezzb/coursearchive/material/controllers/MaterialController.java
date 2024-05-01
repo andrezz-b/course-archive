@@ -1,5 +1,6 @@
 package com.andrezzb.coursearchive.material.controllers;
 
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import com.andrezzb.coursearchive.file.models.MaterialFile;
 import com.andrezzb.coursearchive.file.services.FileService;
 import com.andrezzb.coursearchive.file.validators.ValidMaterialFile;
 import com.andrezzb.coursearchive.material.dto.MaterialCreateDto;
@@ -64,14 +66,14 @@ public class MaterialController {
     return ResponseEntity.ok(material);
   }
 
-  @GetMapping("/file/{id}")
-  public ResponseEntity<?> getMaterialFileById(@PathVariable Long id) {
-    var material = materialService.findMaterialById(id);
-    var fileDto = fileService.retreiveMaterialFile(material);
+  @GetMapping("/file/{materialId}")
+  public ResponseEntity<Resource> getMaterialFileById(@PathVariable Long materialId) {
+    MaterialFile materialFile = fileService.findMaterialFileByMaterialId(materialId);
+    Resource fileResource = fileService.loadMaterialFileResource(materialFile);
 
     return ResponseEntity.ok()
-        .contentType(MediaType.parseMediaType(fileDto.getMaterialFile().getMimeType()))
-        .body(fileDto.getFileResource());
+        .contentType(MediaType.parseMediaType(materialFile.getMimeType()))
+        .body(fileResource);
   }
 
   @PutMapping("/{id}")
