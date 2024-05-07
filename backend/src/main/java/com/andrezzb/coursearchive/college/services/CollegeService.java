@@ -1,7 +1,9 @@
 package com.andrezzb.coursearchive.college.services;
 
 import com.andrezzb.coursearchive.college.dto.CollegeCreateDto;
+import com.andrezzb.coursearchive.college.dto.CollegeDto;
 import com.andrezzb.coursearchive.college.dto.CollegeUpdateDto;
+import com.andrezzb.coursearchive.college.dto.CollegeWithProgramsDto;
 import com.andrezzb.coursearchive.college.exceptions.CollegeNotFoundException;
 import com.andrezzb.coursearchive.college.models.College;
 import com.andrezzb.coursearchive.college.repository.CollegeRepository;
@@ -30,30 +32,37 @@ public class CollegeService {
     }
 
     @PreAuthorize("hasRole('USER')")
-    public Page<College> findAllCollegesPaged(Pageable p) {
-        return collegeRepository.findAll(p);
+    public Page<CollegeDto> findAllCollegesPaged(Pageable p) {
+        Page<College> colleges = collegeRepository.findAll(p);
+        return colleges.map(college -> modelMapper.map(college, CollegeDto.class));
     }
 
     @PreAuthorize("hasRole('USER')")
-    public College findCollegeById(Long id) {
+    public CollegeWithProgramsDto findCollegeById(Long id) {
+        College college = findCollege(id);
+        return modelMapper.map(college, CollegeWithProgramsDto.class);
+    }
+
+    public College findCollege(Long id) {
         return collegeRepository.findById(id).orElseThrow(() -> new CollegeNotFoundException(id));
     }
 
     @Transactional
     @PreAuthorize("hasRole('MANAGER')")
-    public College createCollege(CollegeCreateDto collegeDto) {
-        College newCollege = modelMapper.map(collegeDto, College.class);
+    public CollegeDto createCollege(CollegeCreateDto createDto) {
+        College newCollege = modelMapper.map(createDto, College.class);
         College savedCollege = collegeRepository.save(newCollege);
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         aclUtilService.grantPermission(savedCollege, username, AclPermission.ADMINISTRATION);
-        return savedCollege;
+        return modelMapper.map(savedCollege, CollegeDto.class);
     }
 
     @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.college.models.College', write) || hasRole('MANAGER')")
-    public College updateCollege(Long id, CollegeUpdateDto collegeDto) {
-        College college = findCollegeById(id);
-        modelMapper.map(collegeDto, college);
-        return collegeRepository.save(college);
+    public CollegeDto updateCollege(Long id, CollegeUpdateDto updateDto) {
+        College college = findCollege(id);
+        modelMapper.map(updateDto, college);
+        College savedCollege = collegeRepository.save(college);
+        return modelMapper.map(savedCollege, CollegeDto.class);
     }
 
     @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.college.models.College', delete) || hasRole('MANAGER')")

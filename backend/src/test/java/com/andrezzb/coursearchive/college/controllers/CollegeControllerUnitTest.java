@@ -29,8 +29,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import com.andrezzb.coursearchive.college.dto.CollegeCreateDto;
+import com.andrezzb.coursearchive.college.dto.CollegeDto;
 import com.andrezzb.coursearchive.college.dto.CollegeUpdateDto;
-import com.andrezzb.coursearchive.college.models.College;
+import com.andrezzb.coursearchive.college.dto.CollegeWithProgramsDto;
 import com.andrezzb.coursearchive.college.services.CollegeService;
 import com.andrezzb.coursearchive.exceptions.ErrorObject;
 import com.andrezzb.coursearchive.security.SecurityConfig;
@@ -72,11 +73,11 @@ public class CollegeControllerUnitTest {
   class GetAllColleges {
     private static final String URL = "/api/college/";
 
-    private College college;
+    private CollegeDto college;
 
     @BeforeEach
     void setUp() {
-      college = new College();
+      college = new CollegeDto();
       college.setId(1L);
       college.setName("College Name");
     }
@@ -246,7 +247,7 @@ public class CollegeControllerUnitTest {
           .postcode(12345)
           .address("Address")
           .build();
-      College college = new College();
+      var college = new CollegeDto();
       college.setId(1L);
       modelMapper.map(collegeCreateDto, college);
 
@@ -273,7 +274,7 @@ public class CollegeControllerUnitTest {
     @WithMockUser
     void givenValidId_whenGetCollegeById_thenReturns() throws Exception {
       // Arrange
-      College college = new College();
+      var college = new CollegeWithProgramsDto();
       college.setId(1L);
       college.setName("College Name");
 
@@ -303,7 +304,7 @@ public class CollegeControllerUnitTest {
       CollegeUpdateDto collegeUpdateDto = CollegeUpdateDto.builder()
           .description("Description")
           .build();
-      College college = new College();
+      var college = new CollegeDto();
       college.setId(1L);
       college.setName("College Name");
       college.setDescription(collegeUpdateDto.getDescription());

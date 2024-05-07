@@ -47,7 +47,7 @@ public class ProgramService {
   @Transactional
   @PreAuthorize("hasPermission(#programDto.collegeId, 'com.andrezzb.coursearchive.college.models.College', create) || hasRole('MANAGER')")
   public Program createProgram(ProgramCreateDto programDto) {
-    var college = collegeService.findCollegeById(programDto.getCollegeId());
+    var college = collegeService.findCollege(programDto.getCollegeId());
     Program program = modelMapper.map(programDto, Program.class);
     program.setCollege(college);
     Program savedProgram = programRepository.save(program);

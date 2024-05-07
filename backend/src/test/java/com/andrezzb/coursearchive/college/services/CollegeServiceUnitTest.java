@@ -87,14 +87,14 @@ public class CollegeServiceUnitTest {
           .description("Test Description")
           .build();
 
-      when(collegeRepository.save(any(College.class))).thenReturn(null);
+      when(collegeRepository.save(any(College.class))).thenReturn(new College());
 
       // Act
       collegeService.createCollege(collegeDto);
       // Assert
       ArgumentCaptor<College> collegeCaptor = ArgumentCaptor.forClass(College.class);
       verify(collegeRepository).save(collegeCaptor.capture());
-      verify(aclUtilService).grantPermission(eq(null), any(String.class),
+      verify(aclUtilService).grantPermission(any(), any(String.class),
           eq(AclPermission.ADMINISTRATION));
 
       assertThat(collegeCaptor.getValue()).isNotNull();
@@ -149,7 +149,7 @@ public class CollegeServiceUnitTest {
           .build();
 
       when(collegeRepository.findById(collegeId)).thenReturn(Optional.of(college));
-      when(collegeRepository.save(any(College.class))).thenReturn(null);
+      when(collegeRepository.save(any(College.class))).thenReturn(college);
 
       collegeService.updateCollege(collegeId, collegeDto);
       ArgumentCaptor<College> collegeCaptor = ArgumentCaptor.forClass(College.class);
@@ -188,7 +188,7 @@ public class CollegeServiceUnitTest {
           .build();
 
       when(collegeRepository.findById(collegeId)).thenReturn(Optional.of(college));
-      when(collegeRepository.save(any(College.class))).thenReturn(null);
+      when(collegeRepository.save(any(College.class))).thenReturn(college);
 
       collegeService.updateCollege(collegeId, collegeDto);
       ArgumentCaptor<College> collegeCaptor = ArgumentCaptor.forClass(College.class);

@@ -86,7 +86,7 @@ public class ProgramServiceUnitTest {
         ProgramCreateDto createDto =
             ProgramCreateDto.builder().name("Test program").collegeId(1L).build();
 
-        when(collegeService.findCollegeById(1L)).thenThrow(new CollegeNotFoundException(1L));
+        when(collegeService.findCollege(1L)).thenThrow(new CollegeNotFoundException(1L));
 
         assertThatThrownBy(() -> programService.createProgram(createDto))
             .isInstanceOf(CollegeNotFoundException.class);
@@ -101,13 +101,13 @@ public class ProgramServiceUnitTest {
         College college = new College();
         college.setId(1L);
 
-        when(collegeService.findCollegeById(college.getId())).thenReturn(college);
+        when(collegeService.findCollege(college.getId())).thenReturn(college);
         when(programRepository.save(any(Program.class))).thenReturn(null);
 
         programService.createProgram(createDto);
 
         ArgumentCaptor<Program> programCaptor = ArgumentCaptor.forClass(Program.class);
-        verify(collegeService).findCollegeById(1L);
+        verify(collegeService).findCollege(1L);
 
         verify(aclUtilService).grantPermission(eq(null), any(String.class),
             eq(AclPermission.ADMINISTRATION));

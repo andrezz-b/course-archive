@@ -1,8 +1,9 @@
 package com.andrezzb.coursearchive.college.controllers;
 
 import com.andrezzb.coursearchive.college.dto.CollegeCreateDto;
+import com.andrezzb.coursearchive.college.dto.CollegeDto;
 import com.andrezzb.coursearchive.college.dto.CollegeUpdateDto;
-import com.andrezzb.coursearchive.college.models.College;
+import com.andrezzb.coursearchive.college.dto.CollegeWithProgramsDto;
 import com.andrezzb.coursearchive.college.services.CollegeService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -28,7 +29,7 @@ public class CollegeController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<Page<College>> getAllColleges(
+    public ResponseEntity<Page<CollegeDto>> getAllColleges(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
             @RequestParam(defaultValue = "asc") String sortDirection,
@@ -41,20 +42,20 @@ public class CollegeController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<College> createCollege(@Valid @RequestBody CollegeCreateDto college) {
+    public ResponseEntity<CollegeDto> createCollege(@Valid @RequestBody CollegeCreateDto college) {
         final var createdCollege = collegeService.createCollege(college);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdCollege);
     }
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<College> getCollegeById(@PathVariable Long id) {
+    public ResponseEntity<CollegeWithProgramsDto> getCollegeById(@PathVariable Long id) {
         final var college = collegeService.findCollegeById(id);
         return ResponseEntity.ok(college);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<College> updateCollegeById(@PathVariable Long id,
+    public ResponseEntity<CollegeDto> updateCollegeById(@PathVariable Long id,
             @Valid @RequestBody CollegeUpdateDto collegeUpdateDto) {
         var updateCollege = collegeService.updateCollege(id, collegeUpdateDto);
         return ResponseEntity.status(HttpStatus.OK).body(updateCollege);
