@@ -3,8 +3,12 @@ package com.andrezzb.coursearchive.college.controllers;
 import com.andrezzb.coursearchive.college.dto.CollegeCreateDto;
 import com.andrezzb.coursearchive.college.dto.CollegeDto;
 import com.andrezzb.coursearchive.college.dto.CollegeUpdateDto;
+import com.andrezzb.coursearchive.college.models.College;
 import com.andrezzb.coursearchive.college.services.CollegeService;
+import com.andrezzb.coursearchive.validators.ValidEnum;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,13 +33,14 @@ public class CollegeController {
 
     @GetMapping("/")
     public ResponseEntity<Page<CollegeDto>> getAllColleges(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
-            @RequestParam(defaultValue = "asc") String sortDirection,
-            @RequestParam(defaultValue = "id") String sortField) {
-        Sort.Direction direction =
-                sortDirection.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
-        Pageable p = PageRequest.of(page, size, Sort.by(direction, sortField));
+            @PositiveOrZero @RequestParam(defaultValue = "0") int page,
+            @Positive @RequestParam(defaultValue = "5") int size,
+            @ValidEnum(enumClazz = Sort.Direction.class, ignoreCase = true) @RequestParam(
+                    defaultValue = "asc") String sortDirection,
+            @ValidEnum(enumClazz = College.SortField.class) @RequestParam(
+                    defaultValue = "id") String sortField) {
+        Pageable p = PageRequest.of(page, size,
+                Sort.by(Sort.Direction.fromString(sortDirection), sortField));
         final var collegesPaged = collegeService.findAllCollegesPaged(p);
         return ResponseEntity.ok(collegesPaged);
     }

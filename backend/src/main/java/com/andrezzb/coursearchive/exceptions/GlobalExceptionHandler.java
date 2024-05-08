@@ -37,8 +37,13 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(HandlerMethodValidationException.class)
   public ResponseEntity<ErrorObject> onHandlerMethodValidationException(
       HandlerMethodValidationException e) {
-    List<String> errors = e.getAllErrors().stream().map(error -> error.getDefaultMessage())
-        .toList();
+    // Map errors with fieldName: error1, error2, ...
+    List<String> errors = e.getAllValidationResults().stream()
+        .map(error -> error.getMethodParameter().getParameterName()
+            + ": "
+            + error.getResolvableErrors().stream().map(err -> err.getDefaultMessage())
+                .collect(Collectors.joining(", ")))
+        .collect(Collectors.toList());
     final ErrorObject error = new ErrorObject(HttpStatus.BAD_REQUEST, errors);
     return ResponseEntity.status(error.getStatus()).body(error);
   }

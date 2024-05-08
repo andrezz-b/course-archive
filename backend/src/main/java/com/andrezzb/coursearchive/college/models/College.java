@@ -67,4 +67,8 @@ public class College implements AclSecured {
     public Object getParent() {
         return null;
     }
+
+    public enum SortField {
+        name, id
+    }
 }
