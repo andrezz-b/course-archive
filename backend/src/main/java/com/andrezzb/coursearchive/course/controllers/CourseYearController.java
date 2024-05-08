@@ -6,6 +6,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.andrezzb.coursearchive.course.services.CourseYearService;
+import com.andrezzb.coursearchive.repository.FilterValueMapper;
+import com.andrezzb.coursearchive.validators.ValidEnum;
+import com.andrezzb.coursearchive.course.dto.CouresYearDto;
 import com.andrezzb.coursearchive.course.dto.CourseYearCreateDto;
 import com.andrezzb.coursearchive.course.dto.CourseYearUpdateDto;
 import com.andrezzb.coursearchive.course.models.CourseYear;
@@ -17,6 +20,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestParam;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,33 +38,39 @@ public class CourseYearController {
   }
 
   @GetMapping("/")
-  public ResponseEntity<Page<CourseYear>> getAllCourseYears(
-      @RequestParam(defaultValue = "0") int page,
-      @RequestParam(defaultValue = "5") int size,
-      @RequestParam(defaultValue = "asc") String sortDirection,
-      @RequestParam(defaultValue = "id") String sortField) {
-    Sort.Direction direction =
-        sortDirection.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
-    Pageable p = PageRequest.of(page, size, Sort.by(direction, sortField));
-    final var courseYearsPaged = courseYearService.findAllCourseYearsPaged(p);
+  public ResponseEntity<Page<CouresYearDto>> getAllCourseYears(
+      @PositiveOrZero @RequestParam(defaultValue = "0") int page,
+      @Positive @RequestParam(defaultValue = "5") int size,
+      @ValidEnum(enumClazz = Sort.Direction.class,
+          ignoreCase = true) @RequestParam(defaultValue = "asc") String sortDirection,
+      @ValidEnum(enumClazz = CourseYear.SortField.class) @RequestParam(
+          defaultValue = "id") String sortField,
+      @ValidEnum(enumClazz = CourseYear.FilterField.class, required = false) @RequestParam(
+          required = false) String filterField,
+      @RequestParam(required = false) String filterValue,
+      @RequestParam(required = false) Long courseId) {
+
+    Object filterValueObj = FilterValueMapper.mapFilterValue(CourseYear.FilterField.class, filterField, filterValue);
+    Pageable p = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortField));
+    final var courseYearsPaged = courseYearService.findAllCourseYearsPaged(p, filterField, filterValueObj, courseId);
     return ResponseEntity.ok(courseYearsPaged);
   }
 
   @PostMapping("/")
-  public ResponseEntity<CourseYear> createCourseYear(
+  public ResponseEntity<CouresYearDto> createCourseYear(
       @Valid @RequestBody CourseYearCreateDto createDto) {
     var courseYear = courseYearService.createCourseYear(createDto);
     return ResponseEntity.status(HttpStatus.CREATED).body(courseYear);
   }
 
   @GetMapping("/{id}")
-  private ResponseEntity<CourseYear> getCourseYearById(@PathVariable Long id) {
+  private ResponseEntity<CouresYearDto> getCourseYearById(@PathVariable Long id) {
     final var courseYear = courseYearService.findCourseYearById(id);
     return ResponseEntity.ok(courseYear);
   }
 
   @PutMapping("/{id}")
-  private ResponseEntity<CourseYear> updateCourseYearById(@PathVariable Long id,
+  private ResponseEntity<CouresYearDto> updateCourseYearById(@PathVariable Long id,
       @Valid @RequestBody CourseYearUpdateDto updateDto) {
     final var courseYear = courseYearService.updateCourseYear(id, updateDto);
     return ResponseEntity.ok(courseYear);

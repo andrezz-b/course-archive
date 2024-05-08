@@ -45,7 +45,7 @@ public class MaterialGroupService {
   @Transactional
   @PreAuthorize("hasPermission(#materialGroupDto.courseYearId, 'com.andrezzb.coursearchive.course.models.CourseYear', create) || hasRole('MANAGER')")
   public MaterialGroup createMaterialGroup(MaterialGroupCreateDto materialGroupDto) {
-    var courseYear = courseYearService.findCourseYearById(materialGroupDto.getCourseYearId());
+    var courseYear = courseYearService.findCourseYear(materialGroupDto.getCourseYearId());
 
     Short displayOrder =
         getNewDisplayOrder(courseYear.getId(), null, materialGroupDto.getDisplayOrder());

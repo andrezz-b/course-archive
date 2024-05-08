@@ -17,6 +17,7 @@ import com.andrezzb.coursearchive.program.dto.ProgramDto;
 import com.andrezzb.coursearchive.program.dto.ProgramUpdateDto;
 import com.andrezzb.coursearchive.program.models.Program;
 import com.andrezzb.coursearchive.program.services.ProgramService;
+import com.andrezzb.coursearchive.repository.FilterValueMapper;
 import com.andrezzb.coursearchive.validators.ValidEnum;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -48,7 +49,7 @@ public class ProgramController {
       @RequestParam(required = false) String filterValue,
       @RequestParam(required = false) Long collegeId) {
 
-    Object filterValueObj = Program.FilterField.mapFilterValue(filterField, filterValue);
+    Object filterValueObj = FilterValueMapper.mapFilterValue(Program.FilterField.class, filterField, filterValue);
     Pageable p =
         PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortField));
     final var programsPaged =

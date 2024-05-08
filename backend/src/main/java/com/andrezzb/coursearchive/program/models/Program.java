@@ -9,6 +9,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
 import com.andrezzb.coursearchive.college.models.College;
 import com.andrezzb.coursearchive.course.models.Course;
+import com.andrezzb.coursearchive.repository.FilterValueMapper;
 import com.andrezzb.coursearchive.security.models.AclSecured;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
@@ -85,21 +86,14 @@ public class Program implements AclSecured {
     return college;
   }
 
-  public static enum FilterField {
-    name, duration;
-
-    public static Object mapFilterValue(String filterField, String filterValue) {
-      if (filterField == null || filterValue == null || filterValue.isBlank()) {
-        return null;
+  public static enum FilterField implements FilterValueMapper {
+    name, duration {
+      @Override
+      public Object map(String filterValue) {
+        return Short.parseShort(filterValue);
       }
-      var enumValue = FilterField.valueOf(filterField);
-      switch (enumValue) {
-        case duration:
-          return Short.parseShort(filterValue);
-        default:
-          return filterValue;
-      }
-    }
+    
+    };
   }
 
   public static enum SortField {

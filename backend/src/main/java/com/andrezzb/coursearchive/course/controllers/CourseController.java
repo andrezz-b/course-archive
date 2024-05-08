@@ -8,6 +8,7 @@ import com.andrezzb.coursearchive.course.dto.CourseDto;
 import com.andrezzb.coursearchive.course.dto.CourseUpdateDto;
 import com.andrezzb.coursearchive.course.models.Course;
 import com.andrezzb.coursearchive.course.services.CourseService;
+import com.andrezzb.coursearchive.repository.FilterValueMapper;
 import com.andrezzb.coursearchive.validators.ValidEnum;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -48,7 +49,7 @@ public class CourseController {
       @RequestParam(required = false) String filterValue,
       @RequestParam(required = false) Long programId) {
 
-    Object filterValueObj = Course.FilterField.mapFilterValue(filterField, filterValue);
+    Object filterValueObj = FilterValueMapper.mapFilterValue(Course.FilterField.class, filterField, filterValue);
     Pageable p =
         PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortField));
     final var coursesPaged =

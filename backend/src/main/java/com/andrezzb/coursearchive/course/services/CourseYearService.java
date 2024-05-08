@@ -7,6 +7,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.andrezzb.coursearchive.course.dto.CouresYearDto;
 import com.andrezzb.coursearchive.course.dto.CourseYearCreateDto;
 import com.andrezzb.coursearchive.course.dto.CourseYearUpdateDto;
 import com.andrezzb.coursearchive.course.exceptions.CourseYearNotFoundException;
@@ -34,18 +35,30 @@ public class CourseYearService {
   }
 
   @PreAuthorize("hasRole('USER')")
-  public Page<CourseYear> findAllCourseYearsPaged(Pageable p) {
-    return courseYearRepository.findAll(p);
+  public Page<CouresYearDto> findAllCourseYearsPaged(Pageable p) {
+    return findAllCourseYearsPaged(p, null, null, null);
   }
 
   @PreAuthorize("hasRole('USER')")
-  public CourseYear findCourseYearById(Long id) {
+  public Page<CouresYearDto> findAllCourseYearsPaged(Pageable p, String filterField,
+      Object filterValue, Long courseId) {
+    var years =
+        courseYearRepository.findAllByFilterFieldAndValue(p, filterField, filterValue, courseId);
+    return years.map(year -> modelMapper.map(year, CouresYearDto.class));
+  }
+
+  @PreAuthorize("hasRole('USER')")
+  public CouresYearDto findCourseYearById(Long id) {
+    return modelMapper.map(findCourseYear(id), CouresYearDto.class);
+  }
+
+  public CourseYear findCourseYear(Long id) {
     return courseYearRepository.findById(id).orElseThrow(() -> new CourseYearNotFoundException(id));
   }
 
   @Transactional
   @PreAuthorize("hasPermission(#courseYearDto.courseId, 'com.andrezzb.coursearchive.course.models.Course', create) || hasRole('MANAGER')")
-  public CourseYear createCourseYear(CourseYearCreateDto courseYearDto) {
+  public CouresYearDto createCourseYear(CourseYearCreateDto courseYearDto) {
     var course = courseService.findCourseById(courseYearDto.getCourseId());
     CourseYear courseYear = modelMapper.map(courseYearDto, CourseYear.class);
     courseYear.setCourse(course);
@@ -54,14 +67,14 @@ public class CourseYearService {
 
     String username = SecurityContextHolder.getContext().getAuthentication().getName();
     aclUtilService.grantPermission(savedCourseYear, username, AclPermission.ADMINISTRATION);
-    return savedCourseYear;
+    return modelMapper.map(savedCourseYear, CouresYearDto.class);
   }
 
   @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.course.models.CourseYear', write) || hasRole('MANAGER')")
-  public CourseYear updateCourseYear(Long id, CourseYearUpdateDto courseYearDto) {
-    CourseYear courseYear = findCourseYearById(id);
+  public CouresYearDto updateCourseYear(Long id, CourseYearUpdateDto courseYearDto) {
+    CourseYear courseYear = findCourseYear(id);
     modelMapper.map(courseYearDto, courseYear);
-    return courseYearRepository.save(courseYear);
+    return modelMapper.map(courseYearRepository.save(courseYear), CouresYearDto.class);
   }
 
   @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.course.models.CourseYear', delete) || hasRole('MANAGER')")
