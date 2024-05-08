@@ -15,7 +15,6 @@ import com.andrezzb.coursearchive.exceptions.ErrorObject;
 import com.andrezzb.coursearchive.program.dto.ProgramCreateDto;
 import com.andrezzb.coursearchive.program.dto.ProgramDto;
 import com.andrezzb.coursearchive.program.dto.ProgramUpdateDto;
-import com.andrezzb.coursearchive.program.models.Program;
 import com.andrezzb.coursearchive.program.services.ProgramService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,9 +38,10 @@ import com.andrezzb.coursearchive.security.SecurityConfig;
 import com.andrezzb.coursearchive.security.repository.UserRepository;
 import com.andrezzb.coursearchive.security.services.CustomUserDetailsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.var;
 
 @WebMvcTest(ProgramController.class)
-@Import({ SecurityConfig.class, CustomUserDetailsService.class })
+@Import({SecurityConfig.class, CustomUserDetailsService.class})
 @WebAppConfiguration
 public class ProgramControllerUnitTest {
   @MockBean
@@ -85,7 +85,7 @@ public class ProgramControllerUnitTest {
     @WithMockUser
     void givenNoParams_whenGetAllPrograms_thenReturnsListOfPagedProgramsUsingDefaultParams()
         throws Exception {
-      when(programService.findAllProgramsPaged(any(Pageable.class)))
+      when(programService.findAllProgramsPaged(any(Pageable.class), any(), any(), any()))
           .thenReturn(new PageImpl<>(List.of(program)));
 
       mvc.perform(MockMvcRequestBuilders.get(URL))
@@ -96,7 +96,7 @@ public class ProgramControllerUnitTest {
               jsonPath("$.content[0].name").value(program.getName()));
 
       ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
-      verify(programService).findAllProgramsPaged(pageableCaptor.capture());
+      verify(programService).findAllProgramsPaged(pageableCaptor.capture(), any(), any(), any());
       Pageable pageable = pageableCaptor.getValue();
       assertThat(pageable.getPageNumber()).isEqualTo(0);
       assertThat(pageable.getPageSize()).isEqualTo(5);
@@ -113,7 +113,7 @@ public class ProgramControllerUnitTest {
       String sortDirection = "desc";
       String sortField = "name";
 
-      when(programService.findAllProgramsPaged(any(Pageable.class)))
+      when(programService.findAllProgramsPaged(any(Pageable.class), any(), any(), any()))
           .thenReturn(new PageImpl<>(List.of()));
 
       // Act
@@ -128,7 +128,7 @@ public class ProgramControllerUnitTest {
               jsonPath("$.content[0]").doesNotExist());
 
       ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
-      verify(programService).findAllProgramsPaged(pageableCaptor.capture());
+      verify(programService).findAllProgramsPaged(pageableCaptor.capture(), any(), any(), any());
       Pageable pageable = pageableCaptor.getValue();
       assertThat(pageable.getPageNumber()).isEqualTo(page);
       assertThat(pageable.getPageSize()).isEqualTo(size);
@@ -213,7 +213,7 @@ public class ProgramControllerUnitTest {
           .collegeId(1L)
           .build();
 
-      Program program = new Program();
+      var program = new ProgramDto();
       program.setId(1l);
       program.setName(programCreateDto.getName());
       when(programService.createProgram(any(ProgramCreateDto.class)))
@@ -238,7 +238,7 @@ public class ProgramControllerUnitTest {
     @Test
     @WithMockUser
     void givenValidId_whenGetProgramById_thenReturnsProgram() throws Exception {
-      Program program = new Program();
+      var program = new ProgramDto();
       program.setId(1L);
       program.setName("Program name");
 
@@ -262,12 +262,13 @@ public class ProgramControllerUnitTest {
 
     @Test
     @WithMockUser
-    void givenValidIdAndProgramUpdateDto_whenUpdateProgramById_thenReturnsUpdated() throws Exception {
+    void givenValidIdAndProgramUpdateDto_whenUpdateProgramById_thenReturnsUpdated()
+        throws Exception {
       ProgramUpdateDto programUpdateDto = ProgramUpdateDto.builder()
           .description("My new description")
           .build();
 
-      Program program = new Program();
+      var program = new ProgramDto();
       program.setId(1l);
       program.setDescription(programUpdateDto.getDescription());
 
@@ -282,9 +283,11 @@ public class ProgramControllerUnitTest {
               jsonPath("$.id").value(program.getId()),
               jsonPath("$.description").value(program.getDescription()));
 
-      ArgumentCaptor<ProgramUpdateDto> programUpdateDtoCaptor = ArgumentCaptor.forClass(ProgramUpdateDto.class);
+      ArgumentCaptor<ProgramUpdateDto> programUpdateDtoCaptor =
+          ArgumentCaptor.forClass(ProgramUpdateDto.class);
       verify(programService).updateProgram(eq(1L), programUpdateDtoCaptor.capture());
-      assertThat(programUpdateDtoCaptor.getValue().getDescription()).isEqualTo(programUpdateDto.getDescription());
+      assertThat(programUpdateDtoCaptor.getValue().getDescription())
+          .isEqualTo(programUpdateDto.getDescription());
     }
   }
 

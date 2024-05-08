@@ -1,12 +1,19 @@
 package com.andrezzb.coursearchive.college.models;
 
-import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import com.andrezzb.coursearchive.program.models.Program;
 import com.andrezzb.coursearchive.security.models.AclSecured;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -75,11 +82,12 @@ public class College implements AclSecured {
     public enum FilterField {
         name, city, postcode;
 
-        public static Object mapFilterValue(FilterField filterField, String filterValue) {
-            if (filterValue == null || filterValue.length() == 0) {
+        public static Object mapFilterValue(String filterField, String filterValue) {
+            if (filterField == null || filterValue == null || filterValue.isBlank()) {
                 return null;
             }
-            switch (filterField) {
+            var enumValue = FilterField.valueOf(filterField);
+            switch (enumValue) {
                 case postcode:
                     return Integer.parseInt(filterValue);
                 default:

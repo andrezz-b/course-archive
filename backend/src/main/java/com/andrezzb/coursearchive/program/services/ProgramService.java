@@ -41,7 +41,7 @@ public class ProgramService {
   }
 
   @PreAuthorize("hasRole('USER')")
-  public Page<ProgramDto> findAllProgramsPaged(Pageable p, Program.FilterField filterField,
+  public Page<ProgramDto> findAllProgramsPaged(Pageable p, String filterField,
       Object filterValue, Long collegeId) {
     Page<Program> programs = programRepository.findAllByFilterFieldAndValue(p, filterField,
         filterValue, collegeId);
@@ -50,13 +50,18 @@ public class ProgramService {
   }
 
   @PreAuthorize("hasRole('USER')")
-  public Program findProgramById(Long id) {
+  public ProgramDto findProgramById(Long id) {
+    var program = findProgram(id);
+    return modelMapper.map(program, ProgramDto.class);
+  }
+
+  public Program findProgram(Long id) {
     return programRepository.findById(id).orElseThrow(() -> new ProgramNotFoundException(id));
   }
 
   @Transactional
   @PreAuthorize("hasPermission(#programDto.collegeId, 'com.andrezzb.coursearchive.college.models.College', create) || hasRole('MANAGER')")
-  public Program createProgram(ProgramCreateDto programDto) {
+  public ProgramDto createProgram(ProgramCreateDto programDto) {
     var college = collegeService.findCollege(programDto.getCollegeId());
     Program program = modelMapper.map(programDto, Program.class);
     program.setCollege(college);
@@ -65,14 +70,15 @@ public class ProgramService {
 
     String username = SecurityContextHolder.getContext().getAuthentication().getName();
     aclUtilService.grantPermission(savedProgram, username, AclPermission.ADMINISTRATION);
-    return savedProgram;
+    return modelMapper.map(savedProgram, ProgramDto.class);
   }
 
   @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.program.models.Program', write) || hasRole('MANAGER')")
-  public Program updateProgram(Long id, @Valid ProgramUpdateDto programUpdateDto) {
-    Program program = findProgramById(id);
+  public ProgramDto updateProgram(Long id, @Valid ProgramUpdateDto programUpdateDto) {
+    Program program = findProgram(id);
     modelMapper.map(programUpdateDto, program);
-    return programRepository.save(program);
+    var savedProgram = programRepository.save(program);
+    return modelMapper.map(savedProgram, ProgramDto.class);
   }
 
   @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.program.models.Program', delete) || hasRole('MANAGER')")

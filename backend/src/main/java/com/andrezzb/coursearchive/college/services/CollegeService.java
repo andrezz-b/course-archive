@@ -31,7 +31,7 @@ public class CollegeService {
     }
 
     @PreAuthorize("hasRole('USER')")
-    public Page<CollegeDto> findAllCollegesPaged(Pageable p, College.FilterField filterField, Object filterValue) {
+    public Page<CollegeDto> findAllCollegesPaged(Pageable p, String filterField, Object filterValue) {
         Page<College> colleges = collegeRepository.findAllByFilterFieldAndFilterValue(p, filterField, filterValue);
         return colleges.map(college -> modelMapper.map(college, CollegeDto.class));
     }

@@ -78,4 +78,31 @@ public class Course implements AclSecured {
   public Object getParent() {
     return program;
   }
+
+  public static enum FilterField {
+    name, credits, year;
+
+    public static Object mapFilterValue(String filterField, String filterValue) {
+      var enumValue = FilterField.valueOf(filterField);
+      return mapFilterValue(enumValue, filterValue);
+    }
+
+    public static Object mapFilterValue(FilterField filterField, String filterValue) {
+      if (filterValue == null || filterValue.length() == 0) {
+        return null;
+      }
+      switch (filterField) {
+        case credits:
+          return Short.parseShort(filterValue);
+        case year:
+          return Short.parseShort(filterValue);
+        default:
+          return filterValue;
+      }
+    }
+  }
+
+  public static enum SortField {
+    id, name
+  }
 }

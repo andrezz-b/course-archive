@@ -48,31 +48,29 @@ public class ProgramController {
       @RequestParam(required = false) String filterValue,
       @RequestParam(required = false) Long collegeId) {
 
-    Program.FilterField filterFieldEnum =
-        filterField != null ? Program.FilterField.valueOf(filterField) : null;
-    Object filterValueObj = Program.FilterField.mapFilterValue(filterFieldEnum, filterValue);
+    Object filterValueObj = Program.FilterField.mapFilterValue(filterField, filterValue);
     Pageable p =
         PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortField));
     final var programsPaged =
-        programService.findAllProgramsPaged(p, filterFieldEnum, filterValueObj, collegeId);
+        programService.findAllProgramsPaged(p, filterField, filterValueObj, collegeId);
     return ResponseEntity.ok(programsPaged);
   }
 
   @PostMapping("/")
-  public ResponseEntity<Program> createProgram(
+  public ResponseEntity<ProgramDto> createProgram(
       @Valid @RequestBody ProgramCreateDto programCreateDto) {
     var program = programService.createProgram(programCreateDto);
     return ResponseEntity.status(HttpStatus.CREATED).body(program);
   }
 
   @GetMapping("/{id}")
-  private ResponseEntity<Program> getProgramById(@PathVariable Long id) {
+  private ResponseEntity<ProgramDto> getProgramById(@PathVariable Long id) {
     final var program = programService.findProgramById(id);
     return ResponseEntity.ok(program);
   }
 
   @PutMapping("/{id}")
-  private ResponseEntity<Program> updateProgramById(@PathVariable Long id,
+  private ResponseEntity<ProgramDto> updateProgramById(@PathVariable Long id,
       @Valid @RequestBody ProgramUpdateDto programUpdateDto) {
     var program = programService.updateProgram(id, programUpdateDto);
     return ResponseEntity.status(HttpStatus.OK).body(program);

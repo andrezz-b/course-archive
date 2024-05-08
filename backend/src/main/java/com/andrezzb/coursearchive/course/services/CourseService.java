@@ -8,6 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.andrezzb.coursearchive.course.dto.CourseCreateDto;
+import com.andrezzb.coursearchive.course.dto.CourseDto;
 import com.andrezzb.coursearchive.course.dto.CourseUpdateDto;
 import com.andrezzb.coursearchive.course.exceptions.CourseNotFoundException;
 import com.andrezzb.coursearchive.course.models.Course;
@@ -33,8 +34,17 @@ public class CourseService {
   }
 
   @PreAuthorize("hasRole('USER')")
-  public Page<Course> findAllCoursesPaged(Pageable p) {
-    return courseRepository.findAll(p);
+  public Page<CourseDto> findAllCoursesPaged(Pageable p) {
+    return findAllCoursesPaged(p, null, null, null);
+  }
+
+  @PreAuthorize("hasRole('USER')")
+  public Page<CourseDto> findAllCoursesPaged(Pageable p, String filterField,
+      Object filterValue, Long programId) {
+    Page<Course> courses = courseRepository.findAllByFilterFieldAndValue(p, filterField,
+        filterValue, programId);
+    return courses.map(course -> modelMapper.map(course, CourseDto.class));
+
   }
 
   @PreAuthorize("hasRole('USER')")
@@ -45,7 +55,7 @@ public class CourseService {
   @Transactional
   @PreAuthorize("hasPermission(#courseDto.programId, 'com.andrezzb.coursearchive.program.models.Program', create) || hasRole('MANAGER')")
   public Course createCourse(CourseCreateDto courseDto) {
-    var program = programService.findProgramById(courseDto.getProgramId());
+    var program = programService.findProgram(courseDto.getProgramId());
     Course course = modelMapper.map(courseDto, Course.class);
     course.setProgram(program);
     course.setId(null);

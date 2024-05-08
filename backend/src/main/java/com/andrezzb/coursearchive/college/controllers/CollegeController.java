@@ -42,13 +42,11 @@ public class CollegeController {
             @ValidEnum(enumClazz = College.FilterField.class, required = false) @RequestParam(
                     required = false) String filterField,
             @RequestParam(required = false) String filterValue) {
-        College.FilterField filterFieldEnum =
-                filterField != null ? College.FilterField.valueOf(filterField) : null;
-        Object filterValueObj = College.FilterField.mapFilterValue(filterFieldEnum, filterValue);
+        Object filterValueObj = College.FilterField.mapFilterValue(filterField, filterValue);
         Pageable p = PageRequest.of(page, size,
                 Sort.by(Sort.Direction.fromString(sortDirection), sortField));
         final var collegesPaged =
-                collegeService.findAllCollegesPaged(p, filterFieldEnum, filterValueObj);
+                collegeService.findAllCollegesPaged(p, filterField, filterValueObj);
         return ResponseEntity.ok(collegesPaged);
     }
 

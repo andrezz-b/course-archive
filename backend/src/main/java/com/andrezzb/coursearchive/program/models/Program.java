@@ -88,11 +88,12 @@ public class Program implements AclSecured {
   public static enum FilterField {
     name, duration;
 
-    public static Object mapFilterValue(FilterField filterField, String filterValue) {
-      if (filterValue == null || filterValue.length() == 0) {
+    public static Object mapFilterValue(String filterField, String filterValue) {
+      if (filterField == null || filterValue == null || filterValue.isBlank()) {
         return null;
       }
-      switch (filterField) {
+      var enumValue = FilterField.valueOf(filterField);
+      switch (enumValue) {
         case duration:
           return Short.parseShort(filterValue);
         default:
