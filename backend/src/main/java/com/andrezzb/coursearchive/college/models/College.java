@@ -71,4 +71,20 @@ public class College implements AclSecured {
     public enum SortField {
         name, id
     }
+
+    public enum FilterField {
+        name, city, postcode;
+
+        public static Object mapFilterValue(FilterField filterField, String filterValue) {
+            if (filterValue == null || filterValue.length() == 0) {
+                return null;
+            }
+            switch (filterField) {
+                case postcode:
+                    return Integer.parseInt(filterValue);
+                default:
+                    return filterValue;
+            }
+        }
+    }
 }

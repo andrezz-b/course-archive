@@ -35,13 +35,20 @@ public class CollegeController {
     public ResponseEntity<Page<CollegeDto>> getAllColleges(
             @PositiveOrZero @RequestParam(defaultValue = "0") int page,
             @Positive @RequestParam(defaultValue = "5") int size,
-            @ValidEnum(enumClazz = Sort.Direction.class, ignoreCase = true) @RequestParam(
-                    defaultValue = "asc") String sortDirection,
+            @ValidEnum(enumClazz = Sort.Direction.class,
+                    ignoreCase = true) @RequestParam(defaultValue = "asc") String sortDirection,
             @ValidEnum(enumClazz = College.SortField.class) @RequestParam(
-                    defaultValue = "id") String sortField) {
+                    defaultValue = "id") String sortField,
+            @ValidEnum(enumClazz = College.FilterField.class, required = false) @RequestParam(
+                    required = false) String filterField,
+            @RequestParam(required = false) String filterValue) {
+        College.FilterField filterFieldEnum =
+                filterField != null ? College.FilterField.valueOf(filterField) : null;
+        Object filterValueObj = College.FilterField.mapFilterValue(filterFieldEnum, filterValue);
         Pageable p = PageRequest.of(page, size,
                 Sort.by(Sort.Direction.fromString(sortDirection), sortField));
-        final var collegesPaged = collegeService.findAllCollegesPaged(p);
+        final var collegesPaged =
+                collegeService.findAllCollegesPaged(p, filterFieldEnum, filterValueObj);
         return ResponseEntity.ok(collegesPaged);
     }
 
