@@ -3,7 +3,6 @@ package com.andrezzb.coursearchive.college.controllers;
 import com.andrezzb.coursearchive.college.dto.CollegeCreateDto;
 import com.andrezzb.coursearchive.college.dto.CollegeDto;
 import com.andrezzb.coursearchive.college.dto.CollegeUpdateDto;
-import com.andrezzb.coursearchive.college.dto.CollegeWithProgramsDto;
 import com.andrezzb.coursearchive.college.services.CollegeService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -49,7 +48,7 @@ public class CollegeController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<CollegeWithProgramsDto> getCollegeById(@PathVariable Long id) {
+    public ResponseEntity<CollegeDto> getCollegeById(@PathVariable Long id) {
         final var college = collegeService.findCollegeById(id);
         return ResponseEntity.ok(college);
     }

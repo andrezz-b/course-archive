@@ -31,7 +31,6 @@ import org.springframework.web.context.WebApplicationContext;
 import com.andrezzb.coursearchive.college.dto.CollegeCreateDto;
 import com.andrezzb.coursearchive.college.dto.CollegeDto;
 import com.andrezzb.coursearchive.college.dto.CollegeUpdateDto;
-import com.andrezzb.coursearchive.college.dto.CollegeWithProgramsDto;
 import com.andrezzb.coursearchive.college.services.CollegeService;
 import com.andrezzb.coursearchive.exceptions.ErrorObject;
 import com.andrezzb.coursearchive.security.SecurityConfig;
@@ -274,7 +273,7 @@ public class CollegeControllerUnitTest {
     @WithMockUser
     void givenValidId_whenGetCollegeById_thenReturns() throws Exception {
       // Arrange
-      var college = new CollegeWithProgramsDto();
+      var college = new CollegeDto();
       college.setId(1L);
       college.setName("College Name");
 

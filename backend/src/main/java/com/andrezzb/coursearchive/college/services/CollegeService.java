@@ -3,7 +3,6 @@ package com.andrezzb.coursearchive.college.services;
 import com.andrezzb.coursearchive.college.dto.CollegeCreateDto;
 import com.andrezzb.coursearchive.college.dto.CollegeDto;
 import com.andrezzb.coursearchive.college.dto.CollegeUpdateDto;
-import com.andrezzb.coursearchive.college.dto.CollegeWithProgramsDto;
 import com.andrezzb.coursearchive.college.exceptions.CollegeNotFoundException;
 import com.andrezzb.coursearchive.college.models.College;
 import com.andrezzb.coursearchive.college.repository.CollegeRepository;
@@ -38,9 +37,9 @@ public class CollegeService {
     }
 
     @PreAuthorize("hasRole('USER')")
-    public CollegeWithProgramsDto findCollegeById(Long id) {
+    public CollegeDto findCollegeById(Long id) {
         College college = findCollege(id);
-        return modelMapper.map(college, CollegeWithProgramsDto.class);
+        return modelMapper.map(college, CollegeDto.class);
     }
 
     public College findCollege(Long id) {
