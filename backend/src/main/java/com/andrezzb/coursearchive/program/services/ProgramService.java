@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.andrezzb.coursearchive.college.services.CollegeService;
 import com.andrezzb.coursearchive.program.dto.ProgramCreateDto;
+import com.andrezzb.coursearchive.program.dto.ProgramDto;
 import com.andrezzb.coursearchive.program.dto.ProgramUpdateDto;
 import com.andrezzb.coursearchive.program.exceptions.ProgramNotFoundException;
 import com.andrezzb.coursearchive.program.models.Program;
@@ -35,8 +36,17 @@ public class ProgramService {
   }
 
   @PreAuthorize("hasRole('USER')")
-  public Page<Program> findAllProgramsPaged(Pageable p) {
-    return programRepository.findAll(p);
+  public Page<ProgramDto> findAllProgramsPaged(Pageable p) {
+    return findAllProgramsPaged(p, null, null, null);
+  }
+
+  @PreAuthorize("hasRole('USER')")
+  public Page<ProgramDto> findAllProgramsPaged(Pageable p, Program.FilterField filterField,
+      Object filterValue, Long collegeId) {
+    Page<Program> programs = programRepository.findAllByFilterFieldAndValue(p, filterField,
+        filterValue, collegeId);
+    return programs.map(program -> modelMapper.map(program, ProgramDto.class));
+
   }
 
   @PreAuthorize("hasRole('USER')")
@@ -50,6 +60,7 @@ public class ProgramService {
     var college = collegeService.findCollege(programDto.getCollegeId());
     Program program = modelMapper.map(programDto, Program.class);
     program.setCollege(college);
+    program.setId(null);
     Program savedProgram = programRepository.save(program);
 
     String username = SecurityContextHolder.getContext().getAuthentication().getName();

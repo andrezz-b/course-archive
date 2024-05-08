@@ -49,6 +49,7 @@ public class CourseYearService {
     var course = courseService.findCourseById(courseYearDto.getCourseId());
     CourseYear courseYear = modelMapper.map(courseYearDto, CourseYear.class);
     courseYear.setCourse(course);
+    courseYear.setId(null);
     CourseYear savedCourseYear = courseYearRepository.save(courseYear);
 
     String username = SecurityContextHolder.getContext().getAuthentication().getName();

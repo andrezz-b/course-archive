@@ -13,10 +13,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.andrezzb.coursearchive.program.dto.ProgramCreateDto;
+import com.andrezzb.coursearchive.program.dto.ProgramDto;
 import com.andrezzb.coursearchive.program.dto.ProgramUpdateDto;
 import com.andrezzb.coursearchive.program.models.Program;
 import com.andrezzb.coursearchive.program.services.ProgramService;
+import com.andrezzb.coursearchive.validators.ValidEnum;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -32,20 +36,31 @@ public class ProgramController {
   }
 
   @GetMapping("/")
-  public ResponseEntity<Page<Program>> getAllPrograms(
-      @RequestParam(defaultValue = "0") int page,
-      @RequestParam(defaultValue = "5") int size,
-      @RequestParam(defaultValue = "asc") String sortDirection,
-      @RequestParam(defaultValue = "id") String sortField) {
-    Sort.Direction direction =
-        sortDirection.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
-    Pageable p = PageRequest.of(page, size, Sort.by(direction, sortField));
-    final var programsPaged = programService.findAllProgramsPaged(p);
+  public ResponseEntity<Page<ProgramDto>> getAllPrograms(
+      @PositiveOrZero @RequestParam(defaultValue = "0") int page,
+      @Positive @RequestParam(defaultValue = "5") int size,
+      @ValidEnum(enumClazz = Sort.Direction.class,
+          ignoreCase = true) @RequestParam(defaultValue = "asc") String sortDirection,
+      @ValidEnum(enumClazz = Program.SortField.class) @RequestParam(
+          defaultValue = "id") String sortField,
+      @ValidEnum(enumClazz = Program.FilterField.class, required = false) @RequestParam(
+          required = false) String filterField,
+      @RequestParam(required = false) String filterValue,
+      @RequestParam(required = false) Long collegeId) {
+
+    Program.FilterField filterFieldEnum =
+        filterField != null ? Program.FilterField.valueOf(filterField) : null;
+    Object filterValueObj = Program.FilterField.mapFilterValue(filterFieldEnum, filterValue);
+    Pageable p =
+        PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortField));
+    final var programsPaged =
+        programService.findAllProgramsPaged(p, filterFieldEnum, filterValueObj, collegeId);
     return ResponseEntity.ok(programsPaged);
   }
 
   @PostMapping("/")
-  public ResponseEntity<Program> createProgram(@Valid @RequestBody ProgramCreateDto programCreateDto) {
+  public ResponseEntity<Program> createProgram(
+      @Valid @RequestBody ProgramCreateDto programCreateDto) {
     var program = programService.createProgram(programCreateDto);
     return ResponseEntity.status(HttpStatus.CREATED).body(program);
   }

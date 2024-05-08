@@ -84,4 +84,25 @@ public class Program implements AclSecured {
   public Object getParent() {
     return college;
   }
+
+  public static enum FilterField {
+    name, duration;
+
+    public static Object mapFilterValue(FilterField filterField, String filterValue) {
+      if (filterValue == null || filterValue.length() == 0) {
+        return null;
+      }
+      switch (filterField) {
+        case duration:
+          return Short.parseShort(filterValue);
+        default:
+          return filterValue;
+      }
+    }
+  }
+
+  public static enum SortField {
+    id, name
+  }
+
 }

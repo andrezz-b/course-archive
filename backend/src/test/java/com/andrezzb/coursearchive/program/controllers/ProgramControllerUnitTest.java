@@ -13,6 +13,7 @@ import java.util.List;
 
 import com.andrezzb.coursearchive.exceptions.ErrorObject;
 import com.andrezzb.coursearchive.program.dto.ProgramCreateDto;
+import com.andrezzb.coursearchive.program.dto.ProgramDto;
 import com.andrezzb.coursearchive.program.dto.ProgramUpdateDto;
 import com.andrezzb.coursearchive.program.models.Program;
 import com.andrezzb.coursearchive.program.services.ProgramService;
@@ -70,11 +71,11 @@ public class ProgramControllerUnitTest {
   class GetAllPrograms {
     private static final String URL = "/api/program/";
 
-    private Program program;
+    private ProgramDto program;
 
     @BeforeEach
     void setUpProgram() {
-      program = new Program();
+      program = new ProgramDto();
       program.setId(1L);
       program.setName("Program name");
       assertThat(programService).isNotNull();

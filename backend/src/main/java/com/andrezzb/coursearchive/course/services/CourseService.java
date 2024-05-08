@@ -48,6 +48,7 @@ public class CourseService {
     var program = programService.findProgramById(courseDto.getProgramId());
     Course course = modelMapper.map(courseDto, Course.class);
     course.setProgram(program);
+    course.setId(null);
     Course savedCourse = courseRepository.save(course);
 
     String username = SecurityContextHolder.getContext().getAuthentication().getName();
