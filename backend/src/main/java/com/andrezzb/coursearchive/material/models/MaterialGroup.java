@@ -6,6 +6,7 @@ import java.util.List;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import com.andrezzb.coursearchive.course.models.CourseYear;
+import com.andrezzb.coursearchive.repository.FilterValueMapper;
 import com.andrezzb.coursearchive.security.models.AclSecured;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
@@ -47,6 +48,9 @@ public class MaterialGroup implements AclSecured {
     // @Column(nullable = false, length = 32)
     // private String type;
 
+    @Column(length = 512)
+    private String description;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
@@ -55,8 +59,6 @@ public class MaterialGroup implements AclSecured {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(length = 512)
-    private String description;
 
     @OneToMany(mappedBy = "materialGroup", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Material> materials = new ArrayList<>();
@@ -74,5 +76,13 @@ public class MaterialGroup implements AclSecured {
     @Override
     public Object getParent() {
         return courseYear;
+    }
+
+    public enum FilterField implements FilterValueMapper {
+        name
+    }
+
+    public enum SortField {
+        name, displayOrder
     }
 }

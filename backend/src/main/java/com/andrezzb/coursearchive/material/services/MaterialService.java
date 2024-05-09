@@ -53,7 +53,7 @@ public class MaterialService {
   @Transactional
   @PreAuthorize("hasPermission(#createDto.materialGroupId, 'com.andrezzb.coursearchive.material.models.MaterialGroup', create) || hasRole('MANAGER')")
   public Material createMaterial(MaterialCreateDto createDto, MultipartFile file) {
-    var materialGroup = materialGroupService.findMaterialGroupById(createDto.getMaterialGroupId());
+    var materialGroup = materialGroupService.findMaterialGroup(createDto.getMaterialGroupId());
     Material material = modelMapper.map(createDto, Material.class);
     material.setMaterialGroup(materialGroup);
     material.setId(null);
@@ -77,7 +77,7 @@ public class MaterialService {
     Material material = findMaterialById(id);
     if (updateDto.getMaterialGroupId() != null) {
       var materialGroup =
-          materialGroupService.findMaterialGroupById(updateDto.getMaterialGroupId());
+          materialGroupService.findMaterialGroup(updateDto.getMaterialGroupId());
       material.setMaterialGroup(materialGroup);
     }
     modelMapper.map(updateDto, material);

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.andrezzb.coursearchive.course.services.CourseYearService;
 import com.andrezzb.coursearchive.material.dto.MaterialGroupCreateDto;
+import com.andrezzb.coursearchive.material.dto.MaterialGroupDto;
 import com.andrezzb.coursearchive.material.dto.MaterialGroupUpdateDto;
 import com.andrezzb.coursearchive.material.exceptions.MaterialGroupNotFoundException;
 import com.andrezzb.coursearchive.material.models.MaterialGroup;
@@ -37,14 +38,29 @@ public class MaterialGroupService {
   }
 
   @PreAuthorize("hasRole('USER')")
-  public MaterialGroup findMaterialGroupById(Long id) {
+  public Page<MaterialGroupDto> findAllMaterialGroupsPaged(Pageable p, String filterField,
+      Object filterValue, Long courseYearId) {
+    var groups = materialGroupRepository.findAllByFilterFiledAndValue(p, filterField, filterValue,
+        courseYearId);
+    return groups.map(group -> modelMapper.map(group, MaterialGroupDto.class));
+  }
+
+
+  @PreAuthorize("hasRole('USER')")
+  public MaterialGroupDto findMaterialGroupById(Long id) {
+    MaterialGroup group = findMaterialGroup(id);
+    return modelMapper.map(group, MaterialGroupDto.class);
+  }
+
+  @PreAuthorize("hasRole('USER')")
+  public MaterialGroup findMaterialGroup(Long id) {
     return materialGroupRepository.findById(id)
         .orElseThrow(() -> new MaterialGroupNotFoundException(id));
   }
 
   @Transactional
   @PreAuthorize("hasPermission(#materialGroupDto.courseYearId, 'com.andrezzb.coursearchive.course.models.CourseYear', create) || hasRole('MANAGER')")
-  public MaterialGroup createMaterialGroup(MaterialGroupCreateDto materialGroupDto) {
+  public MaterialGroupDto createMaterialGroup(MaterialGroupCreateDto materialGroupDto) {
     var courseYear = courseYearService.findCourseYear(materialGroupDto.getCourseYearId());
 
     Short displayOrder =
@@ -58,18 +74,19 @@ public class MaterialGroupService {
 
     String username = SecurityContextHolder.getContext().getAuthentication().getName();
     aclUtilService.grantPermission(savedMaterialGroup, username, AclPermission.ADMINISTRATION);
-    return savedMaterialGroup;
+    return modelMapper.map(savedMaterialGroup, MaterialGroupDto.class);
   }
 
   @Transactional
   @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.material.models.MaterialGroup', write) || hasRole('MANAGER')")
-  public MaterialGroup updateMaterialGroup(Long id, MaterialGroupUpdateDto updateDto) {
-    MaterialGroup materialGroup = findMaterialGroupById(id);
+  public MaterialGroupDto updateMaterialGroup(Long id, MaterialGroupUpdateDto updateDto) {
+    MaterialGroup materialGroup = findMaterialGroup(id);
     Short displayOrder = getNewDisplayOrder(materialGroup.getCourseYear().getId(),
         materialGroup.getDisplayOrder(), updateDto.getDisplayOrder());
     updateDto.setDisplayOrder(displayOrder);
     modelMapper.map(updateDto, materialGroup);
-    return materialGroupRepository.save(materialGroup);
+    var savedGroup = materialGroupRepository.save(materialGroup);
+    return modelMapper.map(savedGroup, MaterialGroupDto.class);
   }
 
   @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.material.models.MaterialGroup', delete) || hasRole('MANAGER')")
@@ -77,23 +94,27 @@ public class MaterialGroupService {
     materialGroupRepository.deleteById(id);
   }
 
-  private Short getNewDisplayOrder(Long courseYearId, Short oldOrder, Short newOrder) {
+  Short getNewDisplayOrder(Long courseYearId, Short oldOrder, Short newOrder) {
+    var groupCount = materialGroupRepository.countByCourseYearId(courseYearId).orElse(0L);
+    if (groupCount <= 1) {
+      return 0;
+    }
     // Order is not being changed
     if (newOrder == null && oldOrder != null) {
-      return oldOrder;
+        return oldOrder;
     }
     Short maxOrder = materialGroupRepository.findMaxOrder(courseYearId).orElse((short) -1);
     // No new order specified, default: add it to the end
     if (newOrder == null) {
-      return (short) (maxOrder + 1);
+        return (short) (maxOrder + 1);
     }
-    // New order larger than the end postition, add it to the end postition
-    if (newOrder > maxOrder + 1) {
-      return (short) (maxOrder + 1);
+    // New order larger than the end position, add it to the end position
+    if (newOrder > maxOrder) {
+        return (short) (maxOrder + 1);
     }
     // Max is -1 when this is the only element, so no point in incrementing others
     if (maxOrder != -1)
-      materialGroupRepository.incrementDisplayOrder(courseYearId, newOrder);
+        materialGroupRepository.incrementDisplayOrder(courseYearId, newOrder);
     return newOrder;
-  }
+}
 }
