@@ -37,7 +37,7 @@ public class MaterialGroupService {
     return materialGroupRepository.findAll(p);
   }
 
-  @PreAuthorize("hasRole('USER')")
+  @PreAuthorize("hasPermission(#courseYearId, 'com.andrezzb.coursearchive.course.models.CourseYear', read) || hasRole('MANAGER')")
   public Page<MaterialGroupDto> findAllMaterialGroupsPaged(Pageable p, String filterField,
       Object filterValue, Long courseYearId) {
     var groups = materialGroupRepository.findAllByFilterFiledAndValue(p, filterField, filterValue,
@@ -46,13 +46,12 @@ public class MaterialGroupService {
   }
 
 
-  @PreAuthorize("hasRole('USER')")
   public MaterialGroupDto findMaterialGroupById(Long id) {
     MaterialGroup group = findMaterialGroup(id);
     return modelMapper.map(group, MaterialGroupDto.class);
   }
 
-  @PreAuthorize("hasRole('USER')")
+  @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.material.models.MaterialGroup', read) || hasRole('MANAGER')")
   public MaterialGroup findMaterialGroup(Long id) {
     return materialGroupRepository.findById(id)
         .orElseThrow(() -> new MaterialGroupNotFoundException(id));

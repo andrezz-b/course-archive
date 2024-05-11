@@ -21,10 +21,4 @@ public class MaterialExceptionHandler {
 
     return ResponseEntity.status(errorObject.getStatus()).body(errorObject);
   }
-
-  @ExceptionHandler(MaterialInvalidParametersException.class)
-  public ResponseEntity<ErrorObject> handle(MaterialInvalidParametersException ex) {
-    final ErrorObject errorObject = new ErrorObject(HttpStatus.BAD_REQUEST, ex.getMessage());
-    return ResponseEntity.status(errorObject.getStatus()).body(errorObject);
-  }
 }

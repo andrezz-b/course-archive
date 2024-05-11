@@ -8,7 +8,13 @@ import org.springframework.stereotype.Component;
 import com.andrezzb.coursearchive.college.models.College;
 import com.andrezzb.coursearchive.college.repository.CollegeRepository;
 import com.andrezzb.coursearchive.course.models.Course;
+import com.andrezzb.coursearchive.course.models.CourseYear;
 import com.andrezzb.coursearchive.course.repository.CourseRepository;
+import com.andrezzb.coursearchive.course.repository.CourseYearRepository;
+import com.andrezzb.coursearchive.material.models.Material;
+import com.andrezzb.coursearchive.material.models.MaterialGroup;
+import com.andrezzb.coursearchive.material.repository.MaterialGroupRepository;
+import com.andrezzb.coursearchive.material.repository.MaterialRepository;
 import com.andrezzb.coursearchive.program.models.Program;
 import com.andrezzb.coursearchive.program.repository.ProgramRepository;
 import com.andrezzb.coursearchive.security.acl.AclPermission;
@@ -24,12 +30,18 @@ public class GrantPermissionMapping {
       Map.of(
           "college", CollegeRepository.class,
           "program", ProgramRepository.class,
-          "course", CourseRepository.class);
+          "course", CourseRepository.class,
+          "course-year", CourseYearRepository.class,
+          "material-group", MaterialGroupRepository.class,
+          "material", MaterialRepository.class);
 
   private final Map<String, Class<?>> objectMap = Map.of(
       "college", College.class,
       "program", Program.class,
-      "course", Course.class);
+      "course", Course.class,
+      "course-year", CourseYear.class,
+      "material-group", MaterialGroup.class,
+      "material", Material.class);
 
   private final Map<String, Permission> permissionMap = Map.of(
       "read", AclPermission.READ,

@@ -24,7 +24,6 @@ import com.andrezzb.coursearchive.file.services.FileService;
 import com.andrezzb.coursearchive.file.validators.ValidMaterialFile;
 import com.andrezzb.coursearchive.material.dto.MaterialCreateDto;
 import com.andrezzb.coursearchive.material.dto.MaterialUpdateDto;
-import com.andrezzb.coursearchive.material.exceptions.MaterialInvalidParametersException;
 import com.andrezzb.coursearchive.material.models.Material;
 import com.andrezzb.coursearchive.material.services.MaterialService;
 import com.andrezzb.coursearchive.repository.FilterValueMapper;
@@ -55,18 +54,14 @@ public class MaterialController {
       @ValidEnum(enumClazz = Material.FilterField.class, required = false) @RequestParam(
           required = false) String filterField,
       @RequestParam(required = false) String filterValue,
-      @RequestParam(required = false) Long courseYearId,
+      @RequestParam(required = true) Long courseYearId,
       @RequestParam(required = false) Long materialGroupId) {
-    if (courseYearId == null && materialGroupId == null) {
-      throw new MaterialInvalidParametersException(
-          "courseYearId or materialGroupId must be provided");
-    }
     Object filterValueObj =
         FilterValueMapper.mapFilterValue(Material.FilterField.class, filterField, filterValue);
     Pageable p =
         PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortField));
     final var materialsPaged = materialService.findAllMaterialsPaged(p, filterField, filterValueObj,
-        materialGroupId, courseYearId);
+        courseYearId, materialGroupId);
     return ResponseEntity.ok(materialsPaged);
   }
 

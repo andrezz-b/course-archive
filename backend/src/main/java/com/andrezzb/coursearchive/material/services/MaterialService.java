@@ -39,18 +39,14 @@ public class MaterialService {
     typeMap.addMappings(mapper -> mapper.skip(Material::setId));
   }
 
-  @PreAuthorize("hasRole('USER')")
-  public Page<Material> findAllMaterialsPaged(Pageable p) {
-    return findAllMaterialsPaged(p, null, p, null, null);
-  }
-
-  @PreAuthorize("hasRole('USER')")
+  @PreAuthorize("hasPermission(#courseYearId, 'com.andrezzb.coursearchive.course.models.CourseYear', read) || hasRole('MANAGER')")
   public Page<Material> findAllMaterialsPaged(Pageable p, String filterField, Object filterValue,
-      Long materialGroupId, Long courseYearId) {
-    return materialRepository.findAllByFilterFieldAndValue(p, filterField, filterValue, materialGroupId, courseYearId);
+      Long courseYearId, Long materialGroupId) {
+    return materialRepository.findAllByFilterFieldAndValue(p, filterField, filterValue,
+        materialGroupId, courseYearId);
   }
 
-  @PreAuthorize("hasRole('USER')")
+  @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.material.models.Material', read) || hasRole('MANAGER')")
   public Material findMaterialById(Long id) {
     return materialRepository.findById(id)
         .orElseThrow(() -> new MaterialNotFoundException(id));
