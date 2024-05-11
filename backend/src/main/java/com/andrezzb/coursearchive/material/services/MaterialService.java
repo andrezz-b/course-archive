@@ -41,7 +41,13 @@ public class MaterialService {
 
   @PreAuthorize("hasRole('USER')")
   public Page<Material> findAllMaterialsPaged(Pageable p) {
-    return materialRepository.findAll(p);
+    return findAllMaterialsPaged(p, null, p, null, null);
+  }
+
+  @PreAuthorize("hasRole('USER')")
+  public Page<Material> findAllMaterialsPaged(Pageable p, String filterField, Object filterValue,
+      Long materialGroupId, Long courseYearId) {
+    return materialRepository.findAllByFilterFieldAndValue(p, filterField, filterValue, materialGroupId, courseYearId);
   }
 
   @PreAuthorize("hasRole('USER')")

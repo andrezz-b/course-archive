@@ -24,9 +24,14 @@ import com.andrezzb.coursearchive.file.services.FileService;
 import com.andrezzb.coursearchive.file.validators.ValidMaterialFile;
 import com.andrezzb.coursearchive.material.dto.MaterialCreateDto;
 import com.andrezzb.coursearchive.material.dto.MaterialUpdateDto;
+import com.andrezzb.coursearchive.material.exceptions.MaterialInvalidParametersException;
 import com.andrezzb.coursearchive.material.models.Material;
 import com.andrezzb.coursearchive.material.services.MaterialService;
+import com.andrezzb.coursearchive.repository.FilterValueMapper;
+import com.andrezzb.coursearchive.validators.ValidEnum;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 
 @RestController
 @RequestMapping("api/material")
@@ -41,14 +46,27 @@ public class MaterialController {
 
   @GetMapping("/")
   public ResponseEntity<Page<Material>> getAllMaterials(
-      @RequestParam(defaultValue = "0") int page,
-      @RequestParam(defaultValue = "5") int size,
-      @RequestParam(defaultValue = "asc") String sortDirection,
-      @RequestParam(defaultValue = "name") String sortField) {
-    Sort.Direction direction =
-        sortDirection.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
-    Pageable p = PageRequest.of(page, size, Sort.by(direction, sortField));
-    final var materialsPaged = materialService.findAllMaterialsPaged(p);
+      @PositiveOrZero @RequestParam(defaultValue = "0") int page,
+      @Positive @RequestParam(defaultValue = "5") int size,
+      @ValidEnum(enumClazz = Sort.Direction.class,
+          ignoreCase = true) @RequestParam(defaultValue = "asc") String sortDirection,
+      @ValidEnum(enumClazz = Material.SortField.class) @RequestParam(
+          defaultValue = "name") String sortField,
+      @ValidEnum(enumClazz = Material.FilterField.class, required = false) @RequestParam(
+          required = false) String filterField,
+      @RequestParam(required = false) String filterValue,
+      @RequestParam(required = false) Long courseYearId,
+      @RequestParam(required = false) Long materialGroupId) {
+    if (courseYearId == null && materialGroupId == null) {
+      throw new MaterialInvalidParametersException(
+          "courseYearId or materialGroupId must be provided");
+    }
+    Object filterValueObj =
+        FilterValueMapper.mapFilterValue(Material.FilterField.class, filterField, filterValue);
+    Pageable p =
+        PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortField));
+    final var materialsPaged = materialService.findAllMaterialsPaged(p, filterField, filterValueObj,
+        materialGroupId, courseYearId);
     return ResponseEntity.ok(materialsPaged);
   }
 

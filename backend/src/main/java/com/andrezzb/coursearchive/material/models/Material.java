@@ -6,6 +6,7 @@ import java.util.List;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import com.andrezzb.coursearchive.file.models.MaterialFile;
+import com.andrezzb.coursearchive.repository.FilterValueMapper;
 import com.andrezzb.coursearchive.security.models.AclSecured;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
@@ -68,5 +69,13 @@ public class Material implements AclSecured {
   @Override
   public Object getParent() {
     return materialGroup;
+  }
+
+  public enum FilterField implements FilterValueMapper {
+    description, name
+  }
+
+  public enum SortField {
+    id, name, createdAt, updatedAt
   }
 }

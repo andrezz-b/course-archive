@@ -14,6 +14,10 @@ public class ErrorObject {
   private List<String> errors;
   private LocalDateTime timestamp;
 
+  public ErrorObject(HttpStatus status, String error) {
+    this(status, List.of(error));
+  }
+
   public ErrorObject(HttpStatus status, List<String> errors) {
     this.status = status;
     this.statusCode = status.value();
