@@ -16,7 +16,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import com.andrezzb.coursearchive.exceptions.ErrorObject;
-import com.andrezzb.coursearchive.security.AuthController;
 import com.andrezzb.coursearchive.security.SecurityConfig;
 import com.andrezzb.coursearchive.security.dto.LoginDto;
 import com.andrezzb.coursearchive.security.dto.RegisterDto;

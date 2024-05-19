@@ -10,7 +10,6 @@ import com.andrezzb.coursearchive.security.dto.GrantPermissionDto;
 import com.andrezzb.coursearchive.security.dto.LoginDto;
 import com.andrezzb.coursearchive.security.dto.RegisterDto;
 import com.andrezzb.coursearchive.security.exceptions.EmailTakenException;
-import com.andrezzb.coursearchive.security.exceptions.UserNotFoundException;
 import com.andrezzb.coursearchive.security.exceptions.UsernameTakenException;
 import com.andrezzb.coursearchive.security.mappings.GrantPermissionMapping;
 import com.andrezzb.coursearchive.security.models.AclSecured;
@@ -30,16 +29,18 @@ public class AuthService {
   private final PasswordEncoder passwordEncoder;
   private final GrantPermissionMapping grantPermissionMapping;
   private final AclUtilService aclUtilService;
+  private final UserService userService;
 
   public AuthService(TokenService tokenService, AuthenticationManager authenticationManager,
       UserRepository userRepository, PasswordEncoder passwordEncoder,
-      GrantPermissionMapping grantPermissionMapping, AclUtilService aclUtilService) {
+      GrantPermissionMapping grantPermissionMapping, AclUtilService aclUtilService, UserService userService) {
     this.tokenService = tokenService;
     this.authenticationManager = authenticationManager;
     this.userRepository = userRepository;
     this.passwordEncoder = passwordEncoder;
     this.grantPermissionMapping = grantPermissionMapping;
     this.aclUtilService = aclUtilService;
+    this.userService = userService;
   }
 
   public LoginDto.LoginResponse login(String username, String password) {
@@ -53,12 +54,12 @@ public class AuthService {
   }
 
   public UserEntity register(RegisterDto registerData) {
-    userRepository.findByEmail(registerData.getEmail()).ifPresent(user -> {
+    if (userService.existsByEmail(registerData.getEmail())) {
       throw new EmailTakenException(registerData.getEmail());
-    });
-    userRepository.findByUsername(registerData.getUsername()).ifPresent(user -> {
+    }
+    if (userService.existsByUsername(registerData.getUsername())) {
       throw new UsernameTakenException(registerData.getUsername());
-    });
+    }
     UserEntity user = new UserEntity();
     user.setUsername(registerData.getUsername());
     user.setPassword(passwordEncoder.encode(registerData.getPassword()));
@@ -99,8 +100,7 @@ public class AuthService {
 
   public String refresh(String refreshToken) {
     var jwt = tokenService.validateRefreshToken(refreshToken);
-    var user = userRepository.findByUsername(jwt.getSubject())
-        .orElseThrow(() -> new UserNotFoundException("Invalid token, user not found"));
+    var user = userService.findByUsername(jwt.getSubject());
     Authentication authentication = UsernamePasswordAuthenticationToken
         .authenticated(user.getUsername(), user.getPassword(), user.getAuthorities());
     return tokenService.generateToken(authentication);

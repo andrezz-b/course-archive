@@ -1,4 +1,4 @@
-package com.andrezzb.coursearchive.security;
+package com.andrezzb.coursearchive.security.controllers;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
