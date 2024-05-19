@@ -31,7 +31,7 @@ const LoginPage = () => {
   const location = useLocation();
   const previousLocation = location?.state?.from?.pathname ?? "/";
   const form = useForm<LoginData>({
-    mode: "onBlur",
+    mode: "onTouched",
     defaultValues: {
       username: "",
       password: "",
@@ -96,15 +96,16 @@ const LoginPage = () => {
             />
             {form.formState.errors.root?.serverError.message && (
               <p className="text-destructive text-sm">
+                Test error
                 {form.formState.errors.root?.serverError.message}
               </p>
             )}
-            <Button className="w-full" type="submit">
+            <Button className="w-full" type="submit" disabled={form.formState.isSubmitting}>
               {form.formState.isSubmitting ? <LoaderCircle className="animate-spin" /> : "Login"}
             </Button>
-            <p className="text-center">
+            <p className="text-center text-sm">
               Don't have an account?{" "}
-              <Link to="/register" className="text-primary font-semibold">
+              <Link to="/register" className="text-primary font-semibold underline">
                 Register here!
               </Link>
             </p>
