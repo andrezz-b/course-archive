@@ -26,9 +26,10 @@ export interface RegisterData {
   passwordRepeat: string;
   firstName: string;
   lastName: string;
+  username: string;
 }
 
 export interface LoginData {
-  email: string;
+  username: string;
   password: string;
 }

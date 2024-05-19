@@ -1,34 +1,28 @@
 import type { User } from "@/types/User";
-import type {
-  LoginData,
-  LoginResponse,
-  RefreshResponse,
-  RegisterData,
-} from "@/types/Auth";
+import type { LoginData, LoginResponse, RefreshResponse, RegisterData } from "@/types/Auth";
 import { axiosPublic } from "./config/axios";
 import { UseMutationOptions, useMutation, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import useAuth from "@/hooks/useAuth";
+import { ApiError } from "./config/ApiError";
 
 const AuthService = {
-  useLogin: <T extends LoginResponse>(
-    mutationOptions?: Omit<
-      UseMutationOptions<T, Error, LoginData>,
-      "mutationFn" | "onSuccess"
-    >,
+  useLogin: <T extends LoginResponse, Err extends ApiError>(
+    mutationOptions?: Omit<UseMutationOptions<T, Err, LoginData>, "mutationFn" | "onSuccess">,
   ) => {
     const [, setRefreshToken] = useLocalStorage<string>("refreshToken", "");
     const { setAuth } = useAuth();
     const queryClient = useQueryClient();
-    return useMutation<T, Error, LoginData>({
-      mutationFn: async ({ email, password }) => {
-        const response = await axiosPublic.post<T>(
-          "/auth/login",
-          { email, password },
-          { withCredentials: true },
-        );
-        return response.data;
+    return useMutation<T, Err, LoginData>({
+      mutationFn: async (loginData) => {
+        try {
+          const response = await axiosPublic.post<T>("/auth/login", loginData, {
+            withCredentials: true,
+          });
+          return response.data;
+        } catch (e) {
+          throw new ApiError(e);
+        }
       },
       onSuccess: ({ accessToken, refreshToken }) => {
         queryClient.clear();
@@ -41,38 +35,40 @@ const AuthService = {
     });
   },
 
-  useRefreshToken: <T extends RefreshResponse>(
-    mutationOptions?: Omit<UseMutationOptions<T>, "mutationFn">,
+  useRefreshToken: <Data extends RefreshResponse, Err extends ApiError>(
+    mutationOptions?: Omit<UseMutationOptions<Data, Err>, "mutationFn">,
   ) => {
     // When in StrictMode useLocalStorage sometimes returns the default value so this is a workaround
     const localStorageRefreshToken = localStorage.getItem("refreshToken");
     const refreshToken = localStorageRefreshToken ? JSON.parse(localStorageRefreshToken) : "";
-    return useMutation({
+    return useMutation<Data, Err>({
       mutationFn: async () => {
         try {
-          const response = await axiosPublic.post<T>(
+          const response = await axiosPublic.post<Data>(
             "/auth/refresh",
             { refreshToken },
             { withCredentials: true },
           );
           return response.data;
         } catch (e) {
-          const error = e as AxiosError<Record<string, string>>;
-          const message = `Status: ${error.response?.status}, Error: ${error.response?.data?.error}, Message: ${error.response?.data?.message}`;
-          throw new Error(message);
+          throw new ApiError(e);
         }
       },
       ...mutationOptions,
     });
   },
 
-  useRegister: <T = User>(
-    mutationOptions?: Omit<UseMutationOptions<T, Error, RegisterData>, "mutationFn">,
+  useRegister: <Data extends User, Err extends ApiError>(
+    mutationOptions?: Omit<UseMutationOptions<Data, Err, RegisterData>, "mutationFn">,
   ) => {
     return useMutation({
       mutationFn: async (registerData) => {
-        const response = await axiosPublic.post<T>("/auth/register", registerData);
-        return response.data;
+        try {
+          const response = await axiosPublic.post<Data>("/auth/register", registerData);
+          return response.data;
+        } catch (e) {
+          throw new ApiError(e);
+        }
       },
       ...mutationOptions,
     });

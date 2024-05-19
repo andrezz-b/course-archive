@@ -50,6 +50,16 @@
 }
 
 @layer base {
+  html,
+  body,
+  #root {
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    scroll-behavior: smooth;
+    box-sizing: border-box;
+  }
   * {
     @apply border-border;
   }
