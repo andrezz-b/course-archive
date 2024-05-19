@@ -1,3 +1,4 @@
+import Loading from "@/components/Loading";
 import CurrentUserProvider from "@/context/CurrentUserProvider";
 import useAuth from "@/hooks/useAuth";
 import useRefreshToken from "@/hooks/useRefreshToken";
@@ -36,7 +37,7 @@ const ProtectedRoutes = ({ layout = <Outlet /> }: ProtectedRoutesProps) => {
   }, [auth?.accessToken, refresh]);
 
   // TODO: Add loading spinner
-  if (isLoading) return null;
+  if (isLoading) return <Loading />;
 
   if (!auth?.accessToken) return <Navigate to="/login" state={{ from: location }} replace />;
 

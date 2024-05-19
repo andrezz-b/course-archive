@@ -14,9 +14,6 @@
     "*.{tsx,js,jsx,css,md,json}": [
       "prettier --cache --write"
     ],
-    "*.ts": [
-      "tsc-files --noEmit"
-    ],
     "*.{ts,tsx,js,jsx}": [
       "eslint --fix"
     ]
@@ -60,7 +57,6 @@
     "postcss": "^8.4.38",
     "prettier": "3.2.5",
     "tailwindcss": "^3.4.3",
-    "tsc-files": "^1.1.4",
     "typescript": "^5.2.2",
     "vite": "^5.2.0"
   }

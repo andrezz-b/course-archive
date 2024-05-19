@@ -6,14 +6,15 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import "./index.css";
 
+import { ThemeProvider } from "./context/ThemeProvider.tsx";
+import { AuthProvider } from "./context/AuthProvider.tsx";
+
+import ProtectedRoutes from "./layouts/ProtectedRoutes.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
 import RegisterPage from "./pages/RegisterPage.tsx";
-import { AuthProvider } from "./context/AuthProvider.tsx";
 import ErrorPage from "./pages/ErrorPage.tsx";
-import ProtectedRoutes from "./layouts/ProtectedRoutes.tsx";
 import App from "./App.tsx";
 import RootLayout from "./layouts/RootLayout.tsx";
-import { ThemeProvider } from "./context/ThemeProvider.tsx";
 
 const router = createBrowserRouter([
   {
@@ -23,6 +24,7 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <App />,
+        errorElement: <ErrorPage />,
       },
     ],
   },
@@ -33,14 +35,12 @@ const router = createBrowserRouter([
       {
         path: "/login",
         element: <LoginPage />,
+        errorElement: <ErrorPage />,
       },
       {
         path: "/register",
         element: <RegisterPage />,
-      },
-      {
-        path: "/error",
-        element: <ErrorPage />,
+        errorElement: <ErrorPage />,
       },
     ],
   },

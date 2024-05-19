@@ -3,7 +3,7 @@ import ThemeToggle from "./ThemeToggle";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
 import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "./ui/sheet";
-import { LogOut, Menu, Package } from "lucide-react";
+import { ChevronDown, LogOut, Menu, Package } from "lucide-react";
 import { memo } from "react";
 import useAuth from "@/hooks/useAuth";
 import useLogout from "@/hooks/useLogout";
@@ -28,10 +28,10 @@ const Navbar = () => {
       <div className="flex justify-between items-center flex-grow px-6 md:max-w-[75%]">
         <div className="flex items-center gap-3">
           <Package />
-          <h1 className="text-xl font-bold">Course Archive</h1>
+          <h1 className="text-2xl font-bold">Course Archive</h1>
         </div>
         <div className="hidden md:flex items-center">
-          <ul className="flex items-center space-x-6 h-10">
+          <ul className="flex items-center gap-1 lg:gap-5 h-10">
             <Links logout={logout} />
             <Separator orientation="vertical" />
             <li>
@@ -116,25 +116,29 @@ const AuthNavbar = {
   links: memo(({ logout }: { logout: () => void }) => (
     <>
       <li>
-        <NavLink
-          to="/"
-          className={({ isActive }) => (isActive ? "text-primary font-semibold" : undefined)}
-        >
-          <Button variant="ghost">Home</Button>
+        <NavLink to="/" className={({ isActive }) => (isActive ? "text-primary" : undefined)}>
+          <Button variant="ghost" className="font-semibold">
+            Home
+          </Button>
         </NavLink>
       </li>
       <li>
         <NavLink
           to="/courses"
-          className={({ isActive }) => (isActive ? "text-primary font-semibold" : undefined)}
+          className={({ isActive }) => (isActive ? "text-primary" : undefined)}
         >
-          <Button variant="ghost">My Courses</Button>
+          <Button variant="ghost" className="font-semibold">
+            Courses
+          </Button>
         </NavLink>
       </li>
       <li>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost">Account</Button>
+            <Button variant="ghost" className="flex items-center font-semibold">
+              <span>Account</span>
+              <ChevronDown className="h-3 w-3 ml-1 mt-1" />
+            </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-30">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
