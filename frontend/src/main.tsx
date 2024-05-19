@@ -18,7 +18,7 @@ import { ThemeProvider } from "./context/ThemeProvider.tsx";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <ProtectedRoutes />,
+    element: <ProtectedRoutes layout={<RootLayout />} />,
     children: [
       {
         index: true,
