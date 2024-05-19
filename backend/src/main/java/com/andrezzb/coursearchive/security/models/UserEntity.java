@@ -2,9 +2,13 @@ package com.andrezzb.coursearchive.security.models;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -57,5 +61,11 @@ public class UserEntity {
       joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
       inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
   private List<Role> roles = new ArrayList<>();
+
+  public Collection<? extends GrantedAuthority> getAuthorities() {
+    return this.getRoles().stream()
+        .map(role -> new SimpleGrantedAuthority(role.getName()))
+        .collect(Collectors.toList());
+  }
 
 }

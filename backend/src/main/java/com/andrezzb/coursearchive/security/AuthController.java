@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.andrezzb.coursearchive.security.dto.GrantPermissionDto;
 import com.andrezzb.coursearchive.security.dto.LoginDto;
+import com.andrezzb.coursearchive.security.dto.RefreshDto;
 import com.andrezzb.coursearchive.security.dto.RegisterDto;
 import com.andrezzb.coursearchive.security.models.UserEntity;
 import com.andrezzb.coursearchive.security.services.AuthService;
@@ -24,9 +25,9 @@ public class AuthController {
   }
 
   @PostMapping("/login")
-  public ResponseEntity<String> login(@Valid @RequestBody LoginDto loginData) {
-    final String token = authService.login(loginData.getUsername(), loginData.getPassword());
-    return ResponseEntity.ok(token);
+  public ResponseEntity<LoginDto.LoginResponse> login(@Valid @RequestBody LoginDto.LoginBody loginData) {
+    final var tokenResponse = authService.login(loginData.getUsername(), loginData.getPassword());
+    return ResponseEntity.ok(tokenResponse);
   }
 
   @PostMapping("/register")
@@ -39,5 +40,11 @@ public class AuthController {
   public ResponseEntity<Void> grantPermission(@Valid @RequestBody GrantPermissionDto grantPermissionDto) {
     authService.grantPermission(grantPermissionDto);
     return ResponseEntity.ok().build();
+  }
+
+  @PostMapping("/refresh")
+  public ResponseEntity<RefreshDto.Response> refresh(@Valid @RequestBody RefreshDto.Body refreshData) {
+    final String token = authService.refresh(refreshData.getRefreshToken());
+    return ResponseEntity.ok(RefreshDto.Response.builder().accessToken(token).build());
   }
 }

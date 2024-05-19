@@ -52,7 +52,7 @@ public class AuthServiceUnitTest {
         .thenReturn(UsernamePasswordAuthenticationToken.unauthenticated(username, password));
     when(tokenService.generateToken(any(Authentication.class))).thenReturn(returnedToken);
 
-    String token = authService.login("testuser", "testpassword");
+    var token = authService.login("testuser", "testpassword");
 
     assertThat(token).isEqualTo(returnedToken);
   }

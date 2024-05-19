@@ -4,11 +4,24 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Data;
 
-@Data
-@Builder
+
 public class LoginDto {
-  @NotBlank(message = "Username is required")
-  private String username;
-  @NotBlank(message = "Password is required")
-  private String password;
+
+  @Data
+  @Builder
+  public static class LoginBody {
+    @NotBlank(message = "Username is required")
+    private String username;
+    @NotBlank(message = "Password is required")
+    private String password;
+  }
+
+  @Data
+  @Builder
+  public static class LoginResponse {
+    private String accessToken;
+    private String refreshToken;
+  }
 }
+
+

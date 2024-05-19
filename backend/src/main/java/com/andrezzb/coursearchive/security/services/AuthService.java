@@ -7,8 +7,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.andrezzb.coursearchive.security.dto.GrantPermissionDto;
+import com.andrezzb.coursearchive.security.dto.LoginDto;
 import com.andrezzb.coursearchive.security.dto.RegisterDto;
 import com.andrezzb.coursearchive.security.exceptions.EmailTakenException;
+import com.andrezzb.coursearchive.security.exceptions.UserNotFoundException;
 import com.andrezzb.coursearchive.security.exceptions.UsernameTakenException;
 import com.andrezzb.coursearchive.security.mappings.GrantPermissionMapping;
 import com.andrezzb.coursearchive.security.models.AclSecured;
@@ -40,13 +42,14 @@ public class AuthService {
     this.aclUtilService = aclUtilService;
   }
 
-  public String login(String username, String password) {
+  public LoginDto.LoginResponse login(String username, String password) {
     Authentication authenticationRequest =
         UsernamePasswordAuthenticationToken.unauthenticated(username, password);
     Authentication authenticationResponse =
         this.authenticationManager.authenticate(authenticationRequest);
-    String token = tokenService.generateToken(authenticationResponse);
-    return token;
+    String accessToken = tokenService.generateToken(authenticationResponse);
+    String refreshToken = tokenService.generateRefreshToken(authenticationResponse);
+    return LoginDto.LoginResponse.builder().accessToken(accessToken).refreshToken(refreshToken).build();
   }
 
   public UserEntity register(RegisterDto registerData) {
@@ -70,8 +73,9 @@ public class AuthService {
     var repository = grantPermissionMapping.getRepository(grantPermissionDto.getObjectType());
     Permission permission =
         grantPermissionMapping.getPermission(grantPermissionDto.getPermission());
-    AclSecured object = (AclSecured) repository.findById(grantPermissionDto.getObjectId()).orElseThrow(
-        () -> new IllegalArgumentException("Invalid object ID"));
+    AclSecured object =
+        (AclSecured) repository.findById(grantPermissionDto.getObjectId()).orElseThrow(
+            () -> new IllegalArgumentException("Invalid object ID"));
     Boolean userExists = userRepository.existsByUsername(grantPermissionDto.getUsername());
     if (!userExists) {
       throw new IllegalArgumentException("Invalid username");
@@ -83,14 +87,23 @@ public class AuthService {
     // Sid sid = new PrincipalSid(grantPermissionDto.getUsername());
     // MutableAcl acl = null;
     // try {
-    //   acl = (MutableAcl) aclService.readAclById(oi);
+    // acl = (MutableAcl) aclService.readAclById(oi);
     // } catch (NotFoundException nfe) {
-    //   acl = aclService.createAcl(oi);
+    // acl = aclService.createAcl(oi);
     // }
 
     // // Now grant some permissions via an access control entry (ACE)
     // acl.insertAce(acl.getEntries().size(), permission, sid, true);
     // aclService.updateAcl(acl);
+  }
+
+  public String refresh(String refreshToken) {
+    var jwt = tokenService.validateRefreshToken(refreshToken);
+    var user = userRepository.findByUsername(jwt.getSubject())
+        .orElseThrow(() -> new UserNotFoundException("Invalid token, user not found"));
+    Authentication authentication = UsernamePasswordAuthenticationToken
+        .authenticated(user.getUsername(), user.getPassword(), user.getAuthorities());
+    return tokenService.generateToken(authentication);
   }
 
 }

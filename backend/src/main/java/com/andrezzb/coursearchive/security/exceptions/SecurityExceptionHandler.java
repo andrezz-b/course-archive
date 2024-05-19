@@ -31,4 +31,10 @@ public class SecurityExceptionHandler {
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorObject);
   }
 
+  @ExceptionHandler(UserNotFoundException.class)
+  public ResponseEntity<ErrorObject> handleUserNotFound(UserNotFoundException ex) {
+    final ErrorObject errorObject = new ErrorObject(HttpStatus.NOT_FOUND, ex.getMessage());
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorObject);
+  }
+
 }
