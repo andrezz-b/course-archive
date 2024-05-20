@@ -80,7 +80,7 @@ public class College implements AclSecured {
     }
 
     public enum FilterField {
-        name, city, postcode;
+        name, city, postcode, acronym;
 
         public static Object mapFilterValue(String filterField, String filterValue) {
             if (filterField == null || filterValue == null || filterValue.isBlank()) {

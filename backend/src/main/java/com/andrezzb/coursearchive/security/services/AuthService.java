@@ -70,7 +70,7 @@ public class AuthService {
     user.setFirstName(registerData.getFirstName());
     user.setLastName(registerData.getLastName());
     user.setEmail(registerData.getEmail());
-    user.setRoles(Arrays.asList(userService.findRoleByName(Role.RoleName.ROLE_USER)));
+    user.setRoles(Arrays.asList(userService.findRoleByName(Role.RoleName.USER)));
     return userRepository.save(user);
   }
 

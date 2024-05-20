@@ -96,7 +96,6 @@ const LoginPage = () => {
             />
             {form.formState.errors.root?.serverError.message && (
               <p className="text-destructive text-sm">
-                Test error
                 {form.formState.errors.root?.serverError.message}
               </p>
             )}

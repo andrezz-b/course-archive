@@ -25,7 +25,7 @@ const CollegeCard = ({ college }: CollegeCardProps) => {
     }
   }, [college.website]);
   return (
-    <Card className="min-w-[300px] max-w-[400px] md:w-[325px] flex flex-col max-h-[400px]">
+    <Card className="min-w-[300px] max-w-[400px] md:w-[325px] md:h-[365px] flex flex-col max-h-[400px]">
       <CardHeader className="flex flex-col justify-around h-[120px]">
         <CardTitle>{college.name}</CardTitle>
         <CardDescription className="font-bold">{college.acronym}</CardDescription>
@@ -41,12 +41,12 @@ const CollegeCard = ({ college }: CollegeCardProps) => {
       <CardFooter className="flex justify-between flex-row-reverse">
         <Button className="place-self-end">More info</Button>
         {linkValid && (
-          <Button variant="link" className="px-2">
-            <a target="_blank" href={college.website}>
+          <a target="_blank" href={college.website}>
+            <Button variant="link" className="px-2">
               Website
-            </a>
-            <SquareArrowOutUpRight className="h-3 w-3 ml-1" />
-          </Button>
+              <SquareArrowOutUpRight className="h-3 w-3 ml-1" />
+            </Button>
+          </a>
         )}
       </CardFooter>
     </Card>

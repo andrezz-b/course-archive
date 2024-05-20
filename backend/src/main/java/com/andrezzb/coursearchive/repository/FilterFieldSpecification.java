@@ -13,7 +13,9 @@ public interface FilterFieldSpecification<T> extends JpaSpecificationExecutor<T>
       }
 
       if (filterValue instanceof String) {
-        return criteriaBuilder.like(root.get(filterField.toString()), "%" + filterValue + "%");
+        return criteriaBuilder.like(
+            criteriaBuilder.lower(root.get(filterField.toString())),
+            "%" + ((String) filterValue).toLowerCase() + "%");
       }
 
       if (filterValue instanceof Number) {

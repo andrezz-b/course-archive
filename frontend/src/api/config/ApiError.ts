@@ -11,7 +11,7 @@ export class ApiError extends Error {
 
   private status: string = "UNKNOWN";
   private statusCode: number = 0;
-  private errors: Array<string> = [];
+  private errors: Array<string> = ["Something went wrong"];
   private timestamp: Date = new Date();
 
   constructor(error: unknown) {
