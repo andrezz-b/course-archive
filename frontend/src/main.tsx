@@ -16,6 +16,7 @@ import ErrorPage from "./pages/ErrorPage.tsx";
 import App from "./App.tsx";
 import RootLayout from "./layouts/RootLayout.tsx";
 import CollegeListingPage from "./pages/college/CollegeListingPage.tsx";
+import SingleCollegePage from "./pages/college/SingleCollegePage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -30,6 +31,11 @@ const router = createBrowserRouter([
       {
         path: "/college",
         element: <CollegeListingPage />,
+        errorElement: <ErrorPage />,
+      },
+      {
+        path: "/college/:collegeId",
+        element: <SingleCollegePage />,
         errorElement: <ErrorPage />,
       },
     ],

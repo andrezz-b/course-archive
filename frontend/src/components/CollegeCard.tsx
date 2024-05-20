@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "./ui/button";
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
-import { SquareArrowOutUpRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface CollegeCardProps {
   college: College;
@@ -16,14 +16,7 @@ const CollegeCard = ({ college }: CollegeCardProps) => {
     }
     return college.description;
   }, [college.description]);
-  const linkValid = useMemo(() => {
-    try {
-      new URL(college.website);
-      return true;
-    } catch {
-      return false;
-    }
-  }, [college.website]);
+
   return (
     <Card className="min-w-[300px] max-w-[400px] md:w-[325px] md:h-[365px] flex flex-col max-h-[400px]">
       <CardHeader className="flex flex-col justify-around h-[120px]">
@@ -39,15 +32,9 @@ const CollegeCard = ({ college }: CollegeCardProps) => {
         </p>
       </CardContent>
       <CardFooter className="flex justify-between flex-row-reverse">
-        <Button className="place-self-end">More info</Button>
-        {linkValid && (
-          <a target="_blank" href={college.website}>
-            <Button variant="link" className="px-2">
-              Website
-              <SquareArrowOutUpRight className="h-3 w-3 ml-1" />
-            </Button>
-          </a>
-        )}
+        <Link to={`./${college.id}`}>
+          <Button className="place-self-end">More info</Button>
+        </Link>
       </CardFooter>
     </Card>
   );

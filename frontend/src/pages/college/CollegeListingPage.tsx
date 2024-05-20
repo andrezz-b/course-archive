@@ -171,8 +171,8 @@ const CollegeListingPage = () => {
 
   return (
     <div className="flex flex-col justify-center items-center mt-4 pb-12">
-      <div className="lg:min-w-[1000px] max-w-[1200px] space-y-4 px-4 md:p-0">
-        <h2>Browse Colleges</h2>
+      <div className="md:min-w-[700px] lg:min-w-[1000px] max-w-[1200px] space-y-4 px-4 md:p-0">
+        <h2 className="text-2xl border-none">Browse Colleges</h2>
         <SearchForm form={form} onSubmit={onSubmit} />
         <CollegeList query={query} />
       </div>

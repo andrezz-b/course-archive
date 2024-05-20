@@ -5,6 +5,7 @@ import com.andrezzb.coursearchive.college.dto.CollegeDto;
 import com.andrezzb.coursearchive.college.dto.CollegeUpdateDto;
 import com.andrezzb.coursearchive.college.models.College;
 import com.andrezzb.coursearchive.college.services.CollegeService;
+import com.andrezzb.coursearchive.repository.FilterValueMapper;
 import com.andrezzb.coursearchive.validators.ValidEnum;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -42,7 +43,7 @@ public class CollegeController {
             @ValidEnum(enumClazz = College.FilterField.class, required = false) @RequestParam(
                     required = false) String filterField,
             @RequestParam(required = false) String filterValue) {
-        Object filterValueObj = College.FilterField.mapFilterValue(filterField, filterValue);
+        Object filterValueObj = FilterValueMapper.mapFilterValue(College.FilterField.class, filterField, filterValue);
         Pageable p = PageRequest.of(page, size,
                 Sort.by(Sort.Direction.fromString(sortDirection), sortField));
         final var collegesPaged =

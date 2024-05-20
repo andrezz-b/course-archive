@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import com.andrezzb.coursearchive.program.models.Program;
+import com.andrezzb.coursearchive.repository.FilterValueMapper;
 import com.andrezzb.coursearchive.security.models.AclSecured;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -79,20 +80,17 @@ public class College implements AclSecured {
         name, id
     }
 
-    public enum FilterField {
-        name, city, postcode, acronym;
-
-        public static Object mapFilterValue(String filterField, String filterValue) {
-            if (filterField == null || filterValue == null || filterValue.isBlank()) {
-                return null;
-            }
-            var enumValue = FilterField.valueOf(filterField);
-            switch (enumValue) {
-                case postcode:
+    public enum FilterField implements FilterValueMapper {
+        name, city, postcode {
+            @Override
+            public Object map(String filterValue) {
+                try {
                     return Integer.parseInt(filterValue);
-                default:
-                    return filterValue;
+                } catch (Exception e) {
+                    return null;
+                }
             }
-        }
+        },
+        acronym;
     }
 }
