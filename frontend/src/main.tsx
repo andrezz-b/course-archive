@@ -10,8 +10,6 @@ import { ThemeProvider } from "./context/ThemeProvider.tsx";
 import { AuthProvider } from "./context/AuthProvider.tsx";
 
 import ProtectedRoutes from "./layouts/ProtectedRoutes.tsx";
-import LoginPage from "./pages/LoginPage.tsx";
-import RegisterPage from "./pages/RegisterPage.tsx";
 import ErrorPage from "./pages/ErrorPage.tsx";
 import App from "./App.tsx";
 import RootLayout from "./layouts/RootLayout.tsx";
@@ -38,20 +36,43 @@ const router = createBrowserRouter([
         element: <SingleCollegePage />,
         errorElement: <ErrorPage />,
       },
+      {
+        path: "/admin",
+        async lazy() {
+          const layout = await import("./layouts/AdminLayout.tsx");
+          return { Component: layout.default };
+        },
+        errorElement: <ErrorPage />,
+        children: [
+          {
+            index: true,
+            async lazy() {
+              const component = await import("./pages/college/AdminCollegeListingPage.tsx");
+              return { Component: component.default };
+            },
+            errorElement: <ErrorPage />,
+          },
+        ],
+      },
     ],
   },
   {
-    path: "/",
     element: <RootLayout />,
     children: [
       {
         path: "/login",
-        element: <LoginPage />,
+        async lazy() {
+          const component = await import("./pages/LoginPage.tsx");
+          return { Component: component.default };
+        },
         errorElement: <ErrorPage />,
       },
       {
         path: "/register",
-        element: <RegisterPage />,
+        async lazy() {
+          const component = await import("./pages/RegisterPage.tsx");
+          return { Component: component.default };
+        },
         errorElement: <ErrorPage />,
       },
     ],

@@ -5,6 +5,7 @@ import {
   DefinedInitialDataInfiniteOptions,
   DefinedInitialDataOptions,
   InfiniteData,
+  UndefinedInitialDataOptions,
   useInfiniteQuery,
   useQuery,
   useQueryClient,
@@ -56,6 +57,31 @@ export const CollegeService = {
         }
       },
       initialPageParam: 0,
+      staleTime: 60e3,
+      ...options,
+    });
+  },
+  useGetColleges: <Data extends Page<College>, Err extends ApiError>(
+    page: number,
+    size = COLLEGE_PAGE_SIZE,
+    options?: Omit<UndefinedInitialDataOptions<Data, Err>, "queryKey" | "queryFn" | "staleTime">
+  ) => {
+    const axios = useAxiosPrivate();
+    return useQuery<Data, Err>({
+      queryKey: ["college", "admin", page],
+      queryFn: async () => {
+        try {
+          const { data } = await axios.get<Data>(`/college/`, {
+            params: {
+              page,
+              size,
+            },
+          });
+          return data;
+        } catch (error) {
+          throw new ApiError(error);
+        }
+      },
       staleTime: 60e3,
       ...options,
     });

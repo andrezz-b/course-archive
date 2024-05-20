@@ -3,7 +3,7 @@ import ThemeToggle from "./ThemeToggle";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
 import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "./ui/sheet";
-import { ChevronDown, LogOut, Menu, Package } from "lucide-react";
+import { ChevronDown, LogOut, Menu, Package, Shield } from "lucide-react";
 import { memo } from "react";
 import useAuth from "@/hooks/useAuth";
 import useLogout from "@/hooks/useLogout";
@@ -25,7 +25,7 @@ const Navbar = () => {
 
   return (
     <nav className="flex justify-center bg-background items-center w-full border-b border-accent py-4 min-w-[350px] min-h-[80px] sticky top-0 z-10 ">
-      <div className="flex justify-between items-center flex-grow px-6 md:max-w-[75%]">
+      <div className="flex justify-between items-center flex-grow px-4 md:p-0 md:max-w-[75vw]">
         <div className="flex items-center gap-3">
           <Package />
           <h1 className="text-2xl font-bold">Course Archive</h1>
@@ -143,6 +143,12 @@ const AuthNavbar = {
           <DropdownMenuContent className="w-30">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link to="/admin" className="cursor-pointer">
+                <Shield className="w-4 h-4 mt-1 mr-2" />
+                Admin
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={logout} className="cursor-pointer">
               <LogOut className="mr-2 h-4 w-4" />
               <Button variant="ghost" className="p-0 m-0 h-auto">
