@@ -13,8 +13,10 @@ import com.andrezzb.coursearchive.security.exceptions.EmailTakenException;
 import com.andrezzb.coursearchive.security.exceptions.UsernameTakenException;
 import com.andrezzb.coursearchive.security.mappings.GrantPermissionMapping;
 import com.andrezzb.coursearchive.security.models.AclSecured;
+import com.andrezzb.coursearchive.security.models.Role;
 import com.andrezzb.coursearchive.security.models.UserEntity;
 import com.andrezzb.coursearchive.security.repository.UserRepository;
+import java.util.Arrays;
 import org.springframework.security.acls.model.Permission;
 
 
@@ -33,7 +35,8 @@ public class AuthService {
 
   public AuthService(TokenService tokenService, AuthenticationManager authenticationManager,
       UserRepository userRepository, PasswordEncoder passwordEncoder,
-      GrantPermissionMapping grantPermissionMapping, AclUtilService aclUtilService, UserService userService) {
+      GrantPermissionMapping grantPermissionMapping, AclUtilService aclUtilService,
+      UserService userService) {
     this.tokenService = tokenService;
     this.authenticationManager = authenticationManager;
     this.userRepository = userRepository;
@@ -50,7 +53,8 @@ public class AuthService {
         this.authenticationManager.authenticate(authenticationRequest);
     String accessToken = tokenService.generateToken(authenticationResponse);
     String refreshToken = tokenService.generateRefreshToken(authenticationResponse);
-    return LoginDto.LoginResponse.builder().accessToken(accessToken).refreshToken(refreshToken).build();
+    return LoginDto.LoginResponse.builder().accessToken(accessToken).refreshToken(refreshToken)
+        .build();
   }
 
   public UserEntity register(RegisterDto registerData) {
@@ -66,6 +70,7 @@ public class AuthService {
     user.setFirstName(registerData.getFirstName());
     user.setLastName(registerData.getLastName());
     user.setEmail(registerData.getEmail());
+    user.setRoles(Arrays.asList(userService.findRoleByName(Role.RoleName.ROLE_USER)));
     return userRepository.save(user);
   }
 
