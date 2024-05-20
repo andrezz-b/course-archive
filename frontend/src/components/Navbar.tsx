@@ -24,7 +24,7 @@ const Navbar = () => {
   const SheetLinks = auth ? AuthNavbar.sheetLinks : NoAuthNavbar.sheetLinks;
 
   return (
-    <nav className="flex justify-center items-center w-full border-b border-accent py-4 min-w-[350px] min-h-[60px]">
+    <nav className="flex justify-center bg-background items-center w-full border-b border-accent py-4 min-w-[350px] min-h-[80px] sticky top-0 z-10 ">
       <div className="flex justify-between items-center flex-grow px-6 md:max-w-[75%]">
         <div className="flex items-center gap-3">
           <Package />
@@ -124,11 +124,11 @@ const AuthNavbar = {
       </li>
       <li>
         <NavLink
-          to="/courses"
+          to="/college"
           className={({ isActive }) => (isActive ? "text-primary" : undefined)}
         >
           <Button variant="ghost" className="font-semibold">
-            Courses
+            College
           </Button>
         </NavLink>
       </li>
