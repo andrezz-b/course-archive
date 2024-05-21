@@ -91,6 +91,6 @@ public class College implements AclSecured {
                 }
             }
         },
-        acronym;
+        acronym
     }
 }

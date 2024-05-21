@@ -9,6 +9,8 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.*;
 import java.util.List;
+import java.util.Objects;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -51,7 +53,7 @@ public class CollegeControllerUnitTest {
 
   private MockMvc mvc;
 
-  private ModelMapper modelMapper = new ModelMapper();
+  private final ModelMapper modelMapper = new ModelMapper();
 
   @BeforeEach
   public void setup() {
@@ -101,7 +103,7 @@ public class CollegeControllerUnitTest {
       Pageable pageable = pageableCaptor.getValue();
       assertThat(pageable.getPageNumber()).isEqualTo(0);
       assertThat(pageable.getPageSize()).isEqualTo(5);
-      assertThat(pageable.getSort().getOrderFor("id").isAscending()).isTrue();
+      assertThat(Objects.requireNonNull(pageable.getSort().getOrderFor("id")).isAscending()).isTrue();
     }
 
     @Test
@@ -133,7 +135,7 @@ public class CollegeControllerUnitTest {
       Pageable pageable = pageableCaptor.getValue();
       assertThat(pageable.getPageNumber()).isEqualTo(page);
       assertThat(pageable.getPageSize()).isEqualTo(size);
-      assertThat(pageable.getSort().getOrderFor(sortField).isDescending()).isTrue();
+      assertThat(Objects.requireNonNull(pageable.getSort().getOrderFor(sortField)).isDescending()).isTrue();
     }
 
 

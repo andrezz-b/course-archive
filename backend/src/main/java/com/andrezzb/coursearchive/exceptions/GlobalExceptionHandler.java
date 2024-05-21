@@ -3,6 +3,8 @@ package com.andrezzb.coursearchive.exceptions;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.context.MessageSourceResolvable;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -15,7 +17,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 @RestControllerAdvice
-@Order(Ordered.LOWEST_PRECEDENCE)
+@Order()
 public class GlobalExceptionHandler {
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -50,7 +52,7 @@ public class GlobalExceptionHandler {
     List<String> errors = e.getAllValidationResults().stream()
         .map(error -> error.getMethodParameter().getParameterName()
             + ": "
-            + error.getResolvableErrors().stream().map(err -> err.getDefaultMessage())
+            + error.getResolvableErrors().stream().map(MessageSourceResolvable::getDefaultMessage)
                 .collect(Collectors.joining(", ")))
         .collect(Collectors.toList());
     final ErrorObject error = new ErrorObject(HttpStatus.BAD_REQUEST, errors);

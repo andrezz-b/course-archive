@@ -111,7 +111,7 @@ public class AuthControllerUnitTest {
     class Register {
         private static final String REGISTER_URL = "/api/auth/register";
 
-        private RegisterDtoBuilder defaultData = RegisterDto.builder()
+        private final RegisterDtoBuilder defaultData = RegisterDto.builder()
                 .firstName("first")
                 .lastName("last")
                 .username("testuser")

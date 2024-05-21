@@ -102,7 +102,7 @@ public class MaterialGroupService {
     if (newOrder == null && oldOrder != null) {
         return oldOrder;
     }
-    Short maxOrder = materialGroupRepository.findMaxOrder(courseYearId).orElse((short) -1);
+    short maxOrder = materialGroupRepository.findMaxOrder(courseYearId).orElse((short) -1);
     // No new order specified, default: add it to the end
     if (newOrder == null) {
         return (short) (maxOrder + 1);

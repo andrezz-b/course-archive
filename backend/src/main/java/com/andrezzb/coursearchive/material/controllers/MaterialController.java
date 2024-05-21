@@ -54,7 +54,7 @@ public class MaterialController {
       @ValidEnum(enumClazz = Material.FilterField.class, required = false) @RequestParam(
           required = false) String filterField,
       @RequestParam(required = false) String filterValue,
-      @RequestParam(required = true) Long courseYearId,
+      @RequestParam() Long courseYearId,
       @RequestParam(required = false) Long materialGroupId) {
     Object filterValueObj =
         FilterValueMapper.mapFilterValue(Material.FilterField.class, filterField, filterValue);

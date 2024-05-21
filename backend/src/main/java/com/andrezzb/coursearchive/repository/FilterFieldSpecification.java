@@ -5,8 +5,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface FilterFieldSpecification<T> extends JpaSpecificationExecutor<T> {
 
-  public default Specification<T> filterByFieldAndValue(String filterField,
-      Object filterValue) {
+  default Specification<T> filterByFieldAndValue(String filterField,
+                                                 Object filterValue) {
     return (root, query, criteriaBuilder) -> {
       if (filterField == null || filterValue == null) {
         return null;
@@ -14,12 +14,12 @@ public interface FilterFieldSpecification<T> extends JpaSpecificationExecutor<T>
 
       if (filterValue instanceof String) {
         return criteriaBuilder.like(
-            criteriaBuilder.lower(root.get(filterField.toString())),
+            criteriaBuilder.lower(root.get(filterField)),
             "%" + ((String) filterValue).toLowerCase() + "%");
       }
 
       if (filterValue instanceof Number) {
-        return criteriaBuilder.equal(root.get(filterField.toString()), filterValue);
+        return criteriaBuilder.equal(root.get(filterField), filterValue);
       }
 
       return null;

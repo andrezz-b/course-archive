@@ -17,6 +17,8 @@ import com.andrezzb.coursearchive.security.models.Role;
 import com.andrezzb.coursearchive.security.models.UserEntity;
 import com.andrezzb.coursearchive.security.repository.UserRepository;
 import java.util.Arrays;
+import java.util.Collections;
+
 import org.springframework.security.acls.model.Permission;
 
 
@@ -70,7 +72,7 @@ public class AuthService {
     user.setFirstName(registerData.getFirstName());
     user.setLastName(registerData.getLastName());
     user.setEmail(registerData.getEmail());
-    user.setRoles(Arrays.asList(userService.findRoleByName(Role.RoleName.USER)));
+    user.setRoles(Collections.singletonList(userService.findRoleByName(Role.RoleName.USER)));
     return userRepository.save(user);
   }
 
@@ -82,25 +84,13 @@ public class AuthService {
     AclSecured object =
         (AclSecured) repository.findById(grantPermissionDto.getObjectId()).orElseThrow(
             () -> new IllegalArgumentException("Invalid object ID"));
-    Boolean userExists = userRepository.existsByUsername(grantPermissionDto.getUsername());
+    boolean userExists = userRepository.existsByUsername(grantPermissionDto.getUsername());
     if (!userExists) {
       throw new IllegalArgumentException("Invalid username");
     }
 
     aclUtilService.grantPermission(object, grantPermissionDto.getUsername(), permission);
 
-    // ObjectIdentity oi = new ObjectIdentityImpl(objectClass, grantPermissionDto.getObjectId());
-    // Sid sid = new PrincipalSid(grantPermissionDto.getUsername());
-    // MutableAcl acl = null;
-    // try {
-    // acl = (MutableAcl) aclService.readAclById(oi);
-    // } catch (NotFoundException nfe) {
-    // acl = aclService.createAcl(oi);
-    // }
-
-    // // Now grant some permissions via an access control entry (ACE)
-    // acl.insertAce(acl.getEntries().size(), permission, sid, true);
-    // aclService.updateAcl(acl);
   }
 
   public String refresh(String refreshToken) {
