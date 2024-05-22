@@ -1,15 +1,14 @@
-import { College } from "@/types/College";
+import { College, CollegeCreateData, CollegeCreateSchema } from "@/types/College";
 import { ColumnDef, PaginationState } from "@tanstack/react-table";
 import { DataTable } from "../../components/ui/data-table";
 import { CollegeService } from "@/api/college.service";
-import { lazy, Suspense, useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { keepPreviousData } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Pencil } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import Loading from "@/components/Loading";
-
-const CollegeCreateUpdateDialog = lazy(() => import("@/components/college/CollegeAdminModal"));
+import GenericForm from "@/components/GenericForm";
 
 const AdminCollegesListingPage = () => {
   const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 10 });
@@ -72,6 +71,12 @@ const AdminCollegesListingPage = () => {
     [],
   );
 
+  const handleSubmit = async (data, id?: number) => {
+    console.log(data, id);
+
+    return undefined;
+  }
+
   return (
     <div className="container">
       <div className="flex justify-between">
@@ -88,10 +93,24 @@ const AdminCollegesListingPage = () => {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <Suspense fallback={<Loading size="32" />}>
-            <CollegeCreateUpdateDialog
+            {/* <CollegeCreateUpdateDialog
               edit={!!selectedRow}
               college={selectedRow}
               close={() => setDialogOpen(false)}
+            /> */}
+            <GenericForm<CollegeCreateData>
+              schema={CollegeCreateSchema}
+              defaultValues={{
+                acronym: selectedRow?.acronym,
+                city: selectedRow?.city,
+                name: selectedRow?.name,
+                address: selectedRow?.address,
+                postcode: selectedRow?.postcode,
+                website: selectedRow?.website,
+                description: selectedRow?.description,
+              }}
+              onSubmit={(data) => handleSubmit(data, selectedRow?.id)}
+              title="Create College"
             />
           </Suspense>
         </DialogContent>

@@ -58,24 +58,6 @@ export const CollegeFilter = [
   },
 ];
 
-export const CollegeCreateSchema = z.object({
-  name: z
-    .string()
-    .min(1, { message: "College name is required" })
-    .max(128, "College name must be at most 128 characters"),
-  acronym: z.string().optional(),
-  city: z.string().min(1, { message: "City is required" }),
-  postcode: z.preprocess(
-    (args) => (args === "" ? undefined : args),
-    z.coerce
-      .number({ invalid_type_error: "Postcode must be a number" })
-      .positive("Postcode must be positive"),
-  ),
-  address: z.string().min(1, { message: "Address is required" }),
-  website: z.string().url().optional().or(z.literal('')),
-  description: z.string().max(512, "Description must be at most 512 characters").optional(),
-});
-
 export const CollegeEditSchema = z.object({
   acronym: z.string().optional(),
   city: z.string().min(1, { message: "City is required" }),
@@ -84,11 +66,17 @@ export const CollegeEditSchema = z.object({
     z.coerce
       .number({ invalid_type_error: "Postcode must be a number" })
       .positive("Postcode must be positive"),
-  ),
+  ) as z.ZodType<number, z.ZodTypeDef, number>,
   address: z.string().min(1, { message: "Address is required" }),
-  website:  z.string().url().optional().or(z.literal('')),
+  website: z.string().url().optional().or(z.literal("")),
   description: z.string().max(512, "Description must be at most 512 characters").optional(),
 });
+
+export const CollegeCreateSchema = z
+  .object({
+    name: z.string().min(1, { message: "Name is required" }),
+  })
+  .and(CollegeEditSchema);
 
 export type CollegeCreateData = z.infer<typeof CollegeCreateSchema>;
 export type CollegeEditData = z.infer<typeof CollegeEditSchema>;

@@ -1,11 +1,15 @@
 import { Program } from "@/types/Program";
 import { ColumnDef, PaginationState } from "@tanstack/react-table";
 import { DataTable } from "../../components/ui/data-table";
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { keepPreviousData } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Pencil } from "lucide-react";
 import { ProgramService } from "@/api/program.service";
+import GenericForm from "@/components/GenericForm";
+import { CollegeCreateSchema } from "@/types/College";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import Loading from "@/components/Loading";
 
 const AdminProgramListingPage = () => {
   const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 10 });
@@ -84,10 +88,10 @@ const AdminProgramListingPage = () => {
       {/* <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <Suspense fallback={<Loading size="32" />}>
-            <CollegeCreateUpdateDialog
-              edit={!!selectedRow}
-              college={selectedRow}
-              close={() => setDialogOpen(false)}
+            <GenericForm 
+            schema={CollegeCreateSchema}
+            defaultValues={selectedRow}
+            
             />
           </Suspense>
         </DialogContent>
