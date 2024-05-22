@@ -123,14 +123,26 @@ const AuthNavbar = {
         </NavLink>
       </li>
       <li>
-        <NavLink
-          to="/college"
-          className={({ isActive }) => (isActive ? "text-primary" : undefined)}
-        >
-          <Button variant="ghost" className="font-semibold">
-            College
-          </Button>
-        </NavLink>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="flex items-center font-semibold">
+              <span>Browse</span>
+              <ChevronDown className="h-3 w-3 ml-1 mt-1" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-30">
+            <DropdownMenuItem asChild>
+              <Link to="/college" className="cursor-pointer">
+                Colleges
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={logout} className="cursor-pointer">
+              <Link to="/program" className="cursor-pointer">
+                Programs
+              </Link>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </li>
       <li>
         <DropdownMenu>

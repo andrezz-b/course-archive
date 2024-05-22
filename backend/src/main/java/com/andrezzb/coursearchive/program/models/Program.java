@@ -97,7 +97,7 @@ public class Program implements AclSecured {
   }
 
   public enum SortField {
-    id, name
+    id, name, duration
   }
 
 }

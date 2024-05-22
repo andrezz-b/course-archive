@@ -1,6 +1,6 @@
 import { College } from "@/types/College";
 import { ColumnDef, PaginationState } from "@tanstack/react-table";
-import { DataTable } from "./data-table";
+import { DataTable } from "../../components/ui/data-table";
 import { CollegeService } from "@/api/college.service";
 import { lazy, Suspense, useMemo, useState } from "react";
 import { keepPreviousData } from "@tanstack/react-query";

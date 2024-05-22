@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { SortDirection } from "./Common";
+import { SortDirection, SortValue } from "./Common";
 
 export interface College {
   id: number;
@@ -23,22 +23,21 @@ export enum CollegeSortField {
   NAME = "name",
 }
 
+export type CollegeSortValue = SortValue<CollegeSortField>;
 export const CollegeSort = [
   {
     field: CollegeSortField.NAME,
     direction: SortDirection.ASC,
     label: "Name: A to Z",
-    value: `${CollegeSortField.NAME}-${SortDirection.ASC}` as SortValue,
+    value: `${CollegeSortField.NAME}-${SortDirection.ASC}` as CollegeSortValue,
   },
   {
     field: CollegeSortField.NAME,
     direction: SortDirection.DESC,
     label: "Name: Z to A",
-    value: `${CollegeSortField.NAME}-${SortDirection.DESC}` as SortValue,
+    value: `${CollegeSortField.NAME}-${SortDirection.DESC}` as CollegeSortValue,
   },
 ];
-
-export type SortValue = `${CollegeSortField}-${SortDirection}`;
 
 export const CollegeFilter = [
   {

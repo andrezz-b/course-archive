@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { ChevronLeft, SquareArrowOutUpRight } from "lucide-react";
 import { useMemo } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 const SingleCollegePage = () => {
   const navigate = useNavigate();
@@ -66,7 +66,14 @@ const SingleCollegePage = () => {
           </div>
         </CardContent>
         <CardFooter className="flex justify-between flex-row-reverse">
-          <Button className="w-32">View Programs</Button>
+          <Link
+            to={{
+              pathname: "/program",
+              search: `?collegeId=${college.id}`,
+            }}
+          >
+            <Button className="w-32">View Programs</Button>
+          </Link>
 
           {linkValid && (
             <a target="_blank" href={college.website}>

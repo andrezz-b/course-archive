@@ -1,6 +1,4 @@
-import { CollegeService } from "@/api/college.service";
-import CollegeCard from "@/components/college/CollegeCard";
-import Loading from "@/components/Loading";
+import { ProgramFilter, ProgramSort, ProgramSortValue } from "@/types/Program";
 import { Button } from "@/components/ui/button";
 import { Form, FormField } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -12,16 +10,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CollegeFilter, CollegeSort, CollegeSortValue } from "@/types/College";
 import { Search } from "lucide-react";
-import { useEffect, useCallback } from "react";
 import { SubmitHandler, useForm, UseFormReturn } from "react-hook-form";
 import { useSearchParams } from "react-router-dom";
+import { useCallback, useEffect, useMemo } from "react";
+import { ProgramService } from "@/api/program.service";
+import ProgramCard from "@/components/program/ProgramCard";
+import Loading from "@/components/Loading";
 
 interface SearchData {
   filterField: string;
   filterValue: string;
-  sortField: CollegeSortValue;
+  sortField: ProgramSortValue;
+  collegeId: number;
 }
 
 interface SearchFormProps {
@@ -37,6 +38,11 @@ const SearchForm = ({ form, onSubmit }: SearchFormProps) => {
         onSubmit={form.handleSubmit(onSubmit)}
       >
         <div className="flex gap-1">
+          <Input
+            {...form.register("collegeId")}
+            placeholder="Enter college ID"
+            className="max-w-[150px]"
+          />
           <FormField
             name="filterField"
             control={form.control}
@@ -47,7 +53,7 @@ const SearchForm = ({ form, onSubmit }: SearchFormProps) => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    {CollegeFilter.map((filter) => (
+                    {ProgramFilter.map((filter) => (
                       <SelectItem key={filter.field} value={filter.field}>
                         {filter.label}
                       </SelectItem>
@@ -73,13 +79,12 @@ const SearchForm = ({ form, onSubmit }: SearchFormProps) => {
           control={form.control}
           render={({ field }) => (
             <Select onValueChange={field.onChange} defaultValue={field.value}>
-              <SelectTrigger className="w-[200px]">
-                Sort by:
-                <SelectValue placeholder="" />
+              <SelectTrigger className="max-w-[200px] overflow-hidden whitespace-nowrap">
+                <SelectValue placeholder="" className="overflow-hidden" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  {CollegeSort.map((sort) => (
+                  {ProgramSort.map((sort) => (
                     <SelectItem key={sort.value} value={sort.value}>
                       {sort.label}
                     </SelectItem>
@@ -94,11 +99,11 @@ const SearchForm = ({ form, onSubmit }: SearchFormProps) => {
   );
 };
 
-interface CollegeListProps {
-  query: ReturnType<typeof CollegeService.useGetAllColleges>;
+interface ListProps {
+  query: ReturnType<typeof ProgramService.useGetAllPrograms>;
 }
 
-const CollegeList = ({ query }: CollegeListProps) => {
+const ElementList = ({ query }: ListProps) => {
   if (query.isLoading) {
     return <Loading />;
   }
@@ -108,14 +113,14 @@ const CollegeList = ({ query }: CollegeListProps) => {
   }
 
   if (!query.data.pages.length || !query.data.pages[0].content?.length) {
-    return <h3 className="text-center pt-10">No colleges found</h3>;
+    return <h3 className="text-center pt-10">No programs found</h3>;
   }
 
   return (
     <>
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
         {query.data.pages.map((page) =>
-          page.content.map((college) => <CollegeCard key={college.id} college={college} />),
+          page.content.map((program) => <ProgramCard key={program.id} program={program} />),
         )}
       </div>
       {query.hasNextPage && (
@@ -129,21 +134,27 @@ const CollegeList = ({ query }: CollegeListProps) => {
   );
 };
 
-const CollegeListingPage = () => {
+const ProgramListingPage = () => {
   const [searchParams, setSearchParams] = useSearchParams({
-    filterField: CollegeFilter[0].field,
+    filterField: ProgramFilter[0].field,
     filterValue: "",
-    sortField: CollegeSort[0].field,
-    sortDirection: CollegeSort[0].direction,
+    sortField: ProgramSort[0].field,
+    sortDirection: ProgramSort[0].direction,
   });
-  const query = CollegeService.useGetAllColleges(Object.fromEntries(searchParams.entries()));
+  const query = ProgramService.useGetAllPrograms(Object.fromEntries(searchParams.entries()));
+
+  const mappedCollegeId = useMemo(() => {
+    const collegeId = searchParams.get("collegeId");
+    return collegeId ? parseInt(collegeId) : undefined;
+  }, [searchParams]);
 
   const form = useForm<SearchData>({
     defaultValues: {
       filterField: searchParams.get("filterField")!,
       filterValue: searchParams.get("filterValue")!,
       sortField:
-        `${searchParams.get("sortField")}-${searchParams.get("sortDirection")}` as CollegeSortValue,
+        `${searchParams.get("sortField")}-${searchParams.get("sortDirection")}` as ProgramSortValue,
+      collegeId: mappedCollegeId,
     },
   });
 
@@ -154,6 +165,7 @@ const CollegeListingPage = () => {
         filterValue: data.filterValue,
         sortField: data.sortField.split("-")[0],
         sortDirection: data.sortField.split("-")[1],
+        collegeId: data.collegeId.toString(),
       });
     },
     [setSearchParams],
@@ -171,12 +183,12 @@ const CollegeListingPage = () => {
   return (
     <div className="flex flex-col justify-center items-center mt-4 pb-12">
       <div className="md:min-w-[700px] lg:min-w-[1000px] max-w-[1200px] space-y-4 px-4 md:p-0">
-        <h2 className="text-2xl border-none">Browse Colleges</h2>
+        <h2 className="text-2xl border-none">Browse Programs</h2>
         <SearchForm form={form} onSubmit={onSubmit} />
-        <CollegeList query={query} />
+        <ElementList query={query} />
       </div>
     </div>
   );
 };
 
-export default CollegeListingPage;
+export default ProgramListingPage;
