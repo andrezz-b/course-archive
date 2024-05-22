@@ -52,8 +52,21 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
+            element: <div>Admin Home</div>,
+            errorElement: <ErrorPage />,
+          },
+          {
+            path: "college",
             async lazy() {
               const component = await import("./pages/college/AdminCollegeListingPage.tsx");
+              return { Component: component.default };
+            },
+            errorElement: <ErrorPage />,
+          },
+          {
+            path: "program",
+            async lazy() {
+              const component = await import("./pages/program/AdminProgramListingPage.tsx");
               return { Component: component.default };
             },
             errorElement: <ErrorPage />,

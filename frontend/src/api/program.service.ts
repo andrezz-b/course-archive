@@ -12,6 +12,7 @@ interface GetAllProgramsParams {
   sortDirection?: SortDirection;
   filterField?: ProgramFilterField;
   filterValue?: string;
+  page?: number;
   size?: number;
   collegeId?: number;
 }
@@ -30,7 +31,7 @@ export const ProgramService = {
     }, [params]);
 
     return useQuery<Data, Err>({
-      queryKey: ["college", "all", definedParams],
+      queryKey: ["program", "all", definedParams],
       queryFn: async () => {
         try {
           const { data } = await axios.get<Data>("/program/", {

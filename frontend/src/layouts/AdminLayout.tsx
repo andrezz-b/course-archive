@@ -14,7 +14,7 @@ const AdminLayout = () => {
           </h2>
           <nav className="flex flex-col gap-1">
             <NavLink
-              to="/admin"
+              to="/admin/college"
               className={({ isActive }) => cn({ "bg-muted": isActive }, "w-full rounded-md")}
             >
               <Button variant="ghost" className="w-full justify-start">
@@ -22,7 +22,7 @@ const AdminLayout = () => {
               </Button>
             </NavLink>
             <NavLink
-              to="/admin/programs"
+              to="/admin/program"
               className={({ isActive }) => cn({ "bg-muted": isActive }, "w-full rounded-md")}
             >
               <Button variant="ghost" className="w-full justify-start">
