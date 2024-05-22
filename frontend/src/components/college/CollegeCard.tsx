@@ -4,12 +4,9 @@ import { Button } from "../ui/button";
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
+import { InfiniteCardProps } from "../InfiniteCardList";
 
-interface CollegeCardProps {
-  college: College;
-}
-
-const CollegeCard = ({ college }: CollegeCardProps) => {
+const CollegeCard = ({ item: college }: InfiniteCardProps<College>) => {
   const truncatedDescription = useMemo(() => {
     if (!college.description) return "";
     if (college.description.length > 90) {

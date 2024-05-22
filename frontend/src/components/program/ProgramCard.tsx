@@ -4,12 +4,9 @@ import { useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import { Program } from "@/types/Program";
+import { InfiniteCardProps } from "../InfiniteCardList";
 
-interface ProgramCardProps {
-  program: Program;
-}
-
-const ProgramCard = ({ program }: ProgramCardProps) => {
+const ProgramCard = ({ item: program }: InfiniteCardProps<Program>) => {
   const truncatedDescription = useMemo(() => {
     if (!program.description) return "";
     if (program.description.length > 90) {

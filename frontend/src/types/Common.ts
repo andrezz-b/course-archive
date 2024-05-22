@@ -4,3 +4,19 @@ export enum SortDirection {
 }
 
 export type SortValue<T extends string> = `${T}-${SortDirection}`;
+
+export interface WithId {
+  id: number;
+}
+
+export interface SortOption {
+  field: string;
+  direction: SortDirection;
+  label: string;
+  value: string;
+}
+
+export interface FilterOption {
+  field: string;
+  label: string;
+}

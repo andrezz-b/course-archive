@@ -36,7 +36,6 @@ const ProtectedRoutes = ({ layout = <Outlet /> }: ProtectedRoutesProps) => {
     };
   }, [auth?.accessToken, refresh]);
 
-  // TODO: Add loading spinner
   if (isLoading) return <Loading />;
 
   if (!auth?.accessToken) return <Navigate to="/login" state={{ from: location }} replace />;

@@ -136,7 +136,7 @@ const AuthNavbar = {
                 Colleges
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={logout} className="cursor-pointer">
+            <DropdownMenuItem asChild>
               <Link to="/program" className="cursor-pointer">
                 Programs
               </Link>
