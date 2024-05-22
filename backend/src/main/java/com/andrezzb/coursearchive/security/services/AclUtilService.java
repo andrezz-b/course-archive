@@ -30,7 +30,7 @@ public class AclUtilService {
   @Transactional
   public void grantPermission(AclSecured object, Sid sid, Permission permission) {
     ObjectIdentity oi = new ObjectIdentityImpl(object);
-    MutableAcl acl = null;
+    MutableAcl acl;
     try {
       acl = (MutableAcl) aclService.readAclById(oi);
     } catch (NotFoundException nfe) {

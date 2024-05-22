@@ -86,17 +86,17 @@ public class Program implements AclSecured {
     return college;
   }
 
-  public static enum FilterField implements FilterValueMapper {
+  public enum FilterField implements FilterValueMapper {
     name, duration {
       @Override
       public Object map(String filterValue) {
         return Short.parseShort(filterValue);
       }
     
-    };
+    }
   }
 
-  public static enum SortField {
+  public enum SortField {
     id, name
   }
 

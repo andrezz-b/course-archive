@@ -3,11 +3,11 @@ package com.andrezzb.coursearchive.security.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public interface AclSecured {
-  public Long getId();
+  Long getId();
   @JsonIgnore
-  public Object getParent();
+  Object getParent();
   @JsonIgnore
-  default public Boolean isInheriting() {
+  default Boolean isInheriting() {
     return true;
   }
 }

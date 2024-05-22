@@ -23,7 +23,7 @@ public class EnumValidator implements ConstraintValidator<ValidEnum, String> {
       return false;
     }
     String valueStr = ignoreCase ? value.toUpperCase() : value;
-    Boolean isValid = valueList.contains(valueStr);
+    boolean isValid = valueList.contains(valueStr);
     if (!isValid) {
       context.buildConstraintViolationWithTemplate(generatedAcceptedValuesMessage()).addConstraintViolation();
     }
@@ -34,7 +34,7 @@ public class EnumValidator implements ConstraintValidator<ValidEnum, String> {
   public void initialize(ValidEnum constraintAnnotation) {
     required = constraintAnnotation.required();
     ignoreCase = constraintAnnotation.ignoreCase();
-    valueList = new ArrayList<String>();
+    valueList = new ArrayList<>();
     Class<? extends Enum<?>> enumClass = constraintAnnotation.enumClazz();
 
     @SuppressWarnings("rawtypes")
@@ -49,8 +49,7 @@ public class EnumValidator implements ConstraintValidator<ValidEnum, String> {
 
   private String generatedAcceptedValuesMessage() {
     String caseNote = this.ignoreCase ? " (case insensitive)" : "";
-    String message =  "Invalid value. Accepted values are" + caseNote + ": " + String.join(", ", valueList);
-    return message;
+      return "Invalid value. Accepted values are" + caseNote + ": " + String.join(", ", valueList);
 }
 
 }

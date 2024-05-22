@@ -6,6 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Objects;
+
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -38,7 +40,7 @@ public class FileSystemStorageService implements StorageService {
             "Cannot store file outside current directory.");
       }
       Files.createDirectories(destinationDir); // Create the directory if it does not exist
-      Path destinationFile = destinationDir.resolve(file.getOriginalFilename()); // Add the file
+      Path destinationFile = destinationDir.resolve(Objects.requireNonNull(file.getOriginalFilename())); // Add the file
                                                                                  // name to the path
       try (InputStream inputStream = file.getInputStream()) {
         Files.copy(inputStream, destinationFile,

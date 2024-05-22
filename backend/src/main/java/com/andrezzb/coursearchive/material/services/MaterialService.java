@@ -89,7 +89,7 @@ public class MaterialService {
   @Transactional
   @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.material.models.Material', 'delete') || hasRole('MANAGER')")
   public void deleteMaterialById(Long id) {
-    Material material = null;
+    Material material;
     try {
       material = findMaterialById(id);
     } catch (Exception e) {

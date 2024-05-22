@@ -87,11 +87,11 @@ public class CourseYear implements AclSecured {
     return course;
   }
 
-  public static enum FilterField implements FilterValueMapper {
-    academicYear;
+  public enum FilterField implements FilterValueMapper {
+    academicYear
   }
 
-  public static enum SortField {
+  public enum SortField {
     id, academicYear
   }
 }

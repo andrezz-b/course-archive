@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.*;
 
 import java.util.List;
+import java.util.Objects;
 
 import com.andrezzb.coursearchive.exceptions.ErrorObject;
 import com.andrezzb.coursearchive.program.dto.ProgramCreateDto;
@@ -35,17 +36,13 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import com.andrezzb.coursearchive.security.SecurityConfig;
-import com.andrezzb.coursearchive.security.repository.UserRepository;
 import com.andrezzb.coursearchive.security.services.CustomUserDetailsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.var;
 
 @WebMvcTest(ProgramController.class)
 @Import({SecurityConfig.class, CustomUserDetailsService.class})
 @WebAppConfiguration
 public class ProgramControllerUnitTest {
-  @MockBean
-  private UserRepository userRepository;
 
   @Autowired
   private WebApplicationContext context;
@@ -100,7 +97,7 @@ public class ProgramControllerUnitTest {
       Pageable pageable = pageableCaptor.getValue();
       assertThat(pageable.getPageNumber()).isEqualTo(0);
       assertThat(pageable.getPageSize()).isEqualTo(5);
-      assertThat(pageable.getSort().getOrderFor("id").isAscending()).isTrue();
+      assertThat(Objects.requireNonNull(pageable.getSort().getOrderFor("id")).isAscending()).isTrue();
     }
 
     @Test
@@ -132,7 +129,7 @@ public class ProgramControllerUnitTest {
       Pageable pageable = pageableCaptor.getValue();
       assertThat(pageable.getPageNumber()).isEqualTo(page);
       assertThat(pageable.getPageSize()).isEqualTo(size);
-      assertThat(pageable.getSort().getOrderFor(sortField).isDescending()).isTrue();
+      assertThat(Objects.requireNonNull(pageable.getSort().getOrderFor(sortField)).isDescending()).isTrue();
     }
   }
 
@@ -214,7 +211,7 @@ public class ProgramControllerUnitTest {
           .build();
 
       var program = new ProgramDto();
-      program.setId(1l);
+      program.setId(1L);
       program.setName(programCreateDto.getName());
       when(programService.createProgram(any(ProgramCreateDto.class)))
           .thenReturn(program);
@@ -269,7 +266,7 @@ public class ProgramControllerUnitTest {
           .build();
 
       var program = new ProgramDto();
-      program.setId(1l);
+      program.setId(1L);
       program.setDescription(programUpdateDto.getDescription());
 
       when(programService.updateProgram(eq(1L), any(ProgramUpdateDto.class)))

@@ -80,7 +80,7 @@ public class Course implements AclSecured {
     return program;
   }
 
-  public static enum FilterField implements FilterValueMapper {
+  public enum FilterField implements FilterValueMapper {
     name, credits {
       @Override
       public Object map(String filterValue) {
@@ -93,10 +93,10 @@ public class Course implements AclSecured {
       public Object map(String filterValue) {
         return Short.parseShort(filterValue);
       }
-    };
+    }
   }
 
-  public static enum SortField {
+  public enum SortField {
     id, name
   }
 }

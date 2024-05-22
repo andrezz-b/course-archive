@@ -26,7 +26,7 @@ public class Role {
     return name;
   }
 
-  public static enum RoleName {
+  public enum RoleName {
     USER, MANAGER, ADMIN
   }
 }

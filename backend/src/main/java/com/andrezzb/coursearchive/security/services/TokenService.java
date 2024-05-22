@@ -2,6 +2,7 @@ package com.andrezzb.coursearchive.security.services;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -59,9 +60,9 @@ public class TokenService {
   public Jwt validateRefreshToken(String token) {
     Jwt jwt = this.decoder.decode(token);
     if (!jwt.getClaimAsString("type").equals(TokenType.REFRESH.toString())) {
-      throw new JwtException("Invalid token type, want: " + TokenType.REFRESH.toString());
+      throw new JwtException("Invalid token type, want: " + TokenType.REFRESH);
     }
-    if (jwt.getExpiresAt().isBefore(Instant.now())) {
+    if (Objects.requireNonNull(jwt.getExpiresAt()).isBefore(Instant.now())) {
       throw new JwtException("Token expired");
     }
     return jwt;

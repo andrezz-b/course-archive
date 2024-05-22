@@ -54,7 +54,7 @@ public class AuthServiceUnitTest {
 
     var token = authService.login("testuser", "testpassword");
 
-    assertThat(token).isEqualTo(returnedToken);
+    assertThat(token.getAccessToken()).isEqualTo(returnedToken);
   }
 
   @Test
