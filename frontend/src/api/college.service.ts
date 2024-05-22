@@ -8,82 +8,46 @@ import {
   CollegeSortField,
 } from "@/types/College";
 import {
-  DefinedInitialDataInfiniteOptions,
   DefinedInitialDataOptions,
-  InfiniteData,
   UndefinedInitialDataOptions,
-  useInfiniteQuery,
   useMutation,
   UseMutationOptions,
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
 import { Page } from "@/types/Page";
-import { SortDirection } from "@/types/Common";
+import { DISPLAY_LISTING_PAGE_SIZE, SortDirection } from "@/types/Common";
 import { useMemo } from "react";
 import { getDefinedValuesObject } from "@/lib/utils";
 
-interface GetAllColegesParams {
+export interface GetAllColegesParams {
   sortField?: CollegeSortField;
   sortDirection?: SortDirection;
   filterField?: CollegeFilterField;
   filterValue?: string;
   size?: number;
+  page: number;
 }
-const COLLEGE_PAGE_SIZE = 6;
 
 export const CollegeService = {
-  useGetAllColleges: <Data extends Page<College>, Err extends ApiError>(
+  useGetColleges: <Data extends Page<College>, Err extends ApiError>(
     params?: GetAllColegesParams,
-    options?: Omit<
-      DefinedInitialDataInfiniteOptions<Data, Err>,
-      "getNextPageParam" | "queryKey" | "queryFn" | "initialPageParam"
-    >,
+    options?: Omit<UndefinedInitialDataOptions<Data, Err>, "queryKey" | "queryFn" | "staleTime">,
   ) => {
     const axios = useAxiosPrivate();
     const definedParams = useMemo(() => {
       if (!params) return {};
       const definedValues = getDefinedValuesObject(params);
-      definedValues.size = params.size || COLLEGE_PAGE_SIZE;
+      definedValues.size = params.size || DISPLAY_LISTING_PAGE_SIZE;
       return definedValues;
     }, [params]);
 
-    return useInfiniteQuery<Data, Err>({
-      getNextPageParam: (lastPage) => (!lastPage.last ? lastPage.number + 1 : null),
-      queryKey: ["college", "all", definedParams],
-      queryFn: async ({ pageParam = 0 }) => {
-        try {
-          const { data } = await axios.get<Data>(`/college/`, {
-            params: {
-              ...definedParams,
-              page: pageParam,
-            },
-          });
-          return data;
-        } catch (error) {
-          throw new ApiError(error);
-        }
-      },
-      initialPageParam: 0,
-      staleTime: 60e3,
-      ...options,
-    });
-  },
-  useGetColleges: <Data extends Page<College>, Err extends ApiError>(
-    page: number,
-    size = COLLEGE_PAGE_SIZE,
-    options?: Omit<UndefinedInitialDataOptions<Data, Err>, "queryKey" | "queryFn" | "staleTime">,
-  ) => {
-    const axios = useAxiosPrivate();
     return useQuery<Data, Err>({
-      queryKey: ["college", "admin", page],
+      queryKey: ["college", "all", definedParams],
       queryFn: async () => {
         try {
-          const { data } = await axios.get<Data>(`/college/`, {
-            params: {
-              page,
-              size,
-            },
+          const { data } = await axios.get<Data>("/college/", {
+            params: definedParams,
           });
           return data;
         } catch (error) {
@@ -113,17 +77,15 @@ export const CollegeService = {
       enabled: !!id,
       staleTime: 60e3,
       initialData: () => {
-        const values = queryClient.getQueriesData<InfiniteData<Page<Data>>>({
+        const values = queryClient.getQueriesData<Page<Data>>({
           stale: false,
           queryKey: ["college", "all"],
         });
 
         for (const [, data] of values) {
-          if (data?.pages) {
-            for (const page of data.pages) {
-              const college = page.content.find((college) => college.id === id);
-              if (college !== undefined) return college;
-            }
+          const college = data?.content.find((college) => college.id === id);
+          if (college) {
+            return college;
           }
         }
         return undefined;
@@ -183,7 +145,7 @@ export const CollegeService = {
       onSuccess: (data) => {
         queryClient.setQueriesData<Page<College>>(
           {
-            queryKey: ["college", "admin"],
+            queryKey: ["college", "all"],
             stale: false,
           },
           (oldData) => {

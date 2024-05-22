@@ -2,7 +2,9 @@ import { CollegeService } from "@/api/college.service";
 import CollegeCard from "@/components/college/CollegeCard";
 import InfiniteCardList from "@/components/InfiniteCardList";
 import ListingSearchForm, { SearchData } from "@/components/ListingSearchForm";
-import { CollegeFilter, CollegeSort } from "@/types/College";
+import { CollegeFilter, CollegeFilterField, CollegeSort, CollegeSortField } from "@/types/College";
+import { SortDirection } from "@/types/Common";
+import { keepPreviousData } from "@tanstack/react-query";
 import { useEffect, useCallback } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useSearchParams } from "react-router-dom";
@@ -13,8 +15,21 @@ const CollegeListingPage = () => {
     filterValue: "",
     sortField: CollegeSort[0].field,
     sortDirection: CollegeSort[0].direction,
+    page: "0",
   });
-  const query = CollegeService.useGetAllColleges(Object.fromEntries(searchParams.entries()));
+  const query = CollegeService.useGetColleges(
+    {
+      sortField: searchParams.get("sortField")! as CollegeSortField,
+      sortDirection: searchParams.get("sortDirection")! as SortDirection,
+      filterField: searchParams.get("filterField")! as CollegeFilterField,
+      filterValue: searchParams.get("filterValue")!,
+      size: parseInt(searchParams.get("size")!),
+      page: parseInt(searchParams.get("page")!),
+    },
+    {
+      placeholderData: keepPreviousData,
+    },
+  );
 
   const form = useForm<SearchData>({
     defaultValues: {
@@ -25,6 +40,16 @@ const CollegeListingPage = () => {
     },
   });
 
+  const setPage = useCallback(
+    (page: number) => {
+      setSearchParams((prev) => {
+        prev.set("page", page.toString());
+        return prev;
+      });
+    },
+    [setSearchParams],
+  );
+
   const onSubmit: SubmitHandler<SearchData> = useCallback(
     (data) => {
       setSearchParams({
@@ -32,6 +57,8 @@ const CollegeListingPage = () => {
         filterValue: data.filterValue,
         sortField: data.sortField.split("-")[0],
         sortDirection: data.sortField.split("-")[1],
+        page: "0",
+        size: "3",
       });
     },
     [setSearchParams],
@@ -56,7 +83,12 @@ const CollegeListingPage = () => {
           sortOptions={CollegeSort}
           filterOptions={CollegeFilter}
         />
-        <InfiniteCardList query={query} Card={CollegeCard} notFoundMessage="No colleges found" />
+        <InfiniteCardList
+          query={query}
+          Card={CollegeCard}
+          notFoundMessage="No colleges found"
+          setPage={setPage}
+        />
       </div>
     </div>
   );

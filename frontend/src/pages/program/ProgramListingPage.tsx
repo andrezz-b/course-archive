@@ -13,8 +13,9 @@ const ProgramListingPage = () => {
     filterValue: "",
     sortField: ProgramSort[0].field,
     sortDirection: ProgramSort[0].direction,
+    page: "0",
   });
-  const query = ProgramService.useGetAllPrograms(Object.fromEntries(searchParams.entries()));
+  const query = ProgramService.useGetPrograms(Object.fromEntries(searchParams.entries()));
 
   const form = useForm<SearchData>({
     defaultValues: {
@@ -33,6 +34,17 @@ const ProgramListingPage = () => {
         sortField: data.sortField.split("-")[0],
         sortDirection: data.sortField.split("-")[1],
         collegeId: data?.idField ?? "",
+        page: "0",
+      });
+    },
+    [setSearchParams],
+  );
+
+  const setPage = useCallback(
+    (page: number) => {
+      setSearchParams((prev) => {
+        prev.set("page", page.toString());
+        return prev;
       });
     },
     [setSearchParams],
@@ -58,7 +70,12 @@ const ProgramListingPage = () => {
           filterOptions={ProgramFilter}
           idFieldName="College Id"
         />
-        <InfiniteCardList Card={ProgramCard} query={query} notFoundMessage="No programs found" />
+        <InfiniteCardList
+          Card={ProgramCard}
+          query={query}
+          notFoundMessage="No programs found"
+          setPage={setPage}
+        />
       </div>
     </div>
   );
