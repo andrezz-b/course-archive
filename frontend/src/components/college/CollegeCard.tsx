@@ -1,6 +1,6 @@
 import { College } from "@/types/College";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card";
-import { Button } from "./ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
+import { Button } from "../ui/button";
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
@@ -11,6 +11,7 @@ interface CollegeCardProps {
 
 const CollegeCard = ({ college }: CollegeCardProps) => {
   const truncatedDescription = useMemo(() => {
+    if (!college.description) return "";
     if (college.description.length > 90) {
       return college.description.slice(0, 90) + "...";
     }

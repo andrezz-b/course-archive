@@ -1,5 +1,5 @@
 import { CollegeService } from "@/api/college.service";
-import CollegeCard from "@/components/CollegeCard";
+import CollegeCard from "@/components/college/CollegeCard";
 import Loading from "@/components/Loading";
 import { Button } from "@/components/ui/button";
 import { Form, FormField } from "@/components/ui/form";
@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/select";
 import { CollegeFilter, CollegeSort, SortValue } from "@/types/College";
 import { Search } from "lucide-react";
-import { useEffect, useMemo, useCallback } from "react";
+import { useEffect, useCallback } from "react";
 import { SubmitHandler, useForm, UseFormReturn } from "react-hook-form";
 import { useSearchParams } from "react-router-dom";
 
@@ -130,21 +130,20 @@ const CollegeList = ({ query }: CollegeListProps) => {
 };
 
 const CollegeListingPage = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams({
+    filterField: CollegeFilter[0].field,
+    filterValue: "",
+    sortField: CollegeSort[0].field,
+    sortDirection: CollegeSort[0].direction,
+  });
   const query = CollegeService.useGetAllColleges(Object.fromEntries(searchParams.entries()));
-
-  const mappedSortField = useMemo(() => {
-    if (!!searchParams.get("sortField") && !!searchParams.get("sortDirection")) {
-      return `${searchParams.get("sortField")}-${searchParams.get("sortDirection")}` as SortValue;
-    }
-    return CollegeSort[0].value;
-  }, [searchParams]);
 
   const form = useForm<SearchData>({
     defaultValues: {
-      filterField: searchParams.get("filterField") || CollegeFilter[0].field,
-      filterValue: searchParams.get("filterValue") || "",
-      sortField: mappedSortField,
+      filterField: searchParams.get("filterField")!,
+      filterValue: searchParams.get("filterValue")!,
+      sortField:
+        `${searchParams.get("sortField")}-${searchParams.get("sortDirection")}` as SortValue,
     },
   });
 

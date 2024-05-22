@@ -1,12 +1,20 @@
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import { ApiError } from "./config/ApiError";
-import { College, CollegeFilterField, CollegeSortField } from "@/types/College";
+import {
+  College,
+  CollegeCreateData,
+  CollegeEditData,
+  CollegeFilterField,
+  CollegeSortField,
+} from "@/types/College";
 import {
   DefinedInitialDataInfiniteOptions,
   DefinedInitialDataOptions,
   InfiniteData,
   UndefinedInitialDataOptions,
   useInfiniteQuery,
+  useMutation,
+  UseMutationOptions,
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
@@ -64,7 +72,7 @@ export const CollegeService = {
   useGetColleges: <Data extends Page<College>, Err extends ApiError>(
     page: number,
     size = COLLEGE_PAGE_SIZE,
-    options?: Omit<UndefinedInitialDataOptions<Data, Err>, "queryKey" | "queryFn" | "staleTime">
+    options?: Omit<UndefinedInitialDataOptions<Data, Err>, "queryKey" | "queryFn" | "staleTime">,
   ) => {
     const axios = useAxiosPrivate();
     return useQuery<Data, Err>({
@@ -121,6 +129,79 @@ export const CollegeService = {
         return undefined;
       },
       ...options,
+    });
+  },
+
+  useCreateCollege: <
+    Response extends College,
+    Err extends ApiError,
+    Data extends CollegeCreateData,
+  >(
+    mutationOptions?: Omit<UseMutationOptions<Response, Err, Data>, "mutationFn">,
+  ) => {
+    const axios = useAxiosPrivate();
+    const queryClient = useQueryClient();
+    return useMutation<Response, Err, Data>({
+      mutationFn: async (body) => {
+        try {
+          const { data } = await axios.post<Response>("/college/", body);
+          return data;
+        } catch (error) {
+          throw new ApiError(error);
+        }
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ["college"],
+        });
+      },
+      ...mutationOptions,
+    });
+  },
+
+  useUpdateCollegeById: <
+    Response extends College,
+    Err extends ApiError,
+    Data extends Partial<CollegeEditData> & { id: number },
+  >(
+    mutationOptions?: Omit<UseMutationOptions<Response, Err, Data>, "mutationFn" | "onSuccess">,
+  ) => {
+    const axios = useAxiosPrivate();
+    const queryClient = useQueryClient();
+
+    return useMutation<Response, Err, Data>({
+      mutationFn: async (data) => {
+        const { id, ...rest } = data;
+        const definedData = getDefinedValuesObject(rest);
+        try {
+          const { data } = await axios.put<Response>(`/college/${id}`, definedData);
+          return data;
+        } catch (error) {
+          throw new ApiError(error);
+        }
+      },
+      onSuccess: (data) => {
+        queryClient.setQueriesData<Page<College>>(
+          {
+            queryKey: ["college", "admin"],
+            stale: false,
+          },
+          (oldData) => {
+            if (!oldData || !oldData?.content?.length) return oldData;
+            return {
+              ...oldData,
+              content: oldData?.content.map((college) => {
+                if (college.id === data.id) return data;
+                return college;
+              }),
+            };
+          },
+        );
+        queryClient.invalidateQueries({
+          queryKey: ["college"],
+        });
+      },
+      ...mutationOptions,
     });
   },
 };

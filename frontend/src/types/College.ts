@@ -1,14 +1,15 @@
+import { z } from "zod";
 import { SortDirection } from "./Common";
 
 export interface College {
   id: number;
   name: string;
-  acronym: string;
+  acronym?: string;
   city: string;
   postcode: number;
   address: string;
-  website: string;
-  description: string;
+  website?: string;
+  description?: string;
 }
 
 export enum CollegeFilterField {
@@ -57,3 +58,38 @@ export const CollegeFilter = [
     label: "Acronym",
   },
 ];
+
+export const CollegeCreateSchema = z.object({
+  name: z
+    .string()
+    .min(1, { message: "College name is required" })
+    .max(128, "College name must be at most 128 characters"),
+  acronym: z.string().optional(),
+  city: z.string().min(1, { message: "City is required" }),
+  postcode: z.preprocess(
+    (args) => (args === "" ? undefined : args),
+    z.coerce
+      .number({ invalid_type_error: "Postcode must be a number" })
+      .positive("Postcode must be positive"),
+  ),
+  address: z.string().min(1, { message: "Address is required" }),
+  website: z.string().url().optional().or(z.literal('')),
+  description: z.string().max(512, "Description must be at most 512 characters").optional(),
+});
+
+export const CollegeEditSchema = z.object({
+  acronym: z.string().optional(),
+  city: z.string().min(1, { message: "City is required" }),
+  postcode: z.preprocess(
+    (args) => (args === "" ? undefined : args),
+    z.coerce
+      .number({ invalid_type_error: "Postcode must be a number" })
+      .positive("Postcode must be positive"),
+  ),
+  address: z.string().min(1, { message: "Address is required" }),
+  website:  z.string().url().optional().or(z.literal('')),
+  description: z.string().max(512, "Description must be at most 512 characters").optional(),
+});
+
+export type CollegeCreateData = z.infer<typeof CollegeCreateSchema>;
+export type CollegeEditData = z.infer<typeof CollegeEditSchema>;
