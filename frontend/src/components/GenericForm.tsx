@@ -11,8 +11,9 @@ import { LoaderCircle } from "lucide-react";
 interface GenericFormProps<T extends FieldValues> {
   schema: ZodSchema<T>;
   defaultValues: DefaultValues<T>;
-  onSubmit: (data: T) => Promise<{type: string, message: string} | undefined>;
+  onSubmit: (data: T) => Promise<{ type: string; message: string } | undefined>;
   title: string;
+  closeDialog: () => void;
   showReset?: boolean;
 }
 
@@ -22,9 +23,11 @@ const GenericForm = <T extends FieldValues>({
   onSubmit,
   title,
   showReset = false,
+  closeDialog,
 }: GenericFormProps<T>) => {
   const form = useForm<T>({
     defaultValues,
+    mode: "onTouched",
     resolver: zodResolver(schema),
   });
 
@@ -42,8 +45,10 @@ const GenericForm = <T extends FieldValues>({
         type: result.type,
         message: result.message,
       });
+      return;
     }
-  }
+    closeDialog();
+  };
 
   return (
     <Form {...form}>

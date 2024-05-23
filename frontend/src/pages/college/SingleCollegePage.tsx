@@ -17,15 +17,14 @@ const SingleCollegePage = () => {
   const navigate = useNavigate();
   const { collegeId } = useParams<{ collegeId: string }>();
   const query = CollegeService.useGetCollegeById(collegeId ? parseInt(collegeId) : undefined);
-  const linkValid = useMemo(() => {
+  const validHref = useMemo(() => {
     if (!query.data?.website) {
-      return false;
+      return undefined;
     }
     try {
-      new URL(query.data?.website);
-      return true;
+      return new URL(query.data?.website);
     } catch {
-      return false;
+      return undefined;
     }
   }, [query.data?.website]);
 
@@ -75,8 +74,8 @@ const SingleCollegePage = () => {
             <Button className="w-32">View Programs</Button>
           </Link>
 
-          {linkValid && (
-            <a target="_blank" href={college.website}>
+          {validHref && (
+            <a target="_blank" href={validHref.toString()}>
               <Button variant="link" className="p-0 text-xl text-muted-foreground">
                 Website
                 <SquareArrowOutUpRight size="16" className="ml-1" />

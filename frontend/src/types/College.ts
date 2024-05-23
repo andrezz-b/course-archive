@@ -8,8 +8,8 @@ export interface College {
   city: string;
   postcode: number;
   address: string;
-  website?: string;
-  description?: string;
+  website: string | null;
+  description: string | null;
 }
 
 export enum CollegeFilterField {
@@ -76,7 +76,7 @@ export const CollegeCreateSchema = z
   .object({
     name: z.string().min(1, { message: "Name is required" }),
   })
-  .and(CollegeEditSchema);
+    .merge(CollegeEditSchema)
 
 export type CollegeCreateData = z.infer<typeof CollegeCreateSchema>;
 export type CollegeEditData = z.infer<typeof CollegeEditSchema>;
