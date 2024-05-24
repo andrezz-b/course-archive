@@ -15,7 +15,7 @@ const ProgramListingPage = () => {
     sortDirection: ProgramSort[0].direction,
     page: "0",
   });
-  const query = ProgramService.useGetPrograms(Object.fromEntries(searchParams.entries()));
+  const query = ProgramService.useGetAll(Object.fromEntries(searchParams.entries()));
 
   const form = useForm<SearchData>({
     defaultValues: {

@@ -3,8 +3,6 @@ export enum SortDirection {
   DESC = "desc",
 }
 
-export type SortValue<T extends string> = `${T}-${SortDirection}`;
-
 export interface WithId {
   id: number;
 }

@@ -1,26 +1,37 @@
-import { Program } from "@/types/Program";
+import {
+  Program,
+  ProgramCreateData,
+  ProgramCreateSchema,
+  ProgramEditData,
+  ProgramEditSchema,
+} from "@/types/Program";
 import { ColumnDef, PaginationState } from "@tanstack/react-table";
 import { DataTable } from "../../components/ui/data-table";
-import { Suspense, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { keepPreviousData } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Pencil } from "lucide-react";
 import { ProgramService } from "@/api/program.service";
 import GenericForm from "@/components/GenericForm";
-import { CollegeCreateSchema } from "@/types/College";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import Loading from "@/components/Loading";
+
+type OnSubmit = (
+  data: ProgramCreateData | ProgramEditData,
+  id?: number,
+) => Promise<{ type: string; message: string } | undefined>;
 
 const AdminProgramListingPage = () => {
   const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 10 });
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState<Program | undefined>(undefined);
-  const query = ProgramService.useGetPrograms(
+  const query = ProgramService.useGetAll(
     { page: pagination.pageIndex, size: pagination.pageSize },
     {
       placeholderData: keepPreviousData,
     },
   );
+  const { mutate: createProgram } = ProgramService.useCreate();
+  const { mutate: updateProgram } = ProgramService.useUpdateById();
 
   const handleEdit = (program: Program) => {
     setSelectedRow(program);
@@ -32,7 +43,32 @@ const AdminProgramListingPage = () => {
     setDialogOpen(true);
   };
 
+  const closeDialog = () => {
+    setDialogOpen(false);
+    setSelectedRow(undefined);
+  };
+
   const defaultData = useMemo(() => [], []);
+
+  const handleSubmit: OnSubmit = async (data, id) =>
+    new Promise((resolve) => {
+      if (ProgramEditSchema.safeParse(data).success && id) {
+        updateProgram(
+          { id, ...data },
+          {
+            onSuccess: () => resolve(undefined),
+            onError: (error) =>
+              resolve({ message: error.getErrorMessage(), type: error.getStatus() }),
+          },
+        );
+      } else if (ProgramCreateSchema.safeParse(data).success && "name" in data) {
+        createProgram(data, {
+          onSuccess: () => resolve(undefined),
+          onError: (error) =>
+            resolve({ message: error.getErrorMessage(), type: error.getStatus() }),
+        });
+      }
+    });
 
   const columns: ColumnDef<Program>[] = useMemo(
     () => [
@@ -85,19 +121,43 @@ const AdminProgramListingPage = () => {
         pagination={pagination}
         totalElements={query.data?.totalElements ?? -1}
       />
-      {/* <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
-          <Suspense fallback={<Loading size="32" />}>
-            <GenericForm 
-            schema={CollegeCreateSchema}
-            defaultValues={selectedRow}
-            
+          {selectedRow ? (
+            <GenericForm<ProgramEditData>
+              schema={ProgramEditSchema}
+              defaultValues={{
+                degreeTitle: selectedRow.degreeTitle ?? "",
+                degreeTitleAbbreviation: selectedRow.degreeTitleAbbreviation ?? "",
+                description: selectedRow.description ?? "",
+                duration: selectedRow.duration ?? undefined,
+              }}
+              showReset
+              closeDialog={closeDialog}
+              onSubmit={(data) => handleSubmit(data, selectedRow?.id)}
+              title="Edit Program"
             />
-          </Suspense>
+          ) : (
+            <GenericForm<ProgramCreateData>
+              schema={ProgramCreateSchema}
+              defaultValues={{
+                name: "",
+                collegeId: undefined,
+                degreeTitle: "",
+                degreeTitleAbbreviation: "",
+                description: "",
+                degreeType: "",
+                duration: undefined,
+              }}
+              closeDialog={closeDialog}
+              onSubmit={(data) => handleSubmit(data)}
+              title="Create Program"
+            />
+          )}
         </DialogContent>
-      </Dialog> */}
+      </Dialog>
     </div>
   );
-}
+};
 
-export default AdminProgramListingPage
+export default AdminProgramListingPage;
