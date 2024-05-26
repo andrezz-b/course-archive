@@ -76,11 +76,20 @@ const GenericForm = <T extends FieldValues>({
           </p>
         )}
         <div className="flex justify-between flex-row-reverse">
-          <Button type="submit" disabled={form.formState.isSubmitting} className="w-[5rem]">
+          <Button
+            type="submit"
+            disabled={form.formState.isSubmitting || !form.formState.isDirty}
+            className="w-[5rem]"
+          >
             {form.formState.isSubmitting ? <LoaderCircle className="animate-spin" /> : "Submit"}
           </Button>
           {showReset && (
-            <Button variant="destructive" type="button" onClick={() => form.reset(defaultValues)}>
+            <Button
+              variant="destructive"
+              type="button"
+              onClick={() => form.reset(defaultValues)}
+              disabled={!form.formState.isDirty}
+            >
               Reset
             </Button>
           )}

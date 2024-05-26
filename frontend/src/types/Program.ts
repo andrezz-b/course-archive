@@ -62,14 +62,10 @@ export const ProgramFilter = [
 ];
 
 export const ProgramEditSchema = z.object({
-  duration: z
-    .preprocess(
-      (args) => (args === "" ? undefined : args),
-      z.coerce
-        .number({ invalid_type_error: "Duration must be a number" })
-        .positive("Duration must be positive"),
-    )
-    .optional() as z.ZodType<number, z.ZodTypeDef, number>,
+  duration: z.coerce
+    .number({ invalid_type_error: "Duration must be a number" })
+    .positive("Duration must be positive")
+    .optional(),
   degreeType: z.string().max(64, "Must be less than 64 characters").optional(),
   degreeTitle: z.string().max(64, "Must be less than 64 characters").optional(),
   degreeTitleAbbreviation: z.string().max(64, "Must be less than 64 characters").optional(),
@@ -81,12 +77,9 @@ export const ProgramCreateSchema = z
       .string()
       .min(1, "Program name is required")
       .max(128, "Program name must be less than 128 characters"),
-    collegeId: z.preprocess(
-      (args) => (args === "" ? undefined : args),
-      z.coerce
-        .number({ invalid_type_error: "College id must be a number" })
-        .positive("CollegId must be positive"),
-    ) as z.ZodType<number, z.ZodTypeDef, number>,
+    collegeId: z.coerce
+      .number({ invalid_type_error: "College id must be a number" })
+      .positive("CollegId must be positive"),
   })
   .merge(ProgramEditSchema);
 

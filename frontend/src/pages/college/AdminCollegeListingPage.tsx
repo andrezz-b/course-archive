@@ -130,7 +130,7 @@ const AdminCollegesListingPage = () => {
                 acronym: selectedRow?.acronym,
                 city: selectedRow?.city,
                 address: selectedRow?.address,
-                postcode: selectedRow?.postcode,
+                postcode: selectedRow?.postcode ?? "",
                 website: selectedRow?.website ?? "",
                 description: selectedRow?.description ?? "",
               }}
@@ -147,7 +147,8 @@ const AdminCollegesListingPage = () => {
                 city: "",
                 name: "",
                 address: "",
-                postcode: undefined,
+                // @ts-expect-error String must be passed so that the from can be controlled
+                postcode: "",
                 website: "",
                 description: "",
               }}

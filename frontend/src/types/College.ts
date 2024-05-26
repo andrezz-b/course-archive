@@ -28,13 +28,13 @@ export const CollegeSort = [
     field: CollegeSortField.NAME,
     direction: SortDirection.ASC,
     label: "Name: A to Z",
-    value: `${CollegeSortField.NAME}-${SortDirection.ASC}`
+    value: `${CollegeSortField.NAME}-${SortDirection.ASC}`,
   },
   {
     field: CollegeSortField.NAME,
     direction: SortDirection.DESC,
     label: "Name: Z to A",
-    value: `${CollegeSortField.NAME}-${SortDirection.DESC}`
+    value: `${CollegeSortField.NAME}-${SortDirection.DESC}`,
   },
 ];
 
@@ -60,12 +60,9 @@ export const CollegeFilter = [
 export const CollegeEditSchema = z.object({
   acronym: z.string().optional(),
   city: z.string().min(1, { message: "City is required" }),
-  postcode: z.preprocess(
-    (args) => (args === "" ? undefined : args),
-    z.coerce
-      .number({ invalid_type_error: "Postcode must be a number" })
-      .positive("Postcode must be positive"),
-  ) as z.ZodType<number, z.ZodTypeDef, number>,
+  postcode: z.coerce
+    .number({ invalid_type_error: "Postcode must be a number" })
+    .positive("Postcode must be positive"),
   address: z.string().min(1, { message: "Address is required" }),
   website: z.string().url().optional().or(z.literal("")),
   description: z.string().max(512, "Description must be at most 512 characters").optional(),
@@ -75,7 +72,7 @@ export const CollegeCreateSchema = z
   .object({
     name: z.string().min(1, { message: "Name is required" }),
   })
-    .merge(CollegeEditSchema)
+  .merge(CollegeEditSchema);
 
 export type CollegeCreateData = z.infer<typeof CollegeCreateSchema>;
 export type CollegeEditData = z.infer<typeof CollegeEditSchema>;

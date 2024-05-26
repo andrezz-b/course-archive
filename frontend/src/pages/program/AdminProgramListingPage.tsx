@@ -130,7 +130,7 @@ const AdminProgramListingPage = () => {
                 degreeTitle: selectedRow.degreeTitle ?? "",
                 degreeTitleAbbreviation: selectedRow.degreeTitleAbbreviation ?? "",
                 description: selectedRow.description ?? "",
-                duration: selectedRow.duration ?? undefined,
+                duration: selectedRow.duration ?? "",
               }}
               showReset
               closeDialog={closeDialog}
@@ -142,12 +142,14 @@ const AdminProgramListingPage = () => {
               schema={ProgramCreateSchema}
               defaultValues={{
                 name: "",
-                collegeId: undefined,
+                // @ts-expect-error String must be passed so that the from can be controlled
+                collegeId: "",
                 degreeTitle: "",
                 degreeTitleAbbreviation: "",
                 description: "",
                 degreeType: "",
-                duration: undefined,
+                // @ts-expect-error String must be passed so that the from can be controlled
+                duration: "",
               }}
               closeDialog={closeDialog}
               onSubmit={(data) => handleSubmit(data)}
