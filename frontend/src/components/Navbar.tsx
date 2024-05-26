@@ -141,6 +141,11 @@ const AuthNavbar = {
                 Programs
               </Link>
             </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/course" className="cursor-pointer">
+                Courses
+              </Link>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </li>

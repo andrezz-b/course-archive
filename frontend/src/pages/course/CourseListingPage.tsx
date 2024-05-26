@@ -1,22 +1,22 @@
-import { ProgramFilter, ProgramSort } from "@/types/Program";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { useSearchParams } from "react-router-dom";
-import { useCallback, useEffect } from "react";
-import { ProgramService } from "@/api/program.service";
-import ProgramCard from "@/components/program/ProgramCard";
+import { CourseService } from "@/api/course.service";
+import CourseCard from "@/components/course/CourseCard";
 import InfiniteCardList from "@/components/InfiniteCardList";
 import ListingSearchForm, { SearchData } from "@/components/ListingSearchForm";
+import { CourseFilter, CourseSort } from "@/types/Course";
 import { keepPreviousData } from "@tanstack/react-query";
+import { useCallback, useEffect } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { useSearchParams } from "react-router-dom";
 
-const ProgramListingPage = () => {
+const CourseListingPage = () => {
   const [searchParams, setSearchParams] = useSearchParams({
-    filterField: ProgramFilter[0].field,
+    filterField: CourseFilter[0].field,
     filterValue: "",
-    sortField: ProgramSort[0].field,
-    sortDirection: ProgramSort[0].direction,
+    sortField: CourseSort[0].field,
+    sortDirection: CourseSort[0].direction,
     page: "0",
   });
-  const query = ProgramService.useGetAll(Object.fromEntries(searchParams.entries()), {
+  const query = CourseService.useGetAll(Object.fromEntries(searchParams.entries()), {
     placeholderData: keepPreviousData,
   });
 
@@ -25,7 +25,7 @@ const ProgramListingPage = () => {
       filterField: searchParams.get("filterField")!,
       filterValue: searchParams.get("filterValue")!,
       sortField: `${searchParams.get("sortField")}-${searchParams.get("sortDirection")}`,
-      idField: searchParams.get("collegeId") ?? undefined,
+      idField: searchParams.get("programId") ?? undefined,
     },
   });
 
@@ -36,7 +36,7 @@ const ProgramListingPage = () => {
         filterValue: data.filterValue,
         sortField: data.sortField.split("-")[0],
         sortDirection: data.sortField.split("-")[1],
-        collegeId: data?.idField ?? "",
+        programId: data?.idField ?? "",
         page: "0",
       });
     },
@@ -61,22 +61,21 @@ const ProgramListingPage = () => {
     });
     return () => subscription.unsubscribe();
   }, [form, form.handleSubmit, form.watch, onSubmit]);
-
   return (
     <div className="flex flex-col justify-center items-center mt-4 pb-12">
       <div className="md:min-w-[700px] lg:min-w-[1000px] max-w-[1200px] space-y-4 px-4 md:p-0">
-        <h2 className="text-2xl border-none">Browse Programs</h2>
+        <h2 className="text-2xl border-none">Browse Courses</h2>
         <ListingSearchForm
           form={form}
           onSubmit={onSubmit}
-          sortOptions={ProgramSort}
-          filterOptions={ProgramFilter}
-          idFieldName="College Id"
+          sortOptions={CourseSort}
+          filterOptions={CourseFilter}
+          idFieldName="Program Id"
         />
         <InfiniteCardList
-          Card={ProgramCard}
+          Card={CourseCard}
           query={query}
-          notFoundMessage="No programs found"
+          notFoundMessage="No courses found"
           setPage={setPage}
         />
       </div>
@@ -84,4 +83,4 @@ const ProgramListingPage = () => {
   );
 };
 
-export default ProgramListingPage;
+export default CourseListingPage;

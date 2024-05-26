@@ -19,7 +19,6 @@ import ProgramListingPage from "./pages/program/ProgramListingPage.tsx";
 
 const router = createBrowserRouter([
   {
-    path: "/",
     element: <ProtectedRoutes layout={<RootLayout />} />,
     children: [
       {
@@ -41,6 +40,13 @@ const router = createBrowserRouter([
         path: "/program",
         element: <ProgramListingPage />,
         errorElement: <ErrorPage />,
+      },
+      {
+        path: "/course",
+        async lazy() {
+          const component = await import("./pages/course/CourseListingPage.tsx");
+          return { Component: component.default };
+        },
       },
       {
         path: "/admin",
@@ -67,6 +73,14 @@ const router = createBrowserRouter([
             path: "program",
             async lazy() {
               const component = await import("./pages/program/AdminProgramListingPage.tsx");
+              return { Component: component.default };
+            },
+            errorElement: <ErrorPage />,
+          },
+          {
+            path: "course",
+            async lazy() {
+              const component = await import("./pages/course/AdminCourseListingPage.tsx");
               return { Component: component.default };
             },
             errorElement: <ErrorPage />,

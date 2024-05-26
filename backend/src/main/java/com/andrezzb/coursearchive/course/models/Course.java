@@ -81,7 +81,7 @@ public class Course implements AclSecured {
   }
 
   public enum FilterField implements FilterValueMapper {
-    name, credits {
+    name, acronym, credits {
       @Override
       public Object map(String filterValue) {
         return Short.parseShort(filterValue);

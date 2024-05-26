@@ -16,7 +16,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 const SingleCollegePage = () => {
   const navigate = useNavigate();
   const { collegeId } = useParams<{ collegeId: string }>();
-  const query = CollegeService.useGetCollegeById(collegeId ? parseInt(collegeId) : undefined);
+  const query = CollegeService.useGetById(collegeId ? parseInt(collegeId) : undefined);
   const validHref = useMemo(() => {
     if (!query.data?.website) {
       return undefined;

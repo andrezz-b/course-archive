@@ -30,7 +30,7 @@ const AdminLayout = () => {
               </Button>
             </NavLink>
             <NavLink
-              to="/admin/courses"
+              to="/admin/course"
               className={({ isActive }) => cn({ "bg-muted": isActive }, "w-full rounded-md")}
             >
               <Button variant="ghost" className="w-full justify-start">

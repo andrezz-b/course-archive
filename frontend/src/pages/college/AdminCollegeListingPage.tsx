@@ -24,9 +24,9 @@ const AdminCollegesListingPage = () => {
   const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 10 });
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState<College | undefined>(undefined);
-  const { mutate: editCollege } = CollegeService.useUpdateCollegeById();
-  const { mutate: createCollege } = CollegeService.useCreateCollege();
-  const query = CollegeService.useGetColleges(
+  const { mutate: editCollege } = CollegeService.useUpdateById();
+  const { mutate: createCollege } = CollegeService.useCreate();
+  const query = CollegeService.useGetAll(
     { page: pagination.pageIndex, size: pagination.pageSize },
     {
       placeholderData: keepPreviousData,

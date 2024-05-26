@@ -16,7 +16,6 @@ import com.andrezzb.coursearchive.security.models.AclSecured;
 import com.andrezzb.coursearchive.security.models.Role;
 import com.andrezzb.coursearchive.security.models.UserEntity;
 import com.andrezzb.coursearchive.security.repository.UserRepository;
-import java.util.Arrays;
 import java.util.Collections;
 
 import org.springframework.security.acls.model.Permission;

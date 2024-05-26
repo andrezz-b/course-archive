@@ -15,7 +15,7 @@ public class CourseCreateDto {
     private Long programId;
 
     @NotBlank(message = "Course name is required")
-    @Size(max = 64, message = "Course name must be at most 64 characters")
+    @Size(max = 128, message = "Course name must be at most 128 characters")
     private String name;
 
     @NotNull(message = "Credits are required")
@@ -25,7 +25,7 @@ public class CourseCreateDto {
     @Min(value = 1, message = "Year must be at least 1")
     private Short year;
 
-    @Size(max = 16, message = "Acronym must be at most 16 characters")
+    @Size(max = 32, message = "Acronym must be at most 32 characters")
     private String acronym;
 
     @Size(max = 512, message = "Description must be at most 512 characters")

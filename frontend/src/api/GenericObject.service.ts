@@ -28,8 +28,8 @@ interface GenericObjectService<Entity, CreateData, EditData> {
 
   useGetById: (
     id?: number,
-    options?: DefinedInitialDataOptions<Entity, ApiError>,
-  ) => Omit<UseQueryResult<Entity, ApiError>, "queryKey" | "queryFn" | "initialData">;
+    options?: Omit<DefinedInitialDataOptions<Entity, ApiError>, "queryKey" | "queryFn" >,
+  ) => UseQueryResult<Entity, ApiError>;
 
   useCreate: (
     mutationOptions?: Omit<UseMutationOptions<Entity, ApiError, CreateData>, "mutationFn">,
