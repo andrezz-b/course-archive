@@ -53,10 +53,7 @@ const SingleCollegePage = () => {
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
           <h3>Description</h3>
-          <span>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate aliquid molestiae
-            odit, molestias accusamus dicta, voluptas error quod harum officia sint, aut et maxime?
-          </span>
+          <span>{college.description}</span>
           <h3>Location</h3>
           <div className="flex flex-col">
             <span>Address: {college.address}</span>

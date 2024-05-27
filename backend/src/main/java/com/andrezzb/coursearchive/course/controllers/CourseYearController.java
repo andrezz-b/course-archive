@@ -42,9 +42,9 @@ public class CourseYearController {
       @PositiveOrZero @RequestParam(defaultValue = "0") int page,
       @Positive @RequestParam(defaultValue = "5") int size,
       @ValidEnum(enumClazz = Sort.Direction.class,
-          ignoreCase = true) @RequestParam(defaultValue = "asc") String sortDirection,
+          ignoreCase = true) @RequestParam(defaultValue = "desc") String sortDirection,
       @ValidEnum(enumClazz = CourseYear.SortField.class) @RequestParam(
-          defaultValue = "id") String sortField,
+          defaultValue = "academicYear") String sortField,
       @ValidEnum(enumClazz = CourseYear.FilterField.class, required = false) @RequestParam(
           required = false) String filterField,
       @RequestParam(required = false) String filterValue,

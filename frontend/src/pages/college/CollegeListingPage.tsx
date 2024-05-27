@@ -47,7 +47,6 @@ const CollegeListingPage = () => {
         sortField: data.sortField.split("-")[0],
         sortDirection: data.sortField.split("-")[1],
         page: "0",
-        size: "3",
       });
     },
     [setSearchParams],

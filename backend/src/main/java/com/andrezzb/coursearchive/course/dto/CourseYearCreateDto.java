@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Data;
@@ -16,7 +17,7 @@ public class CourseYearCreateDto {
     private Long courseId;
 
     @NotBlank(message = "Year is required")
-    @Size(max = 9, message = "Year must be in the format 'yyyy/yyyy'")
+    @Pattern(regexp = "^\\d{4}/\\d{4}$", message = "Year must be in the format 'yyyy/yyyy'")
     private String academicYear;
 
     @Size(max = 256, message = "Professor names must be at most 256 characters")

@@ -47,6 +47,15 @@ const router = createBrowserRouter([
           const component = await import("./pages/course/CourseListingPage.tsx");
           return { Component: component.default };
         },
+        errorElement: <ErrorPage />,
+      },
+      {
+        path: "/course/:courseId",
+        async lazy() {
+          const component = await import("./pages/course/SingleCoursePage.tsx");
+          return { Component: component.default };
+        },
+        errorElement: <ErrorPage />,
       },
       {
         path: "/admin",
@@ -81,6 +90,14 @@ const router = createBrowserRouter([
             path: "course",
             async lazy() {
               const component = await import("./pages/course/AdminCourseListingPage.tsx");
+              return { Component: component.default };
+            },
+            errorElement: <ErrorPage />,
+          },
+          {
+            path: "course-year",
+            async lazy() {
+              const component = await import("./components/course/AdminCourseYearListing.tsx");
               return { Component: component.default };
             },
             errorElement: <ErrorPage />,

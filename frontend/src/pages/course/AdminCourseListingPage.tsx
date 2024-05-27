@@ -81,6 +81,10 @@ const AdminCourseListingPage = () => {
         accessorKey: "name",
       },
       {
+        header: "Acronym",
+        accessorKey: "acronym",
+      },
+      {
         header: "Credits",
         accessorKey: "credits",
       },

@@ -52,8 +52,12 @@ const GenericForm = <T extends FieldValues>({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(formSubmit)} className="space-y-4" autoComplete="off">
-        <h2 className="font-semibold">{title}</h2>
+      <h2 className="font-semibold">{title}</h2>
+      <form
+        onSubmit={form.handleSubmit(formSubmit)}
+        className="grid grid-cols-2 gap-4"
+        autoComplete="off"
+      >
         {fields.map((field) => (
           <FormField
             key={String(field)}
@@ -75,7 +79,7 @@ const GenericForm = <T extends FieldValues>({
             {form.formState.errors.root?.serverError.message}
           </p>
         )}
-        <div className="flex justify-between flex-row-reverse">
+        <div className="flex justify-between flex-row-reverse col-span-2">
           <Button
             type="submit"
             disabled={form.formState.isSubmitting || !form.formState.isDirty}
