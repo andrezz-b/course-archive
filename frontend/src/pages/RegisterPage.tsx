@@ -80,7 +80,7 @@ const RegisterPage = () => {
     }
   };
   return (
-    <div className="flex flex-col flex-grow justify-center md:max-h-[75%] items-center px-4 py-4">
+    <div className="container flex justify-center py-4">
       <div className="bg-card shadow p-8 w-full md:w-[550px] border border-border rounded-md">
         <Form {...form}>
           <h3 className="mb-4">Register</h3>

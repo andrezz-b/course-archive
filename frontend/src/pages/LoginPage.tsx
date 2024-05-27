@@ -63,7 +63,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="flex flex-col flex-grow justify-center items-center max-h-[35rem] px-4">
+    <div className="container flex justify-center py-4">
       <div className="bg-card shadow p-8 w-full md:w-[400px] border border-border rounded-md">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" autoComplete="off">
