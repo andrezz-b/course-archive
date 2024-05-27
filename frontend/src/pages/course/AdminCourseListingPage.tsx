@@ -3,7 +3,6 @@ import { DataTable } from "../../components/ui/data-table";
 import { useMemo, useState } from "react";
 import { keepPreviousData } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Pencil } from "lucide-react";
 import GenericForm from "@/components/GenericForm";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
@@ -14,6 +13,8 @@ import {
   CourseEditSchema,
 } from "@/types/Course";
 import { CourseService } from "@/api/course.service";
+import { Link } from "react-router-dom";
+import { ExternalLink, Pencil } from "lucide-react";
 
 type OnSubmit = (
   data: CourseCreateData | CourseEditData,
@@ -97,10 +98,22 @@ const AdminCourseListingPage = () => {
         header: "Actions",
         cell: ({ row }) => {
           return (
-            <Button variant="ghost" className="p-1 h-auto" onClick={() => handleEdit(row.original)}>
-              <span className="sr-only">edit course</span>
-              <Pencil className="h-4 w-4" />
-            </Button>
+            <div className="flex items-center">
+              <Button
+                variant="ghost"
+                className="p-1 h-auto"
+                onClick={() => handleEdit(row.original)}
+              >
+                <span className="sr-only">edit course</span>
+                <Pencil className="h-4 w-4" />
+              </Button>
+              <Link to={`./${row.original.id}`} className="p-1 block cursor-pointer">
+                <Button variant="ghost" className="p-1 h-auto">
+                  <span className="sr-only">open course</span>
+                  <ExternalLink className="h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
           );
         },
       },

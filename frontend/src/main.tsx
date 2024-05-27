@@ -95,9 +95,9 @@ const router = createBrowserRouter([
             errorElement: <ErrorPage />,
           },
           {
-            path: "course-year",
+            path: "course/:courseId",
             async lazy() {
-              const component = await import("./components/course/AdminCourseYearListing.tsx");
+              const component = await import("./pages/course/AdminCoursePage.tsx");
               return { Component: component.default };
             },
             errorElement: <ErrorPage />,

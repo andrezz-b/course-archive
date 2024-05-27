@@ -24,48 +24,56 @@ export const CourseYearEditSchema = z.object({
     })
     .min(1, "Difficulty must be at least 1")
     .max(10, "Difficulty must be at most 10")
+    .or(z.literal(""))
     .optional(),
   enrollmentCount: z.coerce
     .number({
       invalid_type_error: "Enrollment count must be a number",
     })
     .positive()
+    .or(z.literal(""))
     .optional(),
   passedCount: z.coerce
     .number({
       invalid_type_error: "Passed count must be a number",
     })
     .positive()
+    .or(z.literal(""))
     .optional(),
   lectureCount: z.coerce
     .number({
       invalid_type_error: "Lecture count must be a number",
     })
     .positive()
+    .or(z.literal(""))
     .optional(),
   exerciseCount: z.coerce
     .number({
       invalid_type_error: "Exercise count must be a number",
     })
     .positive()
+    .or(z.literal(""))
     .optional(),
   laboratoryCount: z.coerce
     .number({
       invalid_type_error: "Laboratory count must be a number",
     })
     .positive()
+    .or(z.literal(""))
     .optional(),
 });
 
-export const CourseYearCreateSchema = CourseYearEditSchema.extend({
-  courseId: z.coerce
-    .number({
-      invalid_type_error: "Course ID must be a number",
-      required_error: "Course ID is required",
-    })
-    .positive("Course ID must be a positive number"),
-  academicYear: z.string().regex(/^\d{4}\/\d{4}$/, "Must be in the format YYYY/YYYY"),
-});
+export const CourseYearCreateSchema = z
+  .object({
+    academicYear: z.string().regex(/^\d{4}\/\d{4}$/, "Must be in the format YYYY/YYYY"),
+    courseId: z.coerce
+      .number({
+        invalid_type_error: "Course ID must be a number",
+        required_error: "Course ID is required",
+      })
+      .positive("Course ID must be a positive number"),
+  })
+  .merge(CourseYearEditSchema);
 
 export type CourseYearCreateData = z.infer<typeof CourseYearCreateSchema>;
 export type CourseYearEditData = z.infer<typeof CourseYearEditSchema>;

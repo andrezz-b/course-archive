@@ -75,7 +75,7 @@ const GenericForm = <T extends FieldValues>({
           />
         ))}
         {form.formState.errors.root?.serverError.message && (
-          <p className="text-destructive text-sm">
+          <p className="text-destructive text-sm col-span-2">
             {form.formState.errors.root?.serverError.message}
           </p>
         )}

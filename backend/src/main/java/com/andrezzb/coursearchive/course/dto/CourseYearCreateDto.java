@@ -1,5 +1,6 @@
 package com.andrezzb.coursearchive.course.dto;
 
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -41,4 +42,25 @@ public class CourseYearCreateDto {
 
     @Min(value = 1, message = "Laboratory count must be at least 1")
     private Short laboratoryCount;
+
+    @AssertTrue(message = "Year must be in the format 'yyyy/yyyy', difference must be 1 year")
+    public boolean isDifferenceCorrect() {
+        if (academicYear == null) {
+            return false;
+        }
+
+        String[] parts = academicYear.split("/");
+        if (parts.length != 2) {
+            return false;
+        }
+
+        try {
+            int startYear = Integer.parseInt(parts[0]);
+            int endYear = Integer.parseInt(parts[1]);
+
+            return startYear + 1 == endYear;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
 }

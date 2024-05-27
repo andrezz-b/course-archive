@@ -15,7 +15,6 @@ import { Pencil } from "lucide-react";
 import { DataTable } from "../ui/data-table";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import GenericForm from "../GenericForm";
-import { CourseCreateSchema } from "@/types/Course";
 
 type OnSubmit = (
   data: CourseYearCreateData | CourseYearEditData,
@@ -57,6 +56,7 @@ const AdminCourseYearListing = () => {
 
   const handleSubmit: OnSubmit = async (data, id) =>
     new Promise((resolve) => {
+      console.log(data);
       if (CourseYearEditSchema.safeParse(data).success && id) {
         updateYear(
           { id, ...data },
@@ -66,7 +66,7 @@ const AdminCourseYearListing = () => {
               resolve({ message: error.getErrorMessage(), type: error.getStatus() }),
           },
         );
-      } else if (CourseCreateSchema.safeParse(data).success && "courseId" in data) {
+      } else if (CourseYearCreateSchema.safeParse(data).success && "courseId" in data) {
         createYear(data, {
           onSuccess: () => resolve(undefined),
           onError: (error) =>
@@ -129,17 +129,11 @@ const AdminCourseYearListing = () => {
               defaultValues={{
                 professor: selectedRow.professor ?? "",
                 assistant: selectedRow.assistant ?? "",
-                // @ts-expect-error String must be passed so that the from can be controlled
                 difficulty: selectedRow.difficulty ?? "",
-                // @ts-expect-error String must be passed so that the from can be controlled
                 enrollmentCount: selectedRow.enrollmentCount ?? "",
-                // @ts-expect-error String must be passed so that the from can be controlled
                 passedCount: selectedRow.passedCount ?? "",
-                // @ts-expect-error String must be passed so that the from can be controlled
                 lectureCount: selectedRow.lectureCount ?? "",
-                // @ts-expect-error String must be passed so that the from can be controlled
                 exerciseCount: selectedRow.exerciseCount ?? "",
-                // @ts-expect-error String must be passed so that the from can be controlled
                 laboratoryCount: selectedRow.laboratoryCount ?? "",
               }}
               showReset
@@ -156,17 +150,11 @@ const AdminCourseYearListing = () => {
                 courseId: courseId ?? "",
                 professor: "",
                 assistant: "",
-                // @ts-expect-error String must be passed so that the from can be controlled
                 difficulty: "",
-                // @ts-expect-error String must be passed so that the from can be controlled
                 enrollmentCount: "",
-                // @ts-expect-error String must be passed so that the from can be controlled
                 passedCount: "",
-                // @ts-expect-error String must be passed so that the from can be controlled
                 lectureCount: "",
-                // @ts-expect-error String must be passed so that the from can be controlled
                 exerciseCount: "",
-                // @ts-expect-error String must be passed so that the from can be controlled
                 laboratoryCount: "",
               }}
               closeDialog={closeDialog}
