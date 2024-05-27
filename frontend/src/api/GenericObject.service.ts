@@ -38,6 +38,10 @@ interface GenericObjectService<Entity, CreateData, EditData> {
   useUpdateById: (
     mutationOptions?: Omit<UseMutationOptions<Entity, ApiError, EditData>, "mutationFn">,
   ) => UseMutationResult<Entity, ApiError, EditData>;
+
+  useDeleteById: (
+    mutationOptions?: Omit<UseMutationOptions<undefined, ApiError, WithId>, "mutationFn">,
+  ) => UseMutationResult<undefined, ApiError, WithId>
 }
 
 export function createGenericObjectService<
@@ -175,5 +179,26 @@ export function createGenericObjectService<
         ...mutationOptions,
       });
     },
+    useDeleteById: (mutationOptions) => {
+      const axios = useAxiosPrivate();
+      const queryClient = useQueryClient();
+
+      return useMutation({
+        mutationFn: async ({id}) => {
+          try {
+            await axios.delete<void>(`/${entityEndpoint}/${id}`);
+          } catch (error) {
+            throw new ApiError(error);
+          }
+          return undefined;
+        },
+        onSuccess: () => {
+          queryClient.invalidateQueries({
+            queryKey: [entityName],
+          });
+        },
+        ...mutationOptions,
+      });
+    }
   };
 }

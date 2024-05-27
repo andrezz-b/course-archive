@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.andrezzb.coursearchive.material.dto.GroupWithMaterialDto;
 import com.andrezzb.coursearchive.material.dto.MaterialGroupCreateDto;
 import com.andrezzb.coursearchive.material.dto.MaterialGroupDto;
 import com.andrezzb.coursearchive.material.dto.MaterialGroupUpdateDto;
@@ -37,7 +39,7 @@ public class MaterialGroupController {
   }
 
   @GetMapping("/")
-  public ResponseEntity<Page<MaterialGroupDto>> getAllMaterialGroups(
+  public ResponseEntity<Page<GroupWithMaterialDto>> getAllMaterialGroups(
       @PositiveOrZero @RequestParam(defaultValue = "0") int page,
       @Positive @RequestParam(defaultValue = "5") int size,
       @ValidEnum(enumClazz = Sort.Direction.class,

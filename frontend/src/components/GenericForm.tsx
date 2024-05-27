@@ -8,10 +8,12 @@ import { getZodSchemaFieldsShallow } from "@/lib/utils";
 import { useCallback, useMemo } from "react";
 import { LoaderCircle } from "lucide-react";
 
+export type SubmitFn<T> = (data: T) => Promise<{ type: string; message: string } | undefined>;
+
 interface GenericFormProps<T extends FieldValues> {
   schema: ZodSchema<T>;
   defaultValues: DefaultValues<T>;
-  onSubmit: (data: T) => Promise<{ type: string; message: string } | undefined>;
+  onSubmit: SubmitFn<T>;
   title: string;
   closeDialog: () => void;
   showReset?: boolean;

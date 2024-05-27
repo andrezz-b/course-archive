@@ -9,9 +9,9 @@ import {
 import { keepPreviousData } from "@tanstack/react-query";
 import { ColumnDef, PaginationState } from "@tanstack/react-table";
 import { useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Button } from "../ui/button";
-import { Pencil } from "lucide-react";
+import { ExternalLink, Pencil } from "lucide-react";
 import { DataTable } from "../ui/data-table";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import GenericForm from "../GenericForm";
@@ -98,10 +98,22 @@ const AdminCourseYearListing = () => {
         header: "Actions",
         cell: ({ row }) => {
           return (
-            <Button variant="ghost" className="p-1 h-auto" onClick={() => handleEdit(row.original)}>
-              <span className="sr-only">edit course</span>
-              <Pencil className="h-4 w-4" />
-            </Button>
+            <div className="flex items-center">
+              <Button
+                variant="ghost"
+                className="p-1 h-auto"
+                onClick={() => handleEdit(row.original)}
+              >
+                <span className="sr-only">edit course year</span>
+                <Pencil className="h-4 w-4" />
+              </Button>
+              <Link to={`./course-year/${row.original.id}`} className="p-1 block cursor-pointer">
+                <Button variant="ghost" className="p-1 h-auto">
+                  <span className="sr-only">open course year</span>
+                  <ExternalLink className="h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
           );
         },
       },

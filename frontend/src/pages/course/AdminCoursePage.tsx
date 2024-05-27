@@ -10,7 +10,7 @@ const AdminCoursePage = () => {
   const courseQuery = CourseService.useGetById(courseId ? parseInt(courseId) : undefined);
 
   return (
-    <div className="space-y-4">
+    <div className="container space-y-4">
       <div className="flex items-center gap-4">
         {courseQuery.data && (
           <>

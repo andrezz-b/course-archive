@@ -102,6 +102,14 @@ const router = createBrowserRouter([
             },
             errorElement: <ErrorPage />,
           },
+          {
+            path: "course/:courseId/course-year/:courseYearId",
+            async lazy() {
+              const component = await import("./pages/course/AdminCourseYearPage.tsx");
+              return { Component: component.default };
+            },
+            errorElement: <ErrorPage />,
+          },
         ],
       },
     ],
