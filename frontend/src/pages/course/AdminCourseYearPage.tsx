@@ -181,6 +181,7 @@ interface MaterialItemProps {
 const MaterialItem = ({ material, materialGroupId }: MaterialItemProps) => {
 	const { mutate: updateMaterial } = MaterialService.useUpdateById();
 	const { mutate: getFile } = MaterialService.useGetFile();
+	const { mutate: deleteMaterial } = MaterialService.useDeleteById();
 	const [isEditing, setIsEditing] = useState(false);
 	const form = useForm<MaterialEditData>({
 		defaultValues: {
@@ -226,7 +227,11 @@ const MaterialItem = ({ material, materialGroupId }: MaterialItemProps) => {
 					<Button variant="ghost" className="p-1 h-auto" onClick={toggleEdit}>
 						{isEditing ? <Check className="w-5 h-5" /> : <Pencil className="w-5 h-5" />}
 					</Button>
-					<Button variant="ghost" className="p-1 h-auto">
+					<Button
+						variant="ghost"
+						className="p-1 h-auto"
+						onClick={() => deleteMaterial({ id: material.id })}
+					>
 						<Trash className="w-5 h-5 text-destructive" />
 					</Button>
 				</div>

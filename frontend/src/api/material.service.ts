@@ -8,7 +8,7 @@ import { Page } from "@/types/Page";
 
 type MaterialService = Pick<
 	GenericObjectService<Material, MaterialCreateData, MaterialEditData & { id: number }>,
-	"useCreate" | "useUpdateById"
+	"useCreate" | "useUpdateById" | "useDeleteById"
 > & {
 	useGetFile: () => UseMutationResult<Blob, ApiError, number>
 };
@@ -95,6 +95,27 @@ export const MaterialService: MaterialService = {
 					throw new ApiError(error);
 				}
 			},
+		});
+	},
+	useDeleteById: (mutationOptions) => {
+		const axios = useAxiosPrivate();
+		const queryClient = useQueryClient();
+
+		return useMutation({
+			mutationFn: async ({ id }) => {
+				try {
+					await axios.delete(`/material/${id}`);
+					return undefined;
+				} catch (error) {
+					throw new ApiError(error);
+				}
+			},
+			onSuccess: () => {
+				queryClient.invalidateQueries({
+					queryKey: ["material-group", "all"],
+				});
+			},
+			...mutationOptions,
 		});
 	}
 };
