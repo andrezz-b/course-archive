@@ -65,7 +65,7 @@ public class MaterialController {
     return ResponseEntity.ok(materialsPaged);
   }
 
-  @PostMapping(path = "/", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @PostMapping(path = "/", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<Material> createMaterial(
       @Valid @RequestPart("material") MaterialCreateDto materialCreateDto,
       @ValidMaterialFile @RequestPart("file") MultipartFile file) {

@@ -20,3 +20,5 @@ export interface FilterOption {
 }
 
 export const DISPLAY_LISTING_PAGE_SIZE = 6;
+
+export const VALID_FILE_TYPES = ["image/jpeg", "image/png", "application/pdf", "text/markdown", "text/plain"];

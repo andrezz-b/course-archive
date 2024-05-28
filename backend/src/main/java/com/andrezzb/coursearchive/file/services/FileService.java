@@ -51,7 +51,7 @@ public class FileService {
     String filePathPrefix = generateFilePathPrefix(material);
     materialFile.setPath(filePathPrefix + "/" + file.getOriginalFilename());
     materialFile.setMaterial(material);
-    storageService.store(file, materialFile.getPath());
+    storageService.store(file, filePathPrefix);
 
     fileRepository.save(materialFile);
   }

@@ -15,7 +15,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @NotNull
 @FileSize(value = 10 * 1024 * 1024)
-@FileType(value = {"image/jpeg", "image/png", "image/gif", "application/pdf", "text/markdown", "text/plain"})
+@FileType(value = {"image/jpeg", "image/png", "application/pdf", "text/markdown", "text/plain"})
 @Target({FIELD, METHOD, PARAMETER, ANNOTATION_TYPE, TYPE_USE})
 @Retention(RUNTIME)
 @Constraint(validatedBy = {})

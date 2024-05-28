@@ -20,7 +20,7 @@ interface GenericObjectServiceFactoryOptions {
   entityEndpoint?: string;
 }
 
-interface GenericObjectService<Entity, CreateData, EditData> {
+export interface GenericObjectService<Entity, CreateData, EditData> {
   useGetAll: (
     params?: Record<string, unknown>,
     options?: Omit<UndefinedInitialDataOptions<Page<Entity>, ApiError>, "queryKey" | "queryFn" >,
