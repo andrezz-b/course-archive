@@ -1,19 +1,19 @@
-import {z} from "zod";
+import { z } from "zod";
 
 export interface Material {
-  id: number;
-  name: string;
-  description: string | null;
-  createdAt: string;
-  updatedAt: string;
-  files: Array<MaterialFile>;
+	id: number;
+	name: string;
+	description: string | null;
+	createdAt: string;
+	updatedAt: string;
+	files: Array<MaterialFile>;
 }
 
 export interface MaterialFile {
-  id: number;
-  name: string;
-  path: string;
-  mimeType: string;
+	id: number;
+	name: string;
+	path: string;
+	mimeType: string;
 }
 
 export const MaterialCreateSchema = z.object({
@@ -30,4 +30,8 @@ export const MaterialCreateSchema = z.object({
 	description: z.string().max(512, "Description should be less than 512 characters").optional(),
 });
 
-export type MaterialCreateData = z.infer<typeof MaterialCreateSchema>
+export type MaterialCreateData = z.infer<typeof MaterialCreateSchema>;
+
+export const MaterialEditSchema = MaterialCreateSchema.omit({ file: true });
+
+export type MaterialEditData = z.infer<typeof MaterialEditSchema>;

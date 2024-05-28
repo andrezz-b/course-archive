@@ -10,9 +10,10 @@ import { MaterialService } from "@/api/material.service.ts";
 
 interface MaterialCreateFormProps {
 	materialGroupId: number;
+	closeDialog: () => void;
 }
 
-const MaterialCreateForm = ({ materialGroupId }: MaterialCreateFormProps) => {
+const MaterialCreateForm = ({ materialGroupId, closeDialog }: MaterialCreateFormProps) => {
 	const { mutate: createMaterial } = MaterialService.useCreate();
 	const form = useForm<MaterialCreateData>({
 		defaultValues: {
@@ -28,7 +29,7 @@ const MaterialCreateForm = ({ materialGroupId }: MaterialCreateFormProps) => {
 		new Promise<void>((resolve) =>
 			createMaterial(data, {
 				onSuccess: () => {
-					form.reset();
+					closeDialog();
 					resolve();
 				},
 				onError: (error) => {
@@ -42,7 +43,6 @@ const MaterialCreateForm = ({ materialGroupId }: MaterialCreateFormProps) => {
 		);
 	return (
 		<Form {...form}>
-			<h3 className="font-semibold">Create Material</h3>
 			<form
 				onSubmit={form.handleSubmit(onSubmit)}
 				className="flex flex-col gap-2"
