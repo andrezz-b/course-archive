@@ -6,7 +6,9 @@ const RootLayout = () => {
 	return (
 		<>
 			<Navbar />
-			<Outlet />
+			<main className="container flex flex-col flex-grow">
+				<Outlet />
+			</main>
 			<Toaster richColors position="top-center" closeButton />
 		</>
 	);

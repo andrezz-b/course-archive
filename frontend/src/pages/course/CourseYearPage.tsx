@@ -1,12 +1,9 @@
-import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card.tsx";
+import { Card, CardContent, CardDescription } from "@/components/ui/card.tsx";
 import { Button } from "@/components/ui/button.tsx";
-import { ChevronLeft, File } from "lucide-react";
-import { useNavigate, useParams } from "react-router-dom";
-import { CourseService } from "@/api/course.service.ts";
-import { CourseYearService } from "@/api/course-year.service.ts";
+import { File } from "lucide-react";
+import { useParams } from "react-router-dom";
 import { MaterialGroupService } from "@/api/material-group.service.ts";
 import { keepPreviousData } from "@tanstack/react-query";
-import { Skeleton } from "@/components/ui/skeleton.tsx";
 import { MaterialGroup } from "@/types/MaterialGroup.ts";
 import { Material } from "@/types/Material.ts";
 import { MaterialService } from "@/api/material.service.ts";
@@ -20,12 +17,7 @@ import useLocalStorage from "@/hooks/useLocalStorage.ts";
 import { useMemo } from "react";
 
 const CourseYearPage = () => {
-	const { courseYearId, courseId } = useParams<{ courseYearId: string; courseId: string }>();
-	const navigate = useNavigate();
-	const courseQuery = CourseService.useGetById(courseId ? parseInt(courseId) : undefined);
-	const courseYearQuery = CourseYearService.useGetById(
-		courseYearId ? parseInt(courseYearId) : undefined,
-	);
+	const { courseYearId } = useParams<{ courseYearId: string }>();
 	const defaultValue = useMemo(() => ({}), []);
 	const [openValues, setOpenValues] = useLocalStorage<Record<string, Array<string>>>(
 		"open-group-values",
@@ -40,7 +32,7 @@ const CourseYearPage = () => {
 			return [];
 		}
 		return openValues[courseYearId!];
-	}, [openValues]);
+	}, [courseYearId, openValues]);
 
 	const updateValues = (values: Array<string>) => {
 		setOpenValues({
@@ -59,44 +51,16 @@ const CourseYearPage = () => {
 		},
 	);
 
-	const TitleDisplay = () => {
-		const isLoading = courseQuery.isLoading || courseYearQuery.isLoading;
-		return isLoading ? (
-			<div className="flex gap-2 my-2">
-				<Skeleton className="w-[40px] h-[35px]" />
-				<Skeleton className="w-[400px] h-[35px]" />
-			</div>
-		) : (
-			<>
-				<Button
-					variant="outline"
-					className="absolute w-8 h-8 p-0 left-1 md:left-4 md:top-4"
-					onClick={() => navigate(-1)}
-				>
-					<ChevronLeft />
-				</Button>
-				<CardHeader>
-					<h2 className="flex gap-4 text-4xl items-center border-none p-0 pt-4">
-						{courseQuery.data?.name} - {courseYearQuery.data?.academicYear}
-					</h2>
-				</CardHeader>
-			</>
-		);
-	};
-
 	return (
-		<div className="container">
-			<Card className="w-full md:px-10 border-none space-y-4 relative">
-				<TitleDisplay />
-				<CardContent className="flex flex-col gap-8 p-0">
-					<Accordion type="multiple" value={currentOpenValues} onValueChange={updateValues}>
-						{groupQuery.data?.content.map((group) => (
-							<MaterialGroupCard key={group.id} group={group} />
-						))}
-					</Accordion>
-				</CardContent>
-			</Card>
-		</div>
+		<Card className="w-full md:px-10 border-none space-y-4 relative">
+			<CardContent className="flex flex-col gap-8 p-0">
+				<Accordion type="multiple" value={currentOpenValues} onValueChange={updateValues}>
+					{groupQuery.data?.content.map((group) => (
+						<MaterialGroupCard key={group.id} group={group} />
+					))}
+				</Accordion>
+			</CardContent>
+		</Card>
 	);
 };
 

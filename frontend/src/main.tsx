@@ -15,56 +15,72 @@ import App from "./App.tsx";
 import RootLayout from "./layouts/RootLayout.tsx";
 import CollegeListingPage from "./pages/college/CollegeListingPage.tsx";
 import ProgramListingPage from "./pages/program/ProgramListingPage.tsx";
+import HomeLayout from "@/layouts/HomeLayout.tsx";
 
 const router = createBrowserRouter([
 	{
 		element: <ProtectedRoutes layout={<RootLayout />} />,
 		children: [
 			{
+				element: <HomeLayout />,
+				children: [
+					{
+						path: "/college",
+						element: <CollegeListingPage />,
+						errorElement: <ErrorPage />,
+					},
+					{
+						path: "/college/:collegeId",
+						async lazy() {
+							const component = await import("./pages/college/CollegePage.tsx");
+							return { Component: component.default };
+						},
+						errorElement: <ErrorPage />,
+					},
+					{
+						path: "/program",
+						element: <ProgramListingPage />,
+						errorElement: <ErrorPage />,
+					},
+					{
+						path: "/course",
+						async lazy() {
+							const component = await import("./pages/course/CourseListingPage.tsx");
+							return { Component: component.default };
+						},
+						errorElement: <ErrorPage />,
+					},
+					{
+						path: "/course/:courseId",
+						async lazy() {
+							const component = await import("./layouts/CourseTitleLayout.tsx");
+							return { Component: component.default };
+						},
+						errorElement: <ErrorPage />,
+						children: [
+							{
+								index: true,
+								async lazy() {
+									const component = await import("./pages/course/CoursePage.tsx");
+									return { Component: component.default };
+								},
+								errorElement: <ErrorPage />,
+							},
+							{
+								path: "course-year/:courseYearId",
+								async lazy() {
+									const component = await import("./pages/course/CourseYearPage.tsx");
+									return { Component: component.default };
+								},
+								errorElement: <ErrorPage />,
+							},
+						],
+					},
+				],
+			},
+			{
 				index: true,
 				element: <App />,
-				errorElement: <ErrorPage />,
-			},
-			{
-				path: "/college",
-				element: <CollegeListingPage />,
-				errorElement: <ErrorPage />,
-			},
-			{
-				path: "/college/:collegeId",
-				async lazy() {
-					const component = await import("./pages/college/CollegePage.tsx");
-					return { Component: component.default };
-				},
-				errorElement: <ErrorPage />,
-			},
-			{
-				path: "/program",
-				element: <ProgramListingPage />,
-				errorElement: <ErrorPage />,
-			},
-			{
-				path: "/course",
-				async lazy() {
-					const component = await import("./pages/course/CourseListingPage.tsx");
-					return { Component: component.default };
-				},
-				errorElement: <ErrorPage />,
-			},
-			{
-				path: "/course/:courseId",
-				async lazy() {
-					const component = await import("./pages/course/CoursePage.tsx");
-					return { Component: component.default };
-				},
-				errorElement: <ErrorPage />,
-			},
-			{
-				path: "/course/:courseId/course-year/:courseYearId",
-				async lazy() {
-					const component = await import("./pages/course/CourseYearPage.tsx");
-					return { Component: component.default };
-				},
 				errorElement: <ErrorPage />,
 			},
 			{
@@ -107,18 +123,28 @@ const router = createBrowserRouter([
 					{
 						path: "course/:courseId",
 						async lazy() {
-							const component = await import("./pages/course/AdminCoursePage.tsx");
+							const component = await import("./layouts/CourseTitleLayout.tsx");
 							return { Component: component.default };
 						},
 						errorElement: <ErrorPage />,
-					},
-					{
-						path: "course/:courseId/course-year/:courseYearId",
-						async lazy() {
-							const component = await import("./pages/course/AdminCourseYearPage.tsx");
-							return { Component: component.default };
-						},
-						errorElement: <ErrorPage />,
+						children: [
+							{
+								index: true,
+								async lazy() {
+									const component = await import("./pages/course/AdminCoursePage.tsx");
+									return { Component: component.default };
+								},
+								errorElement: <ErrorPage />,
+							},
+							{
+								path: "course-year/:courseYearId",
+								async lazy() {
+									const component = await import("./pages/course/AdminCourseYearPage.tsx");
+									return { Component: component.default };
+								},
+								errorElement: <ErrorPage />,
+							},
+						],
 					},
 				],
 			},
