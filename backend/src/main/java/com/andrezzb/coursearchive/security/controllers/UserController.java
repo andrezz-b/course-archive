@@ -1,21 +1,24 @@
 package com.andrezzb.coursearchive.security.controllers;
 
+import com.andrezzb.coursearchive.program.models.Program;
 import com.andrezzb.coursearchive.repository.FilterValueMapper;
 import com.andrezzb.coursearchive.security.models.UserEntity;
 import com.andrezzb.coursearchive.validators.ValidEnum;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.acls.domain.ObjectIdentityImpl;
+import org.springframework.security.acls.domain.PrincipalSid;
+import org.springframework.security.acls.model.AclService;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.andrezzb.coursearchive.security.dto.UserDto;
 import com.andrezzb.coursearchive.security.services.UserService;
 
@@ -24,14 +27,17 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/user")
+@Slf4j
 public class UserController {
 
   private final UserService userService;
   private final ModelMapper modelMapper;
+  private final AclService aclService;
 
-  public UserController(UserService userService, ModelMapper modelMapper) {
+  public UserController(UserService userService, ModelMapper modelMapper, AclService aclService) {
     this.userService = userService;
     this.modelMapper = modelMapper;
+    this.aclService = aclService;
   }
 
   @GetMapping("/current")

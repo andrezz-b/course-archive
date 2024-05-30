@@ -5,6 +5,7 @@ import {
   PaginationState,
   useReactTable,
   Table as TableType,
+  SortingState,
 } from "@tanstack/react-table";
 import {
   Table,
@@ -30,6 +31,8 @@ interface DataTableProps<TData, TValue> {
   totalElements: number;
   pagination: PaginationState;
   setPagination: React.Dispatch<React.SetStateAction<PaginationState>>;
+  sorting?: SortingState;
+  setSorting?: React.Dispatch<React.SetStateAction<SortingState>>;
 }
 
 export function DataTable<TData, TValue>({
@@ -38,6 +41,8 @@ export function DataTable<TData, TValue>({
   totalElements,
   pagination,
   setPagination,
+  sorting,
+  setSorting,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -45,9 +50,12 @@ export function DataTable<TData, TValue>({
     rowCount: totalElements,
     state: {
       pagination,
+      sorting,
     },
     manualPagination: true,
     onPaginationChange: setPagination,
+    manualSorting: !!sorting,
+    onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
   });
 

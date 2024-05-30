@@ -37,6 +37,14 @@ const AdminLayout = () => {
                 Courses
               </Button>
             </NavLink>
+            <NavLink
+              to="/admin/user"
+              className={({ isActive }) => cn({ "bg-muted": isActive }, "w-full rounded-md")}
+            >
+              <Button variant="ghost" className="w-full justify-start">
+                Users
+              </Button>
+            </NavLink>
           </nav>
         </aside>
         <main className="flex-1 p-6">

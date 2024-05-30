@@ -71,7 +71,7 @@ public class UserEntity {
   }
 
   public enum SortField {
-    name, id, firstName, lastName, email
+    username, id, firstName, lastName, email
   }
 
   public enum FilterField implements FilterValueMapper {
