@@ -1,15 +1,12 @@
 package com.andrezzb.coursearchive.security.controllers;
 
+import com.andrezzb.coursearchive.security.dto.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.andrezzb.coursearchive.security.dto.GrantPermissionDto;
-import com.andrezzb.coursearchive.security.dto.LoginDto;
-import com.andrezzb.coursearchive.security.dto.RefreshDto;
-import com.andrezzb.coursearchive.security.dto.RegisterDto;
 import com.andrezzb.coursearchive.security.models.UserEntity;
 import com.andrezzb.coursearchive.security.services.AuthService;
 import jakarta.validation.Valid;
@@ -40,6 +37,12 @@ public class AuthController {
   public ResponseEntity<Void> grantPermission(@Valid @RequestBody GrantPermissionDto grantPermissionDto) {
     authService.grantPermission(grantPermissionDto);
     return ResponseEntity.ok().build();
+  }
+
+  @PostMapping("/grant-role")
+  public ResponseEntity<Void> grantRole(@Valid @RequestBody GrantRoleDto roleDto) {
+    authService.grantRole(roleDto);
+    return ResponseEntity.noContent().build();
   }
 
   @PostMapping("/refresh")

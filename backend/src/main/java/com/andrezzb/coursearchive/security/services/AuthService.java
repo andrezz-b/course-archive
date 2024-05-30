@@ -2,7 +2,10 @@ package com.andrezzb.coursearchive.security.services;
 
 import com.andrezzb.coursearchive.mappings.ApplicationObjectType;
 import com.andrezzb.coursearchive.security.acl.AclPermission;
+import com.andrezzb.coursearchive.security.dto.GrantRoleDto;
+import com.andrezzb.coursearchive.security.repository.RoleRepository;
 import org.springframework.context.ApplicationContext;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -36,10 +39,11 @@ public class AuthService {
   private final AclUtilService aclUtilService;
   private final UserService userService;
   private final ApplicationContext context;
+  private final RoleRepository roleRepository;
 
   public AuthService(TokenService tokenService, AuthenticationManager authenticationManager,
                      UserRepository userRepository, PasswordEncoder passwordEncoder, AclUtilService aclUtilService,
-                     UserService userService, ApplicationContext applicationContext) {
+                     UserService userService, ApplicationContext applicationContext, RoleRepository roleRepository) {
     this.tokenService = tokenService;
     this.authenticationManager = authenticationManager;
     this.userRepository = userRepository;
@@ -47,6 +51,7 @@ public class AuthService {
     this.aclUtilService = aclUtilService;
     this.userService = userService;
     this.context = applicationContext;
+    this.roleRepository = roleRepository;
   }
 
   public LoginDto.LoginResponse login(String username, String password) {
@@ -101,4 +106,19 @@ public class AuthService {
     return tokenService.generateToken(authentication);
   }
 
+  @PreAuthorize("hasRole('ADMIN')")
+  public void grantRole(GrantRoleDto roleDto) {
+    var user = userService.findByUsername(roleDto.getUsername());
+    Role.RoleName roleName = Role.RoleName.valueOf(roleDto.getRole().toUpperCase());
+
+    // Ignore if role exists
+    for (var role : user.getRoles()) {
+      if (role.getName().equals(roleName.toString())) {
+        return;
+      }
+    }
+    Role role = roleRepository.findByName(roleName.toString());
+    user.getRoles().add(role);
+    userRepository.save(user);
+  }
 }
