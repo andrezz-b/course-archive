@@ -4,10 +4,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Objects;
 
+import com.andrezzb.coursearchive.file.config.FileSystemProperties;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -16,13 +18,17 @@ import com.andrezzb.coursearchive.file.exceptions.StorageException;
 import com.andrezzb.coursearchive.file.exceptions.StorageFileNotFoundException;
 
 @Service
+@EnableConfigurationProperties(FileSystemProperties.class)
+@Slf4j
 public class FileSystemStorageService implements StorageService {
   private final Path rootLocation;
 
-  public FileSystemStorageService() {
-    this.rootLocation = Paths.get("uploads");
+  public FileSystemStorageService(FileSystemProperties properties) {
+    this.rootLocation = properties.getResolvedUploadDirectory();
     try {
       Files.createDirectories(rootLocation);
+      log.info("Storage location initialized at {}", rootLocation.toAbsolutePath());
+      log.info("User dir {}", System.getProperty("user.dir"));
     } catch (IOException e) {
       throw new StorageException("Could not initialize storage location", e);
     }
