@@ -1,7 +1,7 @@
 package com.andrezzb.coursearchive.security.acl;
 
 import javax.sql.DataSource;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.cache.concurrent.ConcurrentMapCache;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,10 +30,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 @EnableMethodSecurity
 public class AclMethodSecurityConfig {
 
-  @Autowired
-  private DataSource dataSource;
-
-
   @Bean
   PermissionCacheOptimizer permissionCacheOptimizer(AclService aclService) {
     return new AclPermissionCacheOptimizer(aclService);
@@ -41,7 +37,7 @@ public class AclMethodSecurityConfig {
 
   @Bean
   static MethodSecurityExpressionHandler expressionHandler(PermissionEvaluator permissionEvaluator,
-      PermissionCacheOptimizer permissionCacheOptimizer, RoleHierarchy roleHierarchy) {
+                                                           PermissionCacheOptimizer permissionCacheOptimizer, RoleHierarchy roleHierarchy) {
     var expressionHandler = new DefaultMethodSecurityExpressionHandler();
     expressionHandler.setPermissionEvaluator(permissionEvaluator);
     expressionHandler.setPermissionCacheOptimizer(permissionCacheOptimizer);
@@ -67,14 +63,14 @@ public class AclMethodSecurityConfig {
 
   @Bean
   SpringCacheBasedAclCache aclCache(PermissionGrantingStrategy permissionGrantingStrategy,
-      AclAuthorizationStrategy aclAuthorizationStrategy) {
+                                    AclAuthorizationStrategy aclAuthorizationStrategy) {
     final ConcurrentMapCache cache = new ConcurrentMapCache("acl_cache");
     return new SpringCacheBasedAclCache(cache, permissionGrantingStrategy,
-        aclAuthorizationStrategy);
+      aclAuthorizationStrategy);
   }
 
   @Bean
-  MutableAclService aclService(LookupStrategy lookupStrategy, SpringCacheBasedAclCache aclCache) {
+  MutableAclService aclService(DataSource dataSource, LookupStrategy lookupStrategy, SpringCacheBasedAclCache aclCache) {
     var aclService = new JdbcMutableAclService(dataSource, lookupStrategy, aclCache);
     aclService.setClassIdentityQuery("select currval(pg_get_serial_sequence('acl_class', 'id'))");
     aclService.setSidIdentityQuery("select currval(pg_get_serial_sequence('acl_sid', 'id'))");
@@ -82,10 +78,10 @@ public class AclMethodSecurityConfig {
   }
 
   @Bean
-  LookupStrategy lookupStrategy(SpringCacheBasedAclCache aclCache,
-      AclAuthorizationStrategy aclAuthorizationStrategy) {
+  LookupStrategy lookupStrategy(DataSource dataSource, SpringCacheBasedAclCache aclCache,
+                                AclAuthorizationStrategy aclAuthorizationStrategy) {
     return new BasicLookupStrategy(dataSource, aclCache, aclAuthorizationStrategy,
-        new ConsoleAuditLogger());
+      new ConsoleAuditLogger());
   }
 
   @Bean

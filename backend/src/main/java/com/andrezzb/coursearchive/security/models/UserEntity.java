@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.andrezzb.coursearchive.repository.FilterValueMapper;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
@@ -58,14 +60,22 @@ public class UserEntity {
 
   @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   @JoinTable(name = "user_role",
-      joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
-      inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
+    joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+    inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
   private List<Role> roles = new ArrayList<>();
 
   public Collection<? extends GrantedAuthority> getAuthorities() {
     return this.getRoles().stream()
-        .map(role -> new SimpleGrantedAuthority(role.getName()))
-        .collect(Collectors.toList());
+      .map(role -> new SimpleGrantedAuthority(role.getName()))
+      .collect(Collectors.toList());
+  }
+
+  public enum SortField {
+    name, id, firstName, lastName, email
+  }
+
+  public enum FilterField implements FilterValueMapper {
+    firstName, lastName, email, username
   }
 
 }
