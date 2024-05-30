@@ -38,7 +38,6 @@ public class AclUtilService {
     }
 
     this.setParent(acl, object);
-    // Now grant some permissions via an access control entry (ACE)
     acl.insertAce(acl.getEntries().size(), permission, sid, true);
     aclService.updateAcl(acl);
   }
