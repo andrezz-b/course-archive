@@ -1,7 +1,8 @@
 package com.andrezzb.coursearchive.security.controllers;
 
-import com.andrezzb.coursearchive.program.models.Program;
+import com.andrezzb.coursearchive.mappings.ApplicationObjectType;
 import com.andrezzb.coursearchive.repository.FilterValueMapper;
+import com.andrezzb.coursearchive.security.acl.AclPermission;
 import com.andrezzb.coursearchive.security.models.UserEntity;
 import com.andrezzb.coursearchive.validators.ValidEnum;
 import jakarta.validation.constraints.Positive;
@@ -17,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.acls.domain.ObjectIdentityImpl;
 import org.springframework.security.acls.domain.PrincipalSid;
 import org.springframework.security.acls.model.AclService;
+import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import com.andrezzb.coursearchive.security.dto.UserDto;
@@ -76,6 +78,33 @@ public class UserController {
 
     Sort sort = Sort.by(orders);
     return PageRequest.of(page, size, sort);
+  }
+
+  @Data
+  public static class AclData {
+    private String objectType;
+    private Long objectId;
+    private String username;
+  }
+
+  @PostMapping("/acl")
+  private ResponseEntity<Void> readAclData(@RequestBody AclData aclData) {
+    ApplicationObjectType objectType = ApplicationObjectType.fromString(aclData.getObjectType());
+    ObjectIdentityImpl oi = new ObjectIdentityImpl(objectType.getObjectClass(), aclData.getObjectId());
+    PrincipalSid sid = new PrincipalSid(aclData.getUsername());
+    var aclMap = aclService.readAclsById(List.of(oi), List.of(sid));
+    var objectAcl = aclMap.get(oi);
+
+    for (var permission : AclPermission.ALL_PERMISSIONS) {
+      boolean result = false;
+      try {
+        result = objectAcl.isGranted(List.of(permission), List.of(sid), false);
+      } catch (NotFoundException ignored) {
+      }
+      log.info("Permission {} is granted: {}", permission, result);
+    }
+
+    return ResponseEntity.noContent().build();
   }
 
 }

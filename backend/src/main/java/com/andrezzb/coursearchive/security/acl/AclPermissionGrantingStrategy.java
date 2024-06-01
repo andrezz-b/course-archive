@@ -14,7 +14,7 @@ public class AclPermissionGrantingStrategy extends DefaultPermissionGrantingStra
   @Override
   protected boolean isGranted(AccessControlEntry ace, Permission p) {
     if (ace.isGranting() && p.getMask() != 0) {
-      return (ace.getPermission().getMask() & p.getMask()) != 0;
+      return (ace.getPermission().getMask() & p.getMask()) >= p.getMask();
     } else {
       return ace.getPermission().getMask() == p.getMask();
     }

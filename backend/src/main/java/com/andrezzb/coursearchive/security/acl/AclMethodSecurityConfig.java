@@ -79,9 +79,8 @@ public class AclMethodSecurityConfig {
 
   @Bean
   LookupStrategy lookupStrategy(DataSource dataSource, SpringCacheBasedAclCache aclCache,
-                                AclAuthorizationStrategy aclAuthorizationStrategy) {
-    return new BasicLookupStrategy(dataSource, aclCache, aclAuthorizationStrategy,
-      new ConsoleAuditLogger());
+                                AclAuthorizationStrategy aclAuthorizationStrategy, PermissionGrantingStrategy permissionGrantingStrategy) {
+    return new BasicLookupStrategy(dataSource, aclCache, aclAuthorizationStrategy, permissionGrantingStrategy);
   }
 
   @Bean
