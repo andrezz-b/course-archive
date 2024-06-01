@@ -72,7 +72,7 @@ public class College implements AclSecured {
     }
 
     @Override
-    public Object getParent() {
+    public AclSecured getParent() {
         return null;
     }
 

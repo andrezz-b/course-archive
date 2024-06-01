@@ -3,6 +3,8 @@ package com.andrezzb.coursearchive.material.models;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import com.andrezzb.coursearchive.file.models.MaterialFile;
@@ -24,6 +26,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@ToString(exclude = "materialGroup")
 @NoArgsConstructor
 @Entity
 @Table(name = "material")
@@ -67,7 +70,7 @@ public class Material implements AclSecured {
   }
 
   @Override
-  public Object getParent() {
+  public AclSecured getParent() {
     return materialGroup;
   }
 

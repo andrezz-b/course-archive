@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.*;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import com.andrezzb.coursearchive.course.models.CourseYear;
@@ -15,6 +16,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@ToString(exclude = "courseYear")
 @NoArgsConstructor
 @Entity
 @Table(name = "material_group",
@@ -65,7 +67,7 @@ public class MaterialGroup implements AclSecured {
     }
 
     @Override
-    public Object getParent() {
+    public AclSecured getParent() {
         return courseYear;
     }
 

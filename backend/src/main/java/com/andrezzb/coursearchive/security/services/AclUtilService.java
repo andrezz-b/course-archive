@@ -1,5 +1,6 @@
 package com.andrezzb.coursearchive.security.services;
 
+import org.hibernate.Hibernate;
 import org.springframework.security.acls.model.MutableAclService;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.acls.model.Sid;
@@ -45,10 +46,11 @@ public class AclUtilService {
 
   private void setParent(MutableAcl acl, AclSecured object) {
     acl.setEntriesInheriting(object.isInheriting());
-    if (object.getParent() == null) {
+    AclSecured parent = (AclSecured) Hibernate.unproxy(object.getParent());
+    if (parent == null) {
       return;
     }
-    Acl parentAcl = aclService.readAclById(new ObjectIdentityImpl(object.getParent()));
+    Acl parentAcl = aclService.readAclById(new ObjectIdentityImpl(parent.getClass(), parent.getId()));
     acl.setParent(parentAcl);
   }
 }

@@ -1,6 +1,8 @@
 package com.andrezzb.coursearchive.file.models;
 
 import java.time.LocalDateTime;
+
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import com.andrezzb.coursearchive.material.models.Material;
@@ -19,6 +21,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@ToString(exclude = "material")
 @NoArgsConstructor
 @Entity
 @Table(name = "file")

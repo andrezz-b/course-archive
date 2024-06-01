@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public interface AclSecured {
   Long getId();
   @JsonIgnore
-  Object getParent();
+  AclSecured getParent();
   @JsonIgnore
   default Boolean isInheriting() {
     return true;

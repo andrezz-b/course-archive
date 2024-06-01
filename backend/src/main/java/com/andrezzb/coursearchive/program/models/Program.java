@@ -3,6 +3,8 @@ package com.andrezzb.coursearchive.program.models;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -27,6 +29,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@ToString(exclude = "college")
 @NoArgsConstructor
 @Entity
 @Table(name = "program")
@@ -82,8 +85,8 @@ public class Program implements AclSecured {
   }
 
   @Override
-  public Object getParent() {
-    return college;
+  public AclSecured getParent() {
+    return this.getCollege();
   }
 
   public enum FilterField implements FilterValueMapper {
@@ -92,7 +95,7 @@ public class Program implements AclSecured {
       public Object map(String filterValue) {
         return Short.parseShort(filterValue);
       }
-    
+
     }
   }
 

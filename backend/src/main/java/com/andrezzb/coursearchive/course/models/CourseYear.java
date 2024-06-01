@@ -3,6 +3,8 @@ package com.andrezzb.coursearchive.course.models;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import com.andrezzb.coursearchive.material.models.MaterialGroup;
@@ -25,6 +27,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@ToString(exclude = "course")
 @NoArgsConstructor
 @Entity
 @Table(name = "course_year",
@@ -83,7 +86,7 @@ public class CourseYear implements AclSecured {
   }
 
   @Override
-  public Object getParent() {
+  public AclSecured getParent() {
     return course;
   }
 
