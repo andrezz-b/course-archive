@@ -16,6 +16,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class CollegeService {
 
@@ -31,8 +33,8 @@ public class CollegeService {
     }
 
     @PreAuthorize("hasRole('USER')")
-    public Page<CollegeDto> findAllCollegesPaged(Pageable p, String filterField,
-            Object filterValue) {
+    public Page<CollegeDto> findAllCollegesPaged(Pageable p, List<String> filterField,
+            List<Object> filterValue) {
         Page<College> colleges =
                 collegeRepository.findAllByFilterFieldAndFilterValue(p, filterField, filterValue);
         return colleges.map(college -> modelMapper.map(college, CollegeDto.class));
@@ -63,7 +65,7 @@ public class CollegeService {
         return modelMapper.map(savedCollege, CollegeDto.class);
     }
 
-    @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.college.models.College', write) || hasRole('MANAGER')")
+    @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.college.models.College', 'write') || hasRole('MANAGER')")
     public CollegeDto updateCollege(Long id, CollegeUpdateDto updateDto) {
         College college = findCollege(id);
         modelMapper.map(updateDto, college);
@@ -71,7 +73,7 @@ public class CollegeService {
         return modelMapper.map(savedCollege, CollegeDto.class);
     }
 
-    @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.college.models.College', delete) || hasRole('MANAGER')")
+    @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.college.models.College', 'delete') || hasRole('MANAGER')")
     public void deleteCollegeById(Long id) {
         collegeRepository.deleteById(id);
     }

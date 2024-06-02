@@ -11,7 +11,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -20,6 +19,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
+
+import java.util.List;
+
+import static com.andrezzb.coursearchive.utils.PageRequestUtils.createPageRequest;
 
 
 @RestController
@@ -37,15 +40,14 @@ public class CollegeController {
             @PositiveOrZero @RequestParam(defaultValue = "0") int page,
             @Positive @RequestParam(defaultValue = "5") int size,
             @ValidEnum(enumClazz = Sort.Direction.class,
-                    ignoreCase = true) @RequestParam(defaultValue = "asc") String sortDirection,
+                    ignoreCase = true) @RequestParam(defaultValue = "asc") List<String> sortDirection,
             @ValidEnum(enumClazz = College.SortField.class) @RequestParam(
-                    defaultValue = "id") String sortField,
+                    defaultValue = "id") List<String> sortField,
             @ValidEnum(enumClazz = College.FilterField.class, required = false) @RequestParam(
-                    required = false) String filterField,
-            @RequestParam(required = false) String filterValue) {
-        Object filterValueObj = FilterValueMapper.mapFilterValue(College.FilterField.class, filterField, filterValue);
-        Pageable p = PageRequest.of(page, size,
-                Sort.by(Sort.Direction.fromString(sortDirection), sortField));
+                    required = false) List<String> filterField,
+            @RequestParam(required = false) List<String> filterValue) {
+        List<Object> filterValueObj = FilterValueMapper.mapFilterValue(College.FilterField.class, filterField, filterValue);
+        Pageable p = createPageRequest(page, size, sortField, sortDirection);
         final var collegesPaged =
                 collegeService.findAllCollegesPaged(p, filterField, filterValueObj);
         return ResponseEntity.ok(collegesPaged);

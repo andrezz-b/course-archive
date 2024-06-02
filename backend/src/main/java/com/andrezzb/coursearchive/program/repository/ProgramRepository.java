@@ -8,12 +8,14 @@ import org.springframework.stereotype.Repository;
 import com.andrezzb.coursearchive.program.models.Program;
 import com.andrezzb.coursearchive.repository.FilterFieldSpecification;
 
+import java.util.List;
+
 @Repository
 public interface ProgramRepository
-    extends JpaRepository<Program, Long>, FilterFieldSpecification<Program> {
+  extends JpaRepository<Program, Long>, FilterFieldSpecification<Program> {
 
   default Page<Program> findAllByFilterFieldAndValue(Pageable pageable,
-      String filterField, Object filterValue, Long collegeId) {
+                                                     List<String> filterField, List<Object> filterValue, Long collegeId) {
     var baseSpec = filterByFieldAndValue(filterField, filterValue);
     if (collegeId != null) {
       baseSpec = baseSpec.and(filterByCollegeId(collegeId));
@@ -23,6 +25,6 @@ public interface ProgramRepository
 
   static Specification<Program> filterByCollegeId(Long collegeId) {
     return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("college").get("id"),
-        collegeId);
+      collegeId);
   }
 }

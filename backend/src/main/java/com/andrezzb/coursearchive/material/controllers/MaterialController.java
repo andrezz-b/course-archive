@@ -2,7 +2,6 @@ package com.andrezzb.coursearchive.material.controllers;
 
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -32,6 +31,10 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 
+import java.util.List;
+
+import static com.andrezzb.coursearchive.utils.PageRequestUtils.createPageRequest;
+
 @RestController
 @RequestMapping("api/material")
 public class MaterialController {
@@ -45,30 +48,28 @@ public class MaterialController {
 
   @GetMapping("/")
   public ResponseEntity<Page<Material>> getAllMaterials(
-      @PositiveOrZero @RequestParam(defaultValue = "0") int page,
-      @Positive @RequestParam(defaultValue = "5") int size,
-      @ValidEnum(enumClazz = Sort.Direction.class,
-          ignoreCase = true) @RequestParam(defaultValue = "asc") String sortDirection,
-      @ValidEnum(enumClazz = Material.SortField.class) @RequestParam(
-          defaultValue = "name") String sortField,
-      @ValidEnum(enumClazz = Material.FilterField.class, required = false) @RequestParam(
-          required = false) String filterField,
-      @RequestParam(required = false) String filterValue,
-      @RequestParam() Long courseYearId,
-      @RequestParam(required = false) Long materialGroupId) {
-    Object filterValueObj =
-        FilterValueMapper.mapFilterValue(Material.FilterField.class, filterField, filterValue);
-    Pageable p =
-        PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortField));
-    final var materialsPaged = materialService.findAllMaterialsPaged(p, filterField, filterValueObj,
-        courseYearId, materialGroupId);
+    @PositiveOrZero @RequestParam(defaultValue = "0") int page,
+    @Positive @RequestParam(defaultValue = "5") int size,
+    @ValidEnum(enumClazz = Sort.Direction.class, ignoreCase = true)
+    @RequestParam(defaultValue = "asc") List<String> sortDirection,
+    @ValidEnum(enumClazz = Material.SortField.class) @RequestParam(defaultValue = "name")
+    List<String> sortField, @ValidEnum(enumClazz = Material.FilterField.class, required = false)
+  @RequestParam(required = false) List<String> filterField,
+    @RequestParam(required = false) List<String> filterValue, @RequestParam() Long courseYearId,
+    @RequestParam(required = false) Long materialGroupId) {
+    var filterValueObj =
+      FilterValueMapper.mapFilterValue(Material.FilterField.class, filterField, filterValue);
+    Pageable p = createPageRequest(page, size, sortField, sortDirection);
+    final var materialsPaged =
+      materialService.findAllMaterialsPaged(p, filterField, filterValueObj, courseYearId,
+        materialGroupId);
     return ResponseEntity.ok(materialsPaged);
   }
 
   @PostMapping(path = "/", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<Material> createMaterial(
-      @Valid @RequestPart("material") MaterialCreateDto materialCreateDto,
-      @ValidMaterialFile @RequestPart("file") MultipartFile file) {
+    @Valid @RequestPart("material") MaterialCreateDto materialCreateDto,
+    @ValidMaterialFile @RequestPart("file") MultipartFile file) {
     var material = materialService.createMaterial(materialCreateDto, file);
     return ResponseEntity.status(HttpStatus.CREATED).body(material);
   }
@@ -84,14 +85,13 @@ public class MaterialController {
     MaterialFile materialFile = fileService.findMaterialFileByMaterialId(materialId);
     Resource fileResource = fileService.loadMaterialFileResource(materialFile);
 
-    return ResponseEntity.ok()
-        .contentType(MediaType.parseMediaType(materialFile.getMimeType()))
-        .body(fileResource);
+    return ResponseEntity.ok().contentType(MediaType.parseMediaType(materialFile.getMimeType()))
+      .body(fileResource);
   }
 
   @PutMapping("/{id}")
   public ResponseEntity<Material> updateMaterialById(@PathVariable Long id,
-      @Valid @RequestBody MaterialUpdateDto materialUpdateDto) {
+    @Valid @RequestBody MaterialUpdateDto materialUpdateDto) {
     var material = materialService.updateMaterial(id, materialUpdateDto);
     return ResponseEntity.ok(material);
   }

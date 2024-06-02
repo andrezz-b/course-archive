@@ -18,6 +18,8 @@ import com.andrezzb.coursearchive.material.repository.MaterialGroupRepository;
 import com.andrezzb.coursearchive.security.acl.AclPermission;
 import com.andrezzb.coursearchive.security.services.AclUtilService;
 
+import java.util.List;
+
 @Service
 public class MaterialGroupService {
   private final MaterialGroupRepository materialGroupRepository;
@@ -26,43 +28,37 @@ public class MaterialGroupService {
   private final CourseYearService courseYearService;
 
   public MaterialGroupService(MaterialGroupRepository materialGroupRepository,
-      AclUtilService aclUtilService, ModelMapper modelMapper, CourseYearService courseYearService) {
+    AclUtilService aclUtilService, ModelMapper modelMapper, CourseYearService courseYearService) {
     this.materialGroupRepository = materialGroupRepository;
     this.aclUtilService = aclUtilService;
     this.modelMapper = modelMapper;
     this.courseYearService = courseYearService;
   }
 
-  @PreAuthorize("hasRole('USER')")
-  public Page<MaterialGroup> findAllMaterialGroupsPaged(Pageable p) {
-    return materialGroupRepository.findAll(p);
-  }
-
-  @PreAuthorize("hasPermission(#courseYearId, 'com.andrezzb.coursearchive.course.models.CourseYear', read) || hasRole('MANAGER')")
-  public Page<GroupWithMaterialDto> findAllMaterialGroupsPaged(Pageable p, String filterField,
-      Object filterValue, Long courseYearId) {
+  @PreAuthorize(
+    "hasPermission(#courseYearId, 'com.andrezzb.coursearchive.course.models.CourseYear', 'read') || hasRole('MANAGER')")
+  public Page<GroupWithMaterialDto> findAllMaterialGroupsPaged(Pageable p, List<String> filterField,
+    List<Object> filterValue, Long courseYearId) {
     var groups = materialGroupRepository.findAllByFilterFiledAndValue(p, filterField, filterValue,
-        courseYearId);
+      courseYearId);
     return groups.map(group -> modelMapper.map(group, GroupWithMaterialDto.class));
   }
 
-  public MaterialGroupDto findMaterialGroupById(Long id) {
-    MaterialGroup group = findMaterialGroup(id);
-    return modelMapper.map(group, MaterialGroupDto.class);
-  }
-
-  @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.material.models.MaterialGroup', read) || hasRole('MANAGER')")
+  @PreAuthorize(
+    "hasPermission(#id, 'com.andrezzb.coursearchive.material.models.MaterialGroup', 'read') || hasRole('MANAGER')")
   public MaterialGroup findMaterialGroup(Long id) {
     return materialGroupRepository.findById(id)
-        .orElseThrow(() -> new MaterialGroupNotFoundException(id));
+      .orElseThrow(() -> new MaterialGroupNotFoundException(id));
   }
 
   @Transactional
-  @PreAuthorize("hasPermission(#materialGroupDto.courseYearId, 'com.andrezzb.coursearchive.course.models.CourseYear', create) || hasRole('MANAGER')")
+  @PreAuthorize(
+    "hasPermission(#materialGroupDto.courseYearId, 'com.andrezzb.coursearchive.course.models.CourseYear', 'create') || hasRole('MANAGER')")
   public MaterialGroupDto createMaterialGroup(MaterialGroupCreateDto materialGroupDto) {
     var courseYear = courseYearService.findCourseYear(materialGroupDto.getCourseYearId());
 
-    Short displayOrder = getNewDisplayOrder(courseYear.getId(), null, materialGroupDto.getDisplayOrder(), false);
+    Short displayOrder =
+      getNewDisplayOrder(courseYear.getId(), null, materialGroupDto.getDisplayOrder(), false);
     materialGroupDto.setDisplayOrder(displayOrder);
 
     MaterialGroup materialGroup = modelMapper.map(materialGroupDto, MaterialGroup.class);
@@ -76,20 +72,23 @@ public class MaterialGroupService {
   }
 
   @Transactional
-  @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.material.models.MaterialGroup', write) || hasRole('MANAGER')")
+  @PreAuthorize(
+    "hasPermission(#id, 'com.andrezzb.coursearchive.material.models.MaterialGroup', 'write') || hasRole('MANAGER')")
   public MaterialGroupDto updateMaterialGroup(Long id, MaterialGroupUpdateDto updateDto) {
     MaterialGroup materialGroup = findMaterialGroup(id);
-    Short displayOrder = getNewDisplayOrder(materialGroup.getCourseYear().getId(),
-        materialGroup.getDisplayOrder(), updateDto.getDisplayOrder(), true);
+    Short displayOrder =
+      getNewDisplayOrder(materialGroup.getCourseYear().getId(), materialGroup.getDisplayOrder(),
+        updateDto.getDisplayOrder(), true);
     updateDto.setDisplayOrder(displayOrder);
     modelMapper.map(updateDto, materialGroup);
     var savedGroup = materialGroupRepository.save(materialGroup);
     return modelMapper.map(savedGroup, MaterialGroupDto.class);
   }
 
-  @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.material.models.MaterialGroup', delete) || hasRole('MANAGER')")
+  @PreAuthorize(
+    "hasPermission(#id, 'com.andrezzb.coursearchive.material.models.MaterialGroup', 'delete') || hasRole('MANAGER')")
   public void deleteMaterialGroupById(Long id) {
-    MaterialGroup group = null;
+    MaterialGroup group;
     try {
       group = findMaterialGroup(id);
     } catch (Exception e) {
@@ -106,10 +105,10 @@ public class MaterialGroupService {
   }
 
   Short getNewDisplayOrder(Long courseYearId, Short oldOrder, Short newOrder, boolean exists) {
-    var groupCount = materialGroupRepository.countByCourseYearId(courseYearId).orElse(0L);
+    long groupCount = materialGroupRepository.countByCourseYearId(courseYearId).orElse(0L);
     if (groupCount <= 1 && exists) {
       return 0;
-    } else if (groupCount <= 1 && !exists) {
+    } else if (groupCount <= 1) {
       return 1;
     }
     // Order is not being changed

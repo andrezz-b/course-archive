@@ -11,7 +11,6 @@ import com.andrezzb.coursearchive.course.services.CourseService;
 import com.andrezzb.coursearchive.repository.FilterValueMapper;
 import com.andrezzb.coursearchive.validators.ValidEnum;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -26,6 +25,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
 
+import java.util.List;
+
+import static com.andrezzb.coursearchive.utils.PageRequestUtils.createPageRequest;
+
 @RestController
 @RequestMapping("api/course")
 public class CourseController {
@@ -38,22 +41,21 @@ public class CourseController {
 
   @GetMapping("/")
   public ResponseEntity<Page<CourseDto>> getAllCourses(
-      @PositiveOrZero @RequestParam(defaultValue = "0") int page,
-      @Positive @RequestParam(defaultValue = "5") int size,
-      @ValidEnum(enumClazz = Sort.Direction.class,
-          ignoreCase = true) @RequestParam(defaultValue = "asc") String sortDirection,
-      @ValidEnum(enumClazz = Course.SortField.class) @RequestParam(
-          defaultValue = "id") String sortField,
-      @ValidEnum(enumClazz = Course.FilterField.class, required = false) @RequestParam(
-          required = false) String filterField,
-      @RequestParam(required = false) String filterValue,
-      @RequestParam(required = false) Long programId) {
+    @PositiveOrZero @RequestParam(defaultValue = "0") int page,
+    @Positive @RequestParam(defaultValue = "5") int size,
+    @ValidEnum(enumClazz = Sort.Direction.class, ignoreCase = true)
+    @RequestParam(defaultValue = "asc") List<String> sortDirection,
+    @ValidEnum(enumClazz = Course.SortField.class) @RequestParam(defaultValue = "id")
+    List<String> sortField, @ValidEnum(enumClazz = Course.FilterField.class, required = false)
+  @RequestParam(required = false) List<String> filterField,
+    @RequestParam(required = false) List<String> filterValue,
+    @RequestParam(required = false) Long programId) {
 
-    Object filterValueObj = FilterValueMapper.mapFilterValue(Course.FilterField.class, filterField, filterValue);
-    Pageable p =
-        PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortField));
+    var filterValueObj =
+      FilterValueMapper.mapFilterValue(Course.FilterField.class, filterField, filterValue);
+    Pageable p = createPageRequest(page, size, sortDirection, sortField);
     final var coursesPaged =
-        courseService.findAllCoursesPaged(p, filterField, filterValueObj, programId);
+      courseService.findAllCoursesPaged(p, filterField, filterValueObj, programId);
     return ResponseEntity.ok(coursesPaged);
   }
 
@@ -71,7 +73,7 @@ public class CourseController {
 
   @PutMapping("/{id}")
   private ResponseEntity<Course> updateCourseById(@PathVariable Long id,
-      @Valid @RequestBody CourseUpdateDto courseUpdateDto) {
+    @Valid @RequestBody CourseUpdateDto courseUpdateDto) {
     var course = courseService.updatCourse(id, courseUpdateDto);
     return ResponseEntity.ok(course);
   }

@@ -8,13 +8,15 @@ import org.springframework.stereotype.Repository;
 import com.andrezzb.coursearchive.material.models.Material;
 import com.andrezzb.coursearchive.repository.FilterFieldSpecification;
 
+import java.util.List;
+
 @Repository
 public interface MaterialRepository
-    extends JpaRepository<Material, Long>, FilterFieldSpecification<Material> {
+  extends JpaRepository<Material, Long>, FilterFieldSpecification<Material> {
 
 
-  default Page<Material> findAllByFilterFieldAndValue(Pageable pageable, String filterField,
-      Object filterValue, Long materialGroupId, Long courseYearId) {
+  default Page<Material> findAllByFilterFieldAndValue(Pageable pageable, List<String> filterField,
+    List<Object> filterValue, Long materialGroupId, Long courseYearId) {
     var baseSpec = filterByFieldAndValue(filterField, filterValue);
     if (materialGroupId != null) {
       baseSpec = baseSpec.and(filterByMaterialGroupId(materialGroupId));
@@ -27,14 +29,12 @@ public interface MaterialRepository
 
   static Specification<Material> filterByMaterialGroupId(Long materialGroupId) {
     return (root, query, criteriaBuilder) -> criteriaBuilder.equal(
-        root.get("materialGroup").get("id"),
-        materialGroupId);
+      root.get("materialGroup").get("id"), materialGroupId);
   }
 
   static Specification<Material> filterByCourseYearId(Long courseYearId) {
     return (root, query, criteriaBuilder) -> criteriaBuilder.equal(
-        root.get("materialGroup").get("courseYear").get("id"),
-        courseYearId);
+      root.get("materialGroup").get("courseYear").get("id"), courseYearId);
   }
 
 }

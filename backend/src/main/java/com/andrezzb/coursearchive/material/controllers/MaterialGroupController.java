@@ -21,12 +21,15 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
+
+import static com.andrezzb.coursearchive.utils.PageRequestUtils.createPageRequest;
 
 
 @RestController
@@ -40,36 +43,34 @@ public class MaterialGroupController {
 
   @GetMapping("/")
   public ResponseEntity<Page<GroupWithMaterialDto>> getAllMaterialGroups(
-      @PositiveOrZero @RequestParam(defaultValue = "0") int page,
-      @Positive @RequestParam(defaultValue = "5") int size,
-      @ValidEnum(enumClazz = Sort.Direction.class,
-          ignoreCase = true) @RequestParam(defaultValue = "asc") String sortDirection,
-      @ValidEnum(enumClazz = MaterialGroup.SortField.class) @RequestParam(
-          defaultValue = "displayOrder") String sortField,
-      @ValidEnum(enumClazz = MaterialGroup.FilterField.class, required = false) @RequestParam(
-          required = false) String filterField,
-      @RequestParam(required = false) String filterValue,
-      @RequestParam Long courseYearId) {
+    @PositiveOrZero @RequestParam(defaultValue = "0") int page,
+    @Positive @RequestParam(defaultValue = "5") int size,
+    @ValidEnum(enumClazz = Sort.Direction.class, ignoreCase = true)
+    @RequestParam(defaultValue = "asc") List<String> sortDirection,
+    @ValidEnum(enumClazz = MaterialGroup.SortField.class)
+    @RequestParam(defaultValue = "displayOrder") List<String> sortField,
+    @ValidEnum(enumClazz = MaterialGroup.FilterField.class, required = false)
+    @RequestParam(required = false) List<String> filterField,
+    @RequestParam(required = false) List<String> filterValue, @RequestParam Long courseYearId) {
 
-    Object filterValueObj =
-        FilterValueMapper.mapFilterValue(MaterialGroup.FilterField.class, filterField, filterValue);
-    Pageable p =
-        PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortField));
-    final var materialGroupsPaged = materialGroupService.findAllMaterialGroupsPaged(p, filterField,
-        filterValueObj, courseYearId);
+    var filterValueObj =
+      FilterValueMapper.mapFilterValue(MaterialGroup.FilterField.class, filterField, filterValue);
+    Pageable p = createPageRequest(page, size, sortDirection, sortField);
+    final var materialGroupsPaged =
+      materialGroupService.findAllMaterialGroupsPaged(p, filterField, filterValueObj, courseYearId);
     return ResponseEntity.ok(materialGroupsPaged);
   }
 
   @PostMapping("/")
   public ResponseEntity<MaterialGroupDto> createMaterialGroup(
-      @Valid @RequestBody MaterialGroupCreateDto materialGroupCreateDto) {
+    @Valid @RequestBody MaterialGroupCreateDto materialGroupCreateDto) {
     var materialGroup = materialGroupService.createMaterialGroup(materialGroupCreateDto);
     return ResponseEntity.status(HttpStatus.CREATED).body(materialGroup);
   }
 
   @PutMapping("/{id}")
   public ResponseEntity<MaterialGroupDto> updateMaterailGroupById(@PathVariable Long id,
-      @Valid @RequestBody MaterialGroupUpdateDto materialGroupUpdateDto) {
+    @Valid @RequestBody MaterialGroupUpdateDto materialGroupUpdateDto) {
     var materialGroup = materialGroupService.updateMaterialGroup(id, materialGroupUpdateDto);
     return ResponseEntity.ok(materialGroup);
   }

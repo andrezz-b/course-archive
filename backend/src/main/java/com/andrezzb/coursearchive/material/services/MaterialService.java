@@ -18,6 +18,8 @@ import com.andrezzb.coursearchive.material.repository.MaterialRepository;
 import com.andrezzb.coursearchive.security.acl.AclPermission;
 import com.andrezzb.coursearchive.security.services.AclUtilService;
 
+import java.util.List;
+
 @Service
 public class MaterialService {
   private final MaterialRepository materialRepository;
@@ -39,21 +41,21 @@ public class MaterialService {
     typeMap.addMappings(mapper -> mapper.skip(Material::setId));
   }
 
-  @PreAuthorize("hasPermission(#courseYearId, 'com.andrezzb.coursearchive.course.models.CourseYear', read) || hasRole('MANAGER')")
-  public Page<Material> findAllMaterialsPaged(Pageable p, String filterField, Object filterValue,
+  @PreAuthorize("hasPermission(#courseYearId, 'com.andrezzb.coursearchive.course.models.CourseYear', 'read') || hasRole('MANAGER')")
+  public Page<Material> findAllMaterialsPaged(Pageable p, List<String> filterField, List<Object> filterValue,
       Long courseYearId, Long materialGroupId) {
     return materialRepository.findAllByFilterFieldAndValue(p, filterField, filterValue,
         materialGroupId, courseYearId);
   }
 
-  @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.material.models.Material', read) || hasRole('MANAGER')")
+  @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.material.models.Material', 'read') || hasRole('MANAGER')")
   public Material findMaterialById(Long id) {
     return materialRepository.findById(id)
         .orElseThrow(() -> new MaterialNotFoundException(id));
   }
 
   @Transactional
-  @PreAuthorize("hasPermission(#createDto.materialGroupId, 'com.andrezzb.coursearchive.material.models.MaterialGroup', create) || hasRole('MANAGER')")
+  @PreAuthorize("hasPermission(#createDto.materialGroupId, 'com.andrezzb.coursearchive.material.models.MaterialGroup', 'create') || hasRole('MANAGER')")
   public Material createMaterial(MaterialCreateDto createDto, MultipartFile file) {
     var materialGroup = materialGroupService.findMaterialGroup(createDto.getMaterialGroupId());
     Material material = modelMapper.map(createDto, Material.class);

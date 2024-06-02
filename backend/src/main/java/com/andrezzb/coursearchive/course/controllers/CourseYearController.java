@@ -13,7 +13,6 @@ import com.andrezzb.coursearchive.course.dto.CourseYearCreateDto;
 import com.andrezzb.coursearchive.course.dto.CourseYearUpdateDto;
 import com.andrezzb.coursearchive.course.models.CourseYear;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -25,6 +24,10 @@ import jakarta.validation.constraints.PositiveOrZero;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.List;
+
+import static com.andrezzb.coursearchive.utils.PageRequestUtils.createPageRequest;
 
 
 @RestController
@@ -42,16 +45,16 @@ public class CourseYearController {
       @PositiveOrZero @RequestParam(defaultValue = "0") int page,
       @Positive @RequestParam(defaultValue = "5") int size,
       @ValidEnum(enumClazz = Sort.Direction.class,
-          ignoreCase = true) @RequestParam(defaultValue = "desc") String sortDirection,
+          ignoreCase = true) @RequestParam(defaultValue = "desc") List<String> sortDirection,
       @ValidEnum(enumClazz = CourseYear.SortField.class) @RequestParam(
-          defaultValue = "academicYear") String sortField,
+          defaultValue = "academicYear") List<String> sortField,
       @ValidEnum(enumClazz = CourseYear.FilterField.class, required = false) @RequestParam(
-          required = false) String filterField,
-      @RequestParam(required = false) String filterValue,
+          required = false) List<String> filterField,
+      @RequestParam(required = false) List<String> filterValue,
       @RequestParam(required = false) Long courseId) {
 
-    Object filterValueObj = FilterValueMapper.mapFilterValue(CourseYear.FilterField.class, filterField, filterValue);
-    Pageable p = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortField));
+    var filterValueObj = FilterValueMapper.mapFilterValue(CourseYear.FilterField.class, filterField, filterValue);
+    Pageable p = createPageRequest(page, size, sortDirection, sortField);
     final var courseYearsPaged = courseYearService.findAllCourseYearsPaged(p, filterField, filterValueObj, courseId);
     return ResponseEntity.ok(courseYearsPaged);
   }

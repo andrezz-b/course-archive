@@ -25,13 +25,14 @@ public class EnumValidator implements ConstraintValidator<ValidEnum, Object> {
     }
     boolean isValid = isValidValue(value);
     if (!isValid) {
-      context.buildConstraintViolationWithTemplate(generatedAcceptedValuesMessage()).addConstraintViolation();
+      context.buildConstraintViolationWithTemplate(generatedAcceptedValuesMessage())
+        .addConstraintViolation();
     }
     return isValid;
   }
 
   private boolean isValidValue(Object value) {
-    boolean isValid = false;
+    boolean isValid = true;
     switch (value) {
       case String s -> {
         String valueStr = ignoreCase ? s.toUpperCase() : s;
@@ -40,21 +41,22 @@ public class EnumValidator implements ConstraintValidator<ValidEnum, Object> {
       case String[] strings -> {
         for (String str : strings) {
           String valueStr = ignoreCase ? str.toUpperCase() : str;
-          isValid = valueList.contains(valueStr);
+          isValid = isValid && valueList.contains(valueStr);
         }
       }
       case @SuppressWarnings("rawtypes")List list -> {
         for (Object obj : list) {
           if (obj instanceof String) {
             String valueStr = ignoreCase ? ((String) obj).toUpperCase() : (String) obj;
-            isValid = valueList.contains(valueStr);
+            isValid = isValid && valueList.contains(valueStr);
           } else {
-            throw new IllegalArgumentException("Unsupported data type in list. Only String is supported.");
+            throw new IllegalArgumentException(
+              "Unsupported data type in list. Only String is supported.");
           }
         }
       }
-      case null, default ->
-        throw new IllegalArgumentException("Unsupported data type. Only String, String[] and List<String> are supported.");
+      case null, default -> throw new IllegalArgumentException(
+        "Unsupported data type. Only String, String[] and List<String> are supported.");
     }
     return isValid;
   }
@@ -69,8 +71,7 @@ public class EnumValidator implements ConstraintValidator<ValidEnum, Object> {
     @SuppressWarnings("rawtypes")
     Enum[] enumValArr = enumClass.getEnumConstants();
 
-    for (@SuppressWarnings("rawtypes")
-    Enum enumVal : enumValArr) {
+    for (@SuppressWarnings("rawtypes") Enum enumVal : enumValArr) {
       var enumValueStr = ignoreCase ? enumVal.toString().toUpperCase() : enumVal.toString();
       valueList.add(enumValueStr);
     }

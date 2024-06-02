@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.http.ResponseEntity;
 
 @Data
 @NoArgsConstructor
@@ -23,5 +24,9 @@ public class ErrorObject {
     this.statusCode = status.value();
     this.errors = errors;
     this.timestamp = LocalDateTime.now();
+  }
+
+  public ResponseEntity<ErrorObject> toResponseEntity() {
+    return ResponseEntity.status(status).body(this);
   }
 }

@@ -18,6 +18,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.List;
+
 @Service
 public class ProgramService {
 
@@ -36,13 +38,8 @@ public class ProgramService {
   }
 
   @PreAuthorize("hasRole('USER')")
-  public Page<ProgramDto> findAllProgramsPaged(Pageable p) {
-    return findAllProgramsPaged(p, null, null, null);
-  }
-
-  @PreAuthorize("hasRole('USER')")
-  public Page<ProgramDto> findAllProgramsPaged(Pageable p, String filterField,
-      Object filterValue, Long collegeId) {
+  public Page<ProgramDto> findAllProgramsPaged(Pageable p, List<String> filterField,
+      List<Object> filterValue, Long collegeId) {
     Page<Program> programs = programRepository.findAllByFilterFieldAndValue(p, filterField,
         filterValue, collegeId);
     return programs.map(program -> modelMapper.map(program, ProgramDto.class));
@@ -60,7 +57,7 @@ public class ProgramService {
   }
 
   @Transactional
-  @PreAuthorize("hasPermission(#programDto.collegeId, 'com.andrezzb.coursearchive.college.models.College', create) || hasRole('MANAGER')")
+  @PreAuthorize("hasPermission(#programDto.collegeId, 'com.andrezzb.coursearchive.college.models.College', 'create') || hasRole('MANAGER')")
   public ProgramDto createProgram(ProgramCreateDto programDto) {
     var college = collegeService.findCollege(programDto.getCollegeId());
     Program program = modelMapper.map(programDto, Program.class);
@@ -73,7 +70,7 @@ public class ProgramService {
     return modelMapper.map(savedProgram, ProgramDto.class);
   }
 
-  @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.program.models.Program', write) || hasRole('MANAGER')")
+  @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.program.models.Program', 'write') || hasRole('MANAGER')")
   public ProgramDto updateProgram(Long id, @Valid ProgramUpdateDto programUpdateDto) {
     Program program = findProgram(id);
     modelMapper.map(programUpdateDto, program);
@@ -81,7 +78,7 @@ public class ProgramService {
     return modelMapper.map(savedProgram, ProgramDto.class);
   }
 
-  @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.program.models.Program', delete) || hasRole('MANAGER')")
+  @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.program.models.Program', 'delete') || hasRole('MANAGER')")
   public void deleteProgramById(Long id) {
     programRepository.deleteById(id);
   }

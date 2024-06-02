@@ -16,6 +16,8 @@ import com.andrezzb.coursearchive.course.repository.CourseYearRepository;
 import com.andrezzb.coursearchive.security.acl.AclPermission;
 import com.andrezzb.coursearchive.security.services.AclUtilService;
 
+import java.util.List;
+
 @Service
 public class CourseYearService {
 
@@ -35,13 +37,8 @@ public class CourseYearService {
   }
 
   @PreAuthorize("hasRole('USER')")
-  public Page<CouresYearDto> findAllCourseYearsPaged(Pageable p) {
-    return findAllCourseYearsPaged(p, null, null, null);
-  }
-
-  @PreAuthorize("hasRole('USER')")
-  public Page<CouresYearDto> findAllCourseYearsPaged(Pageable p, String filterField,
-      Object filterValue, Long courseId) {
+  public Page<CouresYearDto> findAllCourseYearsPaged(Pageable p, List<String> filterField,
+      List<Object> filterValue, Long courseId) {
     var years =
         courseYearRepository.findAllByFilterFieldAndValue(p, filterField, filterValue, courseId);
     return years.map(year -> modelMapper.map(year, CouresYearDto.class));
@@ -57,7 +54,7 @@ public class CourseYearService {
   }
 
   @Transactional
-  @PreAuthorize("hasPermission(#courseYearDto.courseId, 'com.andrezzb.coursearchive.course.models.Course', create) || hasRole('MANAGER')")
+  @PreAuthorize("hasPermission(#courseYearDto.courseId, 'com.andrezzb.coursearchive.course.models.Course', 'create') || hasRole('MANAGER')")
   public CouresYearDto createCourseYear(CourseYearCreateDto courseYearDto) {
     var course = courseService.findCourseById(courseYearDto.getCourseId());
     CourseYear courseYear = modelMapper.map(courseYearDto, CourseYear.class);
@@ -70,14 +67,14 @@ public class CourseYearService {
     return modelMapper.map(savedCourseYear, CouresYearDto.class);
   }
 
-  @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.course.models.CourseYear', write) || hasRole('MANAGER')")
+  @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.course.models.CourseYear', 'write') || hasRole('MANAGER')")
   public CouresYearDto updateCourseYear(Long id, CourseYearUpdateDto courseYearDto) {
     CourseYear courseYear = findCourseYear(id);
     modelMapper.map(courseYearDto, courseYear);
     return modelMapper.map(courseYearRepository.save(courseYear), CouresYearDto.class);
   }
 
-  @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.course.models.CourseYear', delete) || hasRole('MANAGER')")
+  @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.course.models.CourseYear', 'delete') || hasRole('MANAGER')")
   public void deleteCourseYearById(Long id) {
     courseYearRepository.deleteById(id);
   }

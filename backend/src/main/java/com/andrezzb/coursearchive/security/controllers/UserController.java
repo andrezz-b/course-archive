@@ -11,7 +11,6 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
@@ -24,8 +23,9 @@ import org.springframework.web.bind.annotation.*;
 import com.andrezzb.coursearchive.security.dto.UserDto;
 import com.andrezzb.coursearchive.security.services.UserService;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import static com.andrezzb.coursearchive.utils.PageRequestUtils.createPageRequest;
 
 @RestController
 @RequestMapping("api/user")
@@ -63,21 +63,6 @@ public class UserController {
     Pageable p = createPageRequest(page, size, sortField, sortDirection);
     var usersPaged = userService.findAllUsersPaged(p, filterField, filterValueObjs);
     return ResponseEntity.ok(usersPaged);
-  }
-
-
-  private Pageable createPageRequest(int page, int size, List<String> sortFields, List<String> sortDirections) {
-    if (sortFields.size() != sortDirections.size()) {
-      throw new IllegalArgumentException("Sort fields and directions must be of the same size");
-    }
-
-    List<Sort.Order> orders = new ArrayList<>();
-    for (int i = 0; i < sortFields.size(); i++) {
-      orders.add(new Sort.Order(Sort.Direction.fromString(sortDirections.get(i)), sortFields.get(i)));
-    }
-
-    Sort sort = Sort.by(orders);
-    return PageRequest.of(page, size, sort);
   }
 
   @Data

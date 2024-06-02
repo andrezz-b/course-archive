@@ -8,15 +8,17 @@ import org.springframework.stereotype.Repository;
 import com.andrezzb.coursearchive.course.models.CourseYear;
 import com.andrezzb.coursearchive.repository.FilterFieldSpecification;
 
+import java.util.List;
+
 @Repository
 public interface CourseYearRepository
     extends JpaRepository<CourseYear, Long>, FilterFieldSpecification<CourseYear> {
 
   default Page<CourseYear> findAllByFilterFieldAndValue(Pageable pageable,
-      String filterField, Object filterValue, Long couresId) {
+      List<String> filterField, List<Object> filterValue, Long courseId) {
     var baseSpec = filterByFieldAndValue(filterField, filterValue);
-    if (couresId != null) {
-      baseSpec = baseSpec.and(filterByCourseId(couresId));
+    if (courseId != null) {
+      baseSpec = baseSpec.and(filterByCourseId(courseId));
     }
     return findAll(baseSpec, pageable);
   }

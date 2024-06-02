@@ -1,6 +1,8 @@
 package com.andrezzb.coursearchive.material.repository;
 
+import java.util.List;
 import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -14,7 +16,7 @@ import com.andrezzb.coursearchive.repository.FilterFieldSpecification;
 
 @Repository
 public interface MaterialGroupRepository
-    extends JpaRepository<MaterialGroup, Long>, FilterFieldSpecification<MaterialGroup> {
+  extends JpaRepository<MaterialGroup, Long>, FilterFieldSpecification<MaterialGroup> {
 
   @Query("SELECT MAX(displayOrder) FROM MaterialGroup WHERE courseYear.id = :courseYearId")
   Optional<Short> findMaxOrder(@Param("courseYearId") Long courseYearId);
@@ -23,12 +25,13 @@ public interface MaterialGroupRepository
   Optional<Long> countByCourseYearId(@Param("courseYearId") Long courseYearId);
 
   @Modifying
-  @Query("UPDATE MaterialGroup SET displayOrder = displayOrder + 1 WHERE courseYear.id = :courseYearId AND displayOrder >= :order")
+  @Query(
+    "UPDATE MaterialGroup SET displayOrder = displayOrder + 1 WHERE courseYear.id = :courseYearId AND displayOrder >= :order")
   void incrementDisplayOrder(@Param("courseYearId") Long courseYearId,
-      @Param("order") Short displayOrder);
+    @Param("order") Short displayOrder);
 
-  default Page<MaterialGroup> findAllByFilterFiledAndValue(Pageable pageable, String filterField,
-      Object filterValue, Long courseYearId) {
+  default Page<MaterialGroup> findAllByFilterFiledAndValue(Pageable pageable, List<String> filterField,
+    List<Object> filterValue, Long courseYearId) {
     var baseSpec = filterByFieldAndValue(filterField, filterValue);
     if (courseYearId != null) {
       baseSpec = baseSpec.and(filterByCourseYearId(courseYearId));
@@ -38,6 +41,6 @@ public interface MaterialGroupRepository
 
   static Specification<MaterialGroup> filterByCourseYearId(Long courseYearId) {
     return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("courseYear").get("id"),
-        courseYearId);
+      courseYearId);
   }
 }

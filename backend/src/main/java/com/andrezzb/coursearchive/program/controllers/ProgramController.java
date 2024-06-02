@@ -1,7 +1,6 @@
 package com.andrezzb.coursearchive.program.controllers;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -26,6 +25,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
 
+import java.util.List;
+
+import static com.andrezzb.coursearchive.utils.PageRequestUtils.createPageRequest;
+
 
 @RestController
 @RequestMapping("api/program")
@@ -41,17 +44,16 @@ public class ProgramController {
       @PositiveOrZero @RequestParam(defaultValue = "0") int page,
       @Positive @RequestParam(defaultValue = "5") int size,
       @ValidEnum(enumClazz = Sort.Direction.class,
-          ignoreCase = true) @RequestParam(defaultValue = "asc") String sortDirection,
+          ignoreCase = true) @RequestParam(defaultValue = "asc") List<String> sortDirection,
       @ValidEnum(enumClazz = Program.SortField.class) @RequestParam(
-          defaultValue = "id") String sortField,
+          defaultValue = "id") List<String> sortField,
       @ValidEnum(enumClazz = Program.FilterField.class, required = false) @RequestParam(
-          required = false) String filterField,
-      @RequestParam(required = false) String filterValue,
+          required = false) List<String> filterField,
+      @RequestParam(required = false) List<String> filterValue,
       @RequestParam(required = false) Long collegeId) {
 
-    Object filterValueObj = FilterValueMapper.mapFilterValue(Program.FilterField.class, filterField, filterValue);
-    Pageable p =
-        PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortField));
+    var filterValueObj = FilterValueMapper.mapFilterValue(Program.FilterField.class, filterField, filterValue);
+    Pageable p = createPageRequest(page, size, sortDirection, sortField);
     final var programsPaged =
         programService.findAllProgramsPaged(p, filterField, filterValueObj, collegeId);
     return ResponseEntity.ok(programsPaged);

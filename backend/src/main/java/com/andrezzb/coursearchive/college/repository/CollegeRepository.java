@@ -7,12 +7,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface CollegeRepository
-    extends JpaRepository<College, Long>, FilterFieldSpecification<College> {
+  extends JpaRepository<College, Long>, FilterFieldSpecification<College> {
 
   default Page<College> findAllByFilterFieldAndFilterValue(Pageable pageable,
-      String filterField, Object filterValue) {
+                                                           List<String> filterField, List<Object> filterValue) {
     return findAll(filterByFieldAndValue(filterField, filterValue), pageable);
   }
 }

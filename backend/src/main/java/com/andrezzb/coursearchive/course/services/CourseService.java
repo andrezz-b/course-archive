@@ -17,6 +17,8 @@ import com.andrezzb.coursearchive.program.services.ProgramService;
 import com.andrezzb.coursearchive.security.acl.AclPermission;
 import com.andrezzb.coursearchive.security.services.AclUtilService;
 
+import java.util.List;
+
 @Service
 public class CourseService {
   private final CourseRepository courseRepository;
@@ -25,8 +27,7 @@ public class CourseService {
   private final ProgramService programService;
 
   public CourseService(CourseRepository courseRepository, AclUtilService aclUtilService,
-      ModelMapper modelMapper,
-      ProgramService programService) {
+    ModelMapper modelMapper, ProgramService programService) {
     this.courseRepository = courseRepository;
     this.aclUtilService = aclUtilService;
     this.modelMapper = modelMapper;
@@ -34,15 +35,10 @@ public class CourseService {
   }
 
   @PreAuthorize("hasRole('USER')")
-  public Page<CourseDto> findAllCoursesPaged(Pageable p) {
-    return findAllCoursesPaged(p, null, null, null);
-  }
-
-  @PreAuthorize("hasRole('USER')")
-  public Page<CourseDto> findAllCoursesPaged(Pageable p, String filterField,
-      Object filterValue, Long programId) {
-    Page<Course> courses = courseRepository.findAllByFilterFieldAndValue(p, filterField,
-        filterValue, programId);
+  public Page<CourseDto> findAllCoursesPaged(Pageable p, List<String> filterField,
+    List<Object> filterValue, Long programId) {
+    Page<Course> courses =
+      courseRepository.findAllByFilterFieldAndValue(p, filterField, filterValue, programId);
     return courses.map(course -> modelMapper.map(course, CourseDto.class));
 
   }
@@ -53,7 +49,8 @@ public class CourseService {
   }
 
   @Transactional
-  @PreAuthorize("hasPermission(#courseDto.programId, 'com.andrezzb.coursearchive.program.models.Program', create) || hasRole('MANAGER')")
+  @PreAuthorize(
+    "hasPermission(#courseDto.programId, 'com.andrezzb.coursearchive.program.models.Program', 'create') || hasRole('MANAGER')")
   public Course createCourse(CourseCreateDto courseDto) {
     var program = programService.findProgram(courseDto.getProgramId());
     Course course = modelMapper.map(courseDto, Course.class);
@@ -66,14 +63,16 @@ public class CourseService {
     return savedCourse;
   }
 
-  @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.course.models.Course', write) || hasRole('MANAGER')")
+  @PreAuthorize(
+    "hasPermission(#id, 'com.andrezzb.coursearchive.course.models.Course', 'write') || hasRole('MANAGER')")
   public Course updatCourse(Long id, CourseUpdateDto courseDto) {
     Course course = findCourseById(id);
     modelMapper.map(courseDto, course);
     return courseRepository.save(course);
   }
 
-  @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.course.models.Course', delete) || hasRole('MANAGER')")
+  @PreAuthorize(
+    "hasPermission(#id, 'com.andrezzb.coursearchive.course.models.Course', 'delete') || hasRole('MANAGER')")
   public void deleteCourseById(Long id) {
     courseRepository.deleteById(id);
   }
