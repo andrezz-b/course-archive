@@ -2,7 +2,6 @@ package com.andrezzb.coursearchive.security.services;
 
 import com.andrezzb.coursearchive.mappings.ApplicationObjectType;
 import com.andrezzb.coursearchive.security.acl.AclPermission;
-import com.andrezzb.coursearchive.security.dto.GrantRoleDto;
 import com.andrezzb.coursearchive.security.repository.RoleRepository;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -12,7 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.andrezzb.coursearchive.security.dto.GrantPermissionDto;
+import com.andrezzb.coursearchive.security.dto.ChangePermissionDto;
 import com.andrezzb.coursearchive.security.dto.LoginDto;
 import com.andrezzb.coursearchive.security.dto.RegisterDto;
 import com.andrezzb.coursearchive.security.exceptions.EmailTakenException;
@@ -23,6 +22,7 @@ import com.andrezzb.coursearchive.security.models.UserEntity;
 import com.andrezzb.coursearchive.security.repository.UserRepository;
 
 import java.util.Collections;
+import java.util.stream.Collectors;
 
 import org.springframework.security.acls.model.Permission;
 
@@ -42,8 +42,8 @@ public class AuthService {
   private final RoleRepository roleRepository;
 
   public AuthService(TokenService tokenService, AuthenticationManager authenticationManager,
-                     UserRepository userRepository, PasswordEncoder passwordEncoder, AclUtilService aclUtilService,
-                     UserService userService, ApplicationContext applicationContext, RoleRepository roleRepository) {
+    UserRepository userRepository, PasswordEncoder passwordEncoder, AclUtilService aclUtilService,
+    UserService userService, ApplicationContext applicationContext, RoleRepository roleRepository) {
     this.tokenService = tokenService;
     this.authenticationManager = authenticationManager;
     this.userRepository = userRepository;
@@ -78,38 +78,43 @@ public class AuthService {
     user.setFirstName(registerData.getFirstName());
     user.setLastName(registerData.getLastName());
     user.setEmail(registerData.getEmail());
-    user.setRoles(Collections.singletonList(userService.findRoleByName(Role.RoleName.USER)));
+    user.setRoles(Collections.singleton(userService.findRoleByName(Role.RoleName.USER)));
     return userRepository.save(user);
   }
 
   @Transactional
-  public void grantPermission(GrantPermissionDto grantPermissionDto) {
-    ApplicationObjectType objectType = ApplicationObjectType.fromString(grantPermissionDto.getObjectType());
+  public void changePermission(ChangePermissionDto changePermissionDto) {
+    ApplicationObjectType objectType =
+      ApplicationObjectType.fromString(changePermissionDto.getObjectType());
     var repository = context.getBean(objectType.getRepositoryClass());
-    Permission permission = AclPermission.fromString(grantPermissionDto.getPermission());
-    AclSecured object =
-      repository.findById(grantPermissionDto.getObjectId()).orElseThrow(
-        () -> new IllegalArgumentException("Invalid object ID"));
-    boolean userExists = userRepository.existsByUsername(grantPermissionDto.getUsername());
+    Permission permission = AclPermission.fromString(changePermissionDto.getPermission());
+    AclSecured object = repository.findById(changePermissionDto.getObjectId())
+      .orElseThrow(() -> new IllegalArgumentException("Invalid object ID"));
+    boolean userExists = userRepository.existsByUsername(changePermissionDto.getUsername());
     if (!userExists) {
       throw new IllegalArgumentException("Invalid username");
     }
 
-    aclUtilService.grantPermission(object, grantPermissionDto.getUsername(), permission);
+    if (changePermissionDto.getGranting()) {
+      aclUtilService.grantPermission(object, changePermissionDto.getUsername(), permission);
+    } else {
+      aclUtilService.revokePermission(object, changePermissionDto.getUsername(), permission);
+    }
   }
 
   public String refresh(String refreshToken) {
     var jwt = tokenService.validateRefreshToken(refreshToken);
     var user = userService.findByUsername(jwt.getSubject());
-    Authentication authentication = UsernamePasswordAuthenticationToken
-      .authenticated(user.getUsername(), user.getPassword(), user.getAuthorities());
+    Authentication authentication =
+      UsernamePasswordAuthenticationToken.authenticated(user.getUsername(), user.getPassword(),
+        user.getAuthorities());
     return tokenService.generateToken(authentication);
   }
 
   @PreAuthorize("hasRole('ADMIN')")
-  public void grantRole(GrantRoleDto roleDto) {
-    var user = userService.findByUsername(roleDto.getUsername());
-    Role.RoleName roleName = Role.RoleName.valueOf(roleDto.getRole().toUpperCase());
+  public void grantRole(String username, String roleNameString) {
+    var user = userService.findByUsername(username);
+    Role.RoleName roleName = Role.RoleName.fromString(roleNameString);
 
     // Ignore if role exists
     for (var role : user.getRoles()) {
@@ -119,6 +124,17 @@ public class AuthService {
     }
     Role role = roleRepository.findByName(roleName.toString());
     user.getRoles().add(role);
+    userRepository.save(user);
+  }
+
+  @PreAuthorize("hasRole('ADMIN')")
+  public void revokeRole(String username, String roleNameString) {
+    var user = userService.findByUsername(username);
+    Role.RoleName roleName = Role.RoleName.fromString(roleNameString);
+    var filteredRoles =
+      user.getRoles().stream().filter(role -> !role.getName().equals(roleName.toString()))
+        .collect(Collectors.toSet());
+    user.setRoles(filteredRoles);
     userRepository.save(user);
   }
 }

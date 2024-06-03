@@ -22,7 +22,8 @@ public class AuthController {
   }
 
   @PostMapping("/login")
-  public ResponseEntity<LoginDto.LoginResponse> login(@Valid @RequestBody LoginDto.LoginBody loginData) {
+  public ResponseEntity<LoginDto.LoginResponse> login(
+    @Valid @RequestBody LoginDto.LoginBody loginData) {
     final var tokenResponse = authService.login(loginData.getUsername(), loginData.getPassword());
     return ResponseEntity.ok(tokenResponse);
   }
@@ -33,20 +34,26 @@ public class AuthController {
     return ResponseEntity.status(HttpStatus.CREATED).body(user.getId());
   }
 
-  @PostMapping("/grant-permission")
-  public ResponseEntity<Void> grantPermission(@Valid @RequestBody GrantPermissionDto grantPermissionDto) {
-    authService.grantPermission(grantPermissionDto);
+  @PostMapping("/permission")
+  public ResponseEntity<Void> grantPermission(
+    @Valid @RequestBody ChangePermissionDto changePermissionDto) {
+    authService.changePermission(changePermissionDto);
     return ResponseEntity.ok().build();
   }
 
-  @PostMapping("/grant-role")
-  public ResponseEntity<Void> grantRole(@Valid @RequestBody GrantRoleDto roleDto) {
-    authService.grantRole(roleDto);
+  @PostMapping("/role")
+  public ResponseEntity<Void> grantRole(@Valid @RequestBody RoleChangeDto roleDto) {
+    if (roleDto.getGranting()) {
+      authService.grantRole(roleDto.getUsername(), roleDto.getRole());
+    } else {
+      authService.revokeRole(roleDto.getUsername(), roleDto.getRole());
+    }
     return ResponseEntity.noContent().build();
   }
 
   @PostMapping("/refresh")
-  public ResponseEntity<RefreshDto.Response> refresh(@Valid @RequestBody RefreshDto.Body refreshData) {
+  public ResponseEntity<RefreshDto.Response> refresh(
+    @Valid @RequestBody RefreshDto.Body refreshData) {
     final String token = authService.refresh(refreshData.getRefreshToken());
     return ResponseEntity.ok(RefreshDto.Response.builder().accessToken(token).build());
   }

@@ -50,7 +50,37 @@ public class AclUtilService {
     if (parent == null) {
       return;
     }
-    Acl parentAcl = aclService.readAclById(new ObjectIdentityImpl(parent.getClass(), parent.getId()));
+    Acl parentAcl =
+      aclService.readAclById(new ObjectIdentityImpl(parent.getClass(), parent.getId()));
     acl.setParent(parentAcl);
+  }
+
+  @Transactional
+  public void revokePermission(AclSecured object, String username, Permission permission) {
+    revokePermission(object, new PrincipalSid(username), permission);
+  }
+
+  @Transactional
+  public void revokePermission(AclSecured object, Sid sid, Permission permission) {
+    ObjectIdentity oi = new ObjectIdentityImpl(object);
+    MutableAcl acl;
+    try {
+      acl = (MutableAcl) aclService.readAclById(oi);
+    } catch (NotFoundException e) {
+      // No ACL found, nothing to revoke
+      return;
+    }
+    int aceIndex = -1;
+    for (int i = 0; i < acl.getEntries().size(); i++) {
+      var ace = acl.getEntries().get(i);
+      if (ace.getSid().equals(sid) && ace.getPermission().equals(permission)) {
+        aceIndex = i;
+        break;
+      }
+    }
+    if (aceIndex != -1) {
+      acl.deleteAce(aceIndex);
+      aclService.updateAcl(acl);
+    }
   }
 }

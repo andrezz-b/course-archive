@@ -10,7 +10,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class GrantPermissionDto {
+public class ChangePermissionDto {
   @NotBlank(message = "Object type is required")
   @ValidEnum(enumClazz = ApplicationObjectType.class, ignoreCase = true)
   private String objectType;
@@ -21,4 +21,6 @@ public class GrantPermissionDto {
   private String permission;
   @NotBlank(message = "Username is required")
   private String username;
+  @NotNull
+  private Boolean granting;
 }

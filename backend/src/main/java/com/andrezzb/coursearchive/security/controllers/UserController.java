@@ -18,12 +18,15 @@ import org.springframework.security.acls.domain.ObjectIdentityImpl;
 import org.springframework.security.acls.domain.PrincipalSid;
 import org.springframework.security.acls.model.AclService;
 import org.springframework.security.acls.model.NotFoundException;
+import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import com.andrezzb.coursearchive.security.dto.UserDto;
 import com.andrezzb.coursearchive.security.services.UserService;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.andrezzb.coursearchive.utils.PageRequestUtils.createPageRequest;
 
@@ -73,23 +76,25 @@ public class UserController {
   }
 
   @PostMapping("/acl")
-  private ResponseEntity<Void> readAclData(@RequestBody AclData aclData) {
+  private ResponseEntity<Map<Permission, Boolean>> readAclData(@RequestBody AclData aclData) {
     ApplicationObjectType objectType = ApplicationObjectType.fromString(aclData.getObjectType());
     ObjectIdentityImpl oi = new ObjectIdentityImpl(objectType.getObjectClass(), aclData.getObjectId());
     PrincipalSid sid = new PrincipalSid(aclData.getUsername());
     var aclMap = aclService.readAclsById(List.of(oi), List.of(sid));
     var objectAcl = aclMap.get(oi);
 
+      Map<Permission, Boolean> permissions = new HashMap<>();
     for (var permission : AclPermission.ALL_PERMISSIONS) {
       boolean result = false;
       try {
         result = objectAcl.isGranted(List.of(permission), List.of(sid), false);
       } catch (NotFoundException ignored) {
       }
+      permissions.put(permission, result);
       log.info("Permission {} is granted: {}", permission, result);
     }
 
-    return ResponseEntity.noContent().build();
+    return ResponseEntity.ok(permissions);
   }
 
 }

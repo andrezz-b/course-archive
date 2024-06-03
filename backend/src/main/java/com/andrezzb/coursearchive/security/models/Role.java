@@ -1,12 +1,10 @@
 package com.andrezzb.coursearchive.security.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Entity
@@ -19,12 +17,31 @@ public class Role {
   @Column(unique = true)
   private String name;
 
+  @ManyToMany(mappedBy = "roles")
+  private Set<UserEntity> posts = new HashSet<>();
+
   @Override
   public String toString() {
     return name;
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null || getClass() != obj.getClass()) {
+      return false;
+    }
+    Role role = (Role) obj;
+    return name.equals(role.name);
+  }
+
   public enum RoleName {
-    USER, MANAGER, ADMIN
+    USER, MANAGER, ADMIN;
+
+    public static RoleName fromString(String roleName) {
+      return RoleName.valueOf(roleName.toUpperCase());
+    }
   }
 }

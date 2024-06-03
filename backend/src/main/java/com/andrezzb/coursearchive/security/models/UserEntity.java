@@ -1,9 +1,9 @@
 package com.andrezzb.coursearchive.security.models;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.andrezzb.coursearchive.repository.FilterValueMapper;
@@ -58,21 +58,21 @@ public class UserEntity {
   @Column(name = "updated_at")
   private LocalDateTime updatedAt;
 
-  @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @JoinTable(name = "user_role",
     joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
     inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
-  private List<Role> roles = new ArrayList<>();
+  private Set<Role> roles = new HashSet<>();
 
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    return this.getRoles().stream()
-      .map(role -> new SimpleGrantedAuthority(role.getName()))
+    return this.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName()))
       .collect(Collectors.toList());
   }
 
   public enum SortField {
     username, id, firstName, lastName, email
   }
+
 
   public enum FilterField implements FilterValueMapper {
     firstName, lastName, email, username

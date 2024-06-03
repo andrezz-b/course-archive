@@ -1,6 +1,7 @@
 package com.andrezzb.coursearchive.security.dto;
 
-import java.util.List;
+import java.util.Set;
+
 import lombok.Data;
 
 @Data
@@ -10,5 +11,5 @@ public class UserDto {
   private String firstName;
   private String lastName;
   private String email;
-  private List<String> roles;
+  private Set<String> roles;
 }
