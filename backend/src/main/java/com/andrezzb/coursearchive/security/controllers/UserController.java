@@ -68,6 +68,12 @@ public class UserController {
     return ResponseEntity.ok(usersPaged);
   }
 
+  @GetMapping("/{id}")
+  public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
+    final var user = userService.findById(id);
+    return ResponseEntity.ok(modelMapper.map(user, UserDto.class));
+  }
+
   @Data
   public static class AclData {
     private String objectType;
@@ -76,22 +82,34 @@ public class UserController {
   }
 
   @PostMapping("/acl")
-  private ResponseEntity<Map<Permission, Boolean>> readAclData(@RequestBody AclData aclData) {
+  private ResponseEntity<Map<AclPermission.PermissionType, Boolean>> readAclData(@RequestBody AclData aclData) {
     ApplicationObjectType objectType = ApplicationObjectType.fromString(aclData.getObjectType());
     ObjectIdentityImpl oi = new ObjectIdentityImpl(objectType.getObjectClass(), aclData.getObjectId());
     PrincipalSid sid = new PrincipalSid(aclData.getUsername());
     var aclMap = aclService.readAclsById(List.of(oi), List.of(sid));
     var objectAcl = aclMap.get(oi);
 
-      Map<Permission, Boolean> permissions = new HashMap<>();
-    for (var permission : AclPermission.ALL_PERMISSIONS) {
+      Map<AclPermission.PermissionType, Boolean> permissions = new HashMap<>();
+    for (Map.Entry<AclPermission.PermissionType, Permission> entry : AclPermission.permissionMap.entrySet()) {
+      AclPermission.PermissionType permissionType = entry.getKey();
+      Permission permission = entry.getValue();
       boolean result = false;
+      Boolean grantedByParent = null;
       try {
         result = objectAcl.isGranted(List.of(permission), List.of(sid), false);
+        for (var ace : objectAcl.getEntries()) {
+          if (ace.getSid().equals(sid) && (ace.getPermission().getMask() & permission.getMask()) >= permission.getMask()) {
+            grantedByParent = false;
+            break;
+          }
+        }
+        if (result && grantedByParent == null) {
+          grantedByParent = true;
+        }
       } catch (NotFoundException ignored) {
       }
-      permissions.put(permission, result);
-      log.info("Permission {} is granted: {}", permission, result);
+      permissions.put(permissionType, result);
+      log.info("Permission {} is granted: {}, granted by parent: {}", permissionType, result, grantedByParent);
     }
 
     return ResponseEntity.ok(permissions);

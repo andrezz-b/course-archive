@@ -43,6 +43,10 @@ public class UserService {
       .orElseThrow(() -> new UserNotFoundException(username));
   }
 
+  public UserEntity findById(Long id) {
+    return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id.toString()));
+  }
+
   public Role findRoleByName(Role.RoleName name) {
     return findRoleByName(name.toString());
   }

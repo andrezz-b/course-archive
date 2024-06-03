@@ -72,6 +72,9 @@ export function createGenericObjectService<
           try {
             const { data } = await axios.get(`/${entityEndpoint}/`, {
               params: definedParams,
+              paramsSerializer: {
+                indexes: null
+              }
             });
             return data;
           } catch (error) {

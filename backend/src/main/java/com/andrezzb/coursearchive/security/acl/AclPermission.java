@@ -3,7 +3,6 @@ package com.andrezzb.coursearchive.security.acl;
 import org.springframework.security.acls.domain.AbstractPermission;
 import org.springframework.security.acls.model.Permission;
 
-import java.util.List;
 import java.util.Map;
 
 public class AclPermission extends AbstractPermission {
@@ -17,8 +16,6 @@ public class AclPermission extends AbstractPermission {
 
   public static final Permission ADMINISTRATION = new AclPermission(1 << 4 | DELETE.getMask(), 'A'); // 31
 
-  public static final List<Permission> ALL_PERMISSIONS = List.of(READ, WRITE, CREATE, DELETE, ADMINISTRATION);
-
   protected AclPermission(int mask) {
     super(mask);
   }
@@ -31,7 +28,7 @@ public class AclPermission extends AbstractPermission {
     READ, WRITE, CREATE, DELETE, ADMINISTRATION
   }
 
-  private static final Map<PermissionType, Permission> permissionMap = Map.of(
+  public static final Map<PermissionType, Permission> permissionMap = Map.of(
     PermissionType.READ, AclPermission.READ,
     PermissionType.WRITE, AclPermission.WRITE,
     PermissionType.DELETE, AclPermission.DELETE,

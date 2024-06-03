@@ -9,7 +9,7 @@ import { UserService } from "@/api/user.service.ts";
 import { keepPreviousData } from "@tanstack/react-query";
 import { useTableControls } from "@/hooks/useTableControls.ts";
 
-const AdminUserListing = () => {
+const AdminUserListingPage = () => {
   const { requestParams, ...tableProps } = useTableControls();
   const query = UserService.useGetAll(requestParams, {
     placeholderData: keepPreviousData,
@@ -45,7 +45,7 @@ const AdminUserListing = () => {
         header: "Actions",
         cell: ({ row }) => {
           return (
-            <Link to={`./${row.original.id}`}>
+            <Link to={`./${row.original.id}/college`}>
               <Button variant="ghost" className="p-1 h-auto">
                 <span className="sr-only">edit college</span>
                 <ExternalLink className="h-4 w-4" />
@@ -71,4 +71,4 @@ const AdminUserListing = () => {
   );
 };
 
-export default AdminUserListing;
+export default AdminUserListingPage;

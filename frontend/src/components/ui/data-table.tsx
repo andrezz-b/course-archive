@@ -212,7 +212,9 @@ export function DataTableColumnHeader<TData, TValue>({
 }: DataTableColumnHeaderProps<TData, TValue>) {
   const sort = column.getIsSorted();
   const [inputValue, setInputValue] = useState(column.getFilterValue() as string);
-  const debouncedSetFilterValue = useCallback(debounce(column.setFilterValue, inputDebounce), []);
+  const debouncedSetFilterValue = useCallback(debounce(column.setFilterValue, inputDebounce), [
+    inputDebounce,
+  ]);
   const onChangeHandler = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
       setInputValue(e.target.value);
@@ -227,10 +229,10 @@ export function DataTableColumnHeader<TData, TValue>({
           value={inputValue ?? ""}
           onChange={onChangeHandler}
           placeholder={title}
-          className="border-b-2 border-x-0 border-t-0 h-auto rounded-none py-1 pl-2"
+          className="border-b-2 border-x-0 border-t-0 h-auto rounded-none py-1 pl-2 max-w-[160px]"
         />
       ) : (
-        <span>{title}</span>
+        <span className="max-w-[160px]">{title}</span>
       )}
 
       {column.getCanSort() && (

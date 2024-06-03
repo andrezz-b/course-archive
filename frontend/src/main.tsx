@@ -121,6 +121,29 @@ const router = createBrowserRouter([
             errorElement: <ErrorPage />,
           },
           {
+            path: "user/:userId",
+            async lazy() {
+              const component = await import("./layouts/AdminUserLayout.tsx");
+              return { Component: component.default };
+            },
+            errorElement: <ErrorPage />,
+            children: [
+              {
+                index: true,
+                element: <div>Admin User Home</div>,
+                errorElement: <ErrorPage />,
+              },
+              {
+                path: "college",
+                async lazy() {
+                  const component = await import("./pages/user/AdminUserCollegePage.tsx");
+                  return { Component: component.default };
+                },
+                errorElement: <ErrorPage />,
+              },
+            ],
+          },
+          {
             path: "course/:courseId",
             async lazy() {
               const component = await import("./layouts/CourseTitleLayout.tsx");
@@ -149,7 +172,7 @@ const router = createBrowserRouter([
           {
             path: "user",
             async lazy() {
-              const component = await import("./pages/user/AdminUserListing.tsx");
+              const component = await import("./pages/user/AdminUserListingPage.tsx");
               return { Component: component.default };
             },
             errorElement: <ErrorPage />,

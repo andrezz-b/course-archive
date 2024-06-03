@@ -77,7 +77,7 @@ public class College implements AclSecured {
     }
 
     public enum SortField {
-        name, id
+        name, id, acronym
     }
 
     public enum FilterField implements FilterValueMapper {
