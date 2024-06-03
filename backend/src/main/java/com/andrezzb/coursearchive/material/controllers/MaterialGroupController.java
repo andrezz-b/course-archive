@@ -55,7 +55,7 @@ public class MaterialGroupController {
 
     var filterValueObj =
       FilterValueMapper.mapFilterValue(MaterialGroup.FilterField.class, filterField, filterValue);
-    Pageable p = createPageRequest(page, size, sortDirection, sortField);
+    Pageable p = createPageRequest(page, size, sortField, sortDirection);
     final var materialGroupsPaged =
       materialGroupService.findAllMaterialGroupsPaged(p, filterField, filterValueObj, courseYearId);
     return ResponseEntity.ok(materialGroupsPaged);

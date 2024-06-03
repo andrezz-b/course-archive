@@ -53,7 +53,7 @@ public class CourseController {
 
     var filterValueObj =
       FilterValueMapper.mapFilterValue(Course.FilterField.class, filterField, filterValue);
-    Pageable p = createPageRequest(page, size, sortDirection, sortField);
+    Pageable p = createPageRequest(page, size, sortField, sortDirection);
     final var coursesPaged =
       courseService.findAllCoursesPaged(p, filterField, filterValueObj, programId);
     return ResponseEntity.ok(coursesPaged);

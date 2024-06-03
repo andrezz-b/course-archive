@@ -32,23 +32,26 @@ public class EnumValidator implements ConstraintValidator<ValidEnum, Object> {
   }
 
   private boolean isValidValue(Object value) {
-    boolean isValid = true;
     switch (value) {
       case String s -> {
         String valueStr = ignoreCase ? s.toUpperCase() : s;
-        isValid = valueList.contains(valueStr);
+        return valueList.contains(valueStr);
       }
       case String[] strings -> {
         for (String str : strings) {
           String valueStr = ignoreCase ? str.toUpperCase() : str;
-          isValid = isValid && valueList.contains(valueStr);
+          if (!valueList.contains(valueStr)) {
+            return false;
+          }
         }
       }
       case @SuppressWarnings("rawtypes")List list -> {
         for (Object obj : list) {
           if (obj instanceof String) {
             String valueStr = ignoreCase ? ((String) obj).toUpperCase() : (String) obj;
-            isValid = isValid && valueList.contains(valueStr);
+            if (!valueList.contains(valueStr)) {
+              return false;
+            }
           } else {
             throw new IllegalArgumentException(
               "Unsupported data type in list. Only String is supported.");
@@ -58,7 +61,7 @@ public class EnumValidator implements ConstraintValidator<ValidEnum, Object> {
       case null, default -> throw new IllegalArgumentException(
         "Unsupported data type. Only String, String[] and List<String> are supported.");
     }
-    return isValid;
+    return true;
   }
 
   @Override

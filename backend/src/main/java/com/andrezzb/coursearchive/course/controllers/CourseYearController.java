@@ -54,7 +54,7 @@ public class CourseYearController {
       @RequestParam(required = false) Long courseId) {
 
     var filterValueObj = FilterValueMapper.mapFilterValue(CourseYear.FilterField.class, filterField, filterValue);
-    Pageable p = createPageRequest(page, size, sortDirection, sortField);
+    Pageable p = createPageRequest(page, size, sortField, sortDirection);
     final var courseYearsPaged = courseYearService.findAllCourseYearsPaged(p, filterField, filterValueObj, courseId);
     return ResponseEntity.ok(courseYearsPaged);
   }

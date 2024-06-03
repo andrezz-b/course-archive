@@ -53,7 +53,7 @@ public class ProgramController {
       @RequestParam(required = false) Long collegeId) {
 
     var filterValueObj = FilterValueMapper.mapFilterValue(Program.FilterField.class, filterField, filterValue);
-    Pageable p = createPageRequest(page, size, sortDirection, sortField);
+    Pageable p = createPageRequest(page, size, sortField, sortDirection);
     final var programsPaged =
         programService.findAllProgramsPaged(p, filterField, filterValueObj, collegeId);
     return ResponseEntity.ok(programsPaged);
