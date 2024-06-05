@@ -107,25 +107,44 @@ public class AclUtilService {
       Permission permission = entry.getValue();
       boolean result = false;
       boolean grantedByParent = false;
+      boolean grantedByHigherPermission = false;
       try {
         result = objectAcl.isGranted(List.of(permission), List.of(sid), false);
         if (result) {
           grantedByParent = isGrantedByParent(objectAcl, sid, permission);
+          grantedByHigherPermission = isGrantedByHigherPermission(objectAcl, sid, permission);
         }
       } catch (NotFoundException ignored) {
       }
       permissions.put(permissionType,
-        PermissionData.builder().granted(result).grantedByParent(grantedByParent).build());
+        PermissionData.builder().granted(result).grantedByParent(grantedByParent)
+          .grantedByHigherPermission(grantedByHigherPermission).build());
     }
     return permissions;
   }
 
   private boolean isGrantedByParent(Acl objectAcl, Sid sid, Permission permission) {
-    for (var ace : objectAcl.getEntries()) {
+    var parent = objectAcl.getParentAcl();
+    if (parent == null) {
+      return false;
+    }
+    for (var ace : parent.getEntries()) {
       if (ace.getSid().equals(sid) && (ace.getPermission()
         .getMask() & permission.getMask()) >= permission.getMask()) {
+        return true;
+      }
+    }
+    return isGrantedByParent(parent, sid, permission);
+  }
+
+  private boolean isGrantedByHigherPermission(Acl objectAcl, Sid sid, Permission permission) {
+    for (var ace : objectAcl.getEntries()) {
+      if (ace.getSid().equals(sid) && ace.getPermission().getMask() == permission.getMask()) {
         return false;
       }
+    }
+    if (objectAcl.isEntriesInheriting() && objectAcl.getParentAcl() != null) {
+      return isGrantedByHigherPermission(objectAcl.getParentAcl(), sid, permission);
     }
     return true;
   }

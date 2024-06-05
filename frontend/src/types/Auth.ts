@@ -2,9 +2,11 @@ interface StateContextType<T> {
   auth: T;
   setAuth: React.Dispatch<React.SetStateAction<T>>;
 }
+
 export interface AuthContextData {
   accessToken: string;
 }
+
 export type AuthContextType = StateContextType<AuthContextData | null>;
 
 export interface AuthContextProps {
@@ -34,13 +36,15 @@ export interface LoginData {
   password: string;
 }
 
-export enum Permission {
-  READ = "READ",
-  WRITE = "WRITE",
-  CREATE = "CREATE",
-  DELETE = "DELETE",
-  ADMINISTRATION = "ADMINISTRATION",
-}
+export const Permission = {
+  READ: "READ",
+  WRITE: "WRITE",
+  CREATE: "CREATE",
+  DELETE: "DELETE",
+  ADMINISTRATION: "ADMINISTRATION",
+} as const;
+
+export type PermissionName = (typeof Permission)[keyof typeof Permission];
 
 export enum Role {
   USER = "USER",

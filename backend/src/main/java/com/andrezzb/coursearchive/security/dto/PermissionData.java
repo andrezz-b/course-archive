@@ -8,4 +8,5 @@ import lombok.Getter;
 public class PermissionData {
   private boolean granted;
   private boolean grantedByParent;
+  private boolean grantedByHigherPermission;
 }

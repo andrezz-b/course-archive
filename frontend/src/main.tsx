@@ -11,11 +11,11 @@ import { AuthProvider } from "./context/AuthProvider.tsx";
 
 import ProtectedRoutes from "./layouts/ProtectedRoutes.tsx";
 import ErrorPage from "./pages/ErrorPage.tsx";
-import App from "./App.tsx";
 import RootLayout from "./layouts/RootLayout.tsx";
 import CollegeListingPage from "./pages/college/CollegeListingPage.tsx";
 import ProgramListingPage from "./pages/program/ProgramListingPage.tsx";
 import HomeLayout from "@/layouts/HomeLayout.tsx";
+import PermissionForm from "@/components/PermissionForm.tsx";
 
 const router = createBrowserRouter([
   {
@@ -80,7 +80,7 @@ const router = createBrowserRouter([
       },
       {
         index: true,
-        element: <App />,
+        element: <PermissionForm />,
         errorElement: <ErrorPage />,
       },
       {
