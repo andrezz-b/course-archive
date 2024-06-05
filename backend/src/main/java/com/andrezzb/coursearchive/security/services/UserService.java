@@ -22,15 +22,15 @@ public class UserService {
   private final RoleRepository roleRepository;
   private final ModelMapper modelMapper;
 
-  public UserService(UserRepository userRepository, RoleRepository roleRepository, ModelMapper modelMapper) {
+  public UserService(UserRepository userRepository, RoleRepository roleRepository,
+    ModelMapper modelMapper) {
     this.userRepository = userRepository;
     this.roleRepository = roleRepository;
     this.modelMapper = modelMapper;
   }
 
   public boolean existsByUsername(String username) {
-    var userOptional = userRepository.findByUsername(username);
-    return userOptional.isPresent();
+    return userRepository.existsByUsername(username);
   }
 
   public boolean existsByEmail(String email) {
@@ -40,7 +40,7 @@ public class UserService {
 
   public UserEntity findByUsername(String username) {
     return userRepository.findByUsername(username)
-      .orElseThrow(() -> new UserNotFoundException(username));
+      .orElseThrow(() -> new UserNotFoundException("User not found with username: " + username));
   }
 
   public UserEntity findById(Long id) {
@@ -56,7 +56,8 @@ public class UserService {
   }
 
   @PreAuthorize("hasRole('ADMIN')")
-  public Page<UserDto> findAllUsersPaged(Pageable p, List<String> filterFields, List<Object> filterValueObjs) {
+  public Page<UserDto> findAllUsersPaged(Pageable p, List<String> filterFields,
+    List<Object> filterValueObjs) {
     var users = userRepository.findAllByFilterFieldAndFilterValue(p, filterFields, filterValueObjs);
     return users.map(user -> modelMapper.map(user, UserDto.class));
   }

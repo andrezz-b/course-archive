@@ -33,3 +33,17 @@ export interface LoginData {
   username: string;
   password: string;
 }
+
+export enum Permission {
+  READ = "READ",
+  WRITE = "WRITE",
+  CREATE = "CREATE",
+  DELETE = "DELETE",
+  ADMINISTRATION = "ADMINISTRATION",
+}
+
+export enum Role {
+  USER = "USER",
+  MANAGER = "MANAGER",
+  ADMIN = "ADMIN",
+}

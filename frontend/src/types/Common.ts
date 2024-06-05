@@ -22,3 +22,12 @@ export interface FilterOption {
 export const DISPLAY_LISTING_PAGE_SIZE = 6;
 
 export const VALID_FILE_TYPES = ["image/jpeg", "image/png", "application/pdf", "text/markdown", "text/plain"];
+
+export enum ObjectType {
+  COLLEGE = "COLLEGE",
+  PROGRAM = "PROGRAM",
+  COURSE = "COURSE",
+  COURSE_YEAR = "COURSE_YEAR",
+  MATERIAL_GROUP = "MATERIAL_GROUP",
+  MATERIAL = "MATERIAL",
+}
