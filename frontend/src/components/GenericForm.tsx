@@ -7,6 +7,7 @@ import { Input } from "./ui/input";
 import { getZodSchemaFieldsShallow } from "@/lib/utils";
 import { useCallback, useMemo } from "react";
 import { LoaderCircle } from "lucide-react";
+import { toast } from "sonner";
 
 export type SubmitFn<T> = (data: T) => Promise<{ type: string; message: string } | undefined>;
 
@@ -47,6 +48,7 @@ const GenericForm = <T extends FieldValues>({
         type: result.type,
         message: result.message,
       });
+      toast.error(result.message);
       return;
     }
     closeDialog();
@@ -77,9 +79,9 @@ const GenericForm = <T extends FieldValues>({
           />
         ))}
         {form.formState.errors.root?.serverError.message && (
-          <p className="text-destructive text-sm col-span-2">
+          <span className="text-destructive text-sm col-span-2">
             {form.formState.errors.root?.serverError.message}
-          </p>
+          </span>
         )}
         <div className="flex justify-between flex-row-reverse col-span-2">
           <Button

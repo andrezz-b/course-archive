@@ -36,6 +36,7 @@ const PermissionForm = ({ objectType, objectId, username }: PermissionFormProps)
       {
         onSuccess: () =>
           toast.success(`Permission ${permissionName} ${granting ? "granted" : "revoked"}`),
+        onError: (error) => toast.error(error.getErrorMessage()),
       },
     );
   };

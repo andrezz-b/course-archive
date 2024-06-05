@@ -9,10 +9,10 @@ export interface ApiErrorData {
 
 export class ApiError extends Error {
 
-  private status: string = "UNKNOWN";
-  private statusCode: number = 0;
-  private errors: Array<string> = ["Something went wrong"];
-  private timestamp: Date = new Date();
+  public status: string = "UNKNOWN";
+  public statusCode: number = 0;
+  public errors: Array<string> = ["Something went wrong"];
+  public timestamp: Date = new Date();
 
   constructor(error: unknown) {
     super();
@@ -33,6 +33,10 @@ export class ApiError extends Error {
 
   public getErrorMessage(separator = ", "): string {
     return this.errors.join(separator);
+  }
+
+  override get message(): string {
+    return `ApiError: ${this.status} (${this.statusCode}) - ${this.getErrorMessage()}`;
   }
 
   public getStatus(): string {

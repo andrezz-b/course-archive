@@ -15,6 +15,7 @@ import RootLayout from "./layouts/RootLayout.tsx";
 import CollegeListingPage from "./pages/college/CollegeListingPage.tsx";
 import ProgramListingPage from "./pages/program/ProgramListingPage.tsx";
 import HomeLayout from "@/layouts/HomeLayout.tsx";
+import { ApiError } from "@/api/config/ApiError.ts";
 
 const router = createBrowserRouter([
   {
@@ -140,6 +141,22 @@ const router = createBrowserRouter([
                 },
                 errorElement: <ErrorPage />,
               },
+              {
+                path: "program",
+                async lazy() {
+                  const component = await import("./pages/user/AdminUserProgramPage.tsx");
+                  return { Component: component.default };
+                },
+                errorElement: <ErrorPage />,
+              },
+              {
+                path: "course",
+                async lazy() {
+                  const component = await import("./pages/user/AdminUserCoursePage.tsx");
+                  return { Component: component.default };
+                },
+                errorElement: <ErrorPage />,
+              },
             ],
           },
           {
@@ -203,7 +220,19 @@ const router = createBrowserRouter([
   },
 ]);
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: (failureCount, error) => {
+        if (error instanceof ApiError && error.getStatusCode() === 403) {
+          return false;
+        }
+        return failureCount < 3;
+      },
+      throwOnError: true,
+    },
+  },
+});
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

@@ -1,7 +1,7 @@
-import { College } from "@/types/College";
+import { Program } from "@/types/Program";
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTable, DataTableColumnHeader } from "../../components/ui/data-table";
-import { CollegeService } from "@/api/college.service";
+import { ProgramService } from "@/api/program.service";
 import { useMemo, useState } from "react";
 import { keepPreviousData } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -13,23 +13,23 @@ import { useParams } from "react-router-dom";
 import { UserService } from "@/api/user.service.ts";
 import { ObjectType } from "@/types/Common.ts";
 
-const AdminUserCollegePage = () => {
+const AdminUserProgramPage = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedRow, setSelectedRow] = useState<College | undefined>(undefined);
+  const [selectedRow, setSelectedRow] = useState<Program | undefined>(undefined);
   const { userId } = useParams<{ userId: string }>();
   const userQuery = UserService.useGetById(userId ? parseInt(userId) : undefined);
   const { requestParams, ...tableProps } = useTableControls();
-  const query = CollegeService.useGetAll(requestParams, {
+  const query = ProgramService.useGetAll(requestParams, {
     placeholderData: keepPreviousData,
   });
 
   const defaultData = useMemo(() => [], []);
-  const handleOpenDialog = (college: College) => {
-    setSelectedRow(college);
+  const handleOpenDialog = (program: Program) => {
+    setSelectedRow(program);
     setDialogOpen(true);
   };
 
-  const columns: ColumnDef<College>[] = useMemo(
+  const columns: ColumnDef<Program>[] = useMemo(
     () => [
       {
         header: "ID",
@@ -40,16 +40,16 @@ const AdminUserCollegePage = () => {
         accessorKey: "name",
       },
       {
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Acronym" />,
-        accessorKey: "acronym",
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Duration" />,
+        accessorKey: "duration",
       },
       {
-        header: "Address",
-        accessorKey: "address",
+        header: "Degree Type",
+        accessorKey: "degreeType",
       },
       {
-        header: "City",
-        accessorKey: "city",
+        header: "Degree Title",
+        accessorKey: "degreeTitle",
       },
       {
         id: "actions",
@@ -83,7 +83,7 @@ const AdminUserCollegePage = () => {
         <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
           {selectedRow && userQuery.data && (
             <PermissionForm
-              objectType={ObjectType.COLLEGE}
+              objectType={ObjectType.PROGRAM}
               objectId={selectedRow.id}
               username={userQuery.data.username}
             />
@@ -94,4 +94,4 @@ const AdminUserCollegePage = () => {
   );
 };
 
-export default AdminUserCollegePage;
+export default AdminUserProgramPage;
