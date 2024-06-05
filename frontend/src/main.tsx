@@ -15,7 +15,6 @@ import RootLayout from "./layouts/RootLayout.tsx";
 import CollegeListingPage from "./pages/college/CollegeListingPage.tsx";
 import ProgramListingPage from "./pages/program/ProgramListingPage.tsx";
 import HomeLayout from "@/layouts/HomeLayout.tsx";
-import PermissionForm from "@/components/PermissionForm.tsx";
 
 const router = createBrowserRouter([
   {
@@ -80,7 +79,7 @@ const router = createBrowserRouter([
       },
       {
         index: true,
-        element: <PermissionForm />,
+        element: <div>Home</div>,
         errorElement: <ErrorPage />,
       },
       {

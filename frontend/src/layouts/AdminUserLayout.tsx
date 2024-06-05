@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils.ts";
 
 const AdminUserLayout = () => {
   const navigate = useNavigate();
-  const { userId } = useParams<{ userId: string; courseId: string }>();
+  const { userId } = useParams<{ userId: string }>();
   const userQuery = UserService.useGetById(userId ? parseInt(userId) : undefined);
 
   return (

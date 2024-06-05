@@ -11,17 +11,34 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip.tsx";
 import { Skeleton } from "@/components/ui/skeleton.tsx";
+import AuthService from "@/api/auth.service.ts";
+import { toast } from "sonner";
 
-const PermissionForm = () => {
-  const query = UserService.useGetObjectPermissions({
-    objectType: ObjectType.PROGRAM,
-    objectId: 1,
-    username: "test-user-3",
-  });
+interface PermissionFormProps {
+  objectType: ObjectType;
+  objectId: number;
+  username: string;
+}
 
-  // const handleSubmit = (data: PermissionName) => {
-  //   console.log(data);
-  // };
+const PermissionForm = ({ objectType, objectId, username }: PermissionFormProps) => {
+  const query = UserService.useGetObjectPermissions({ objectType, objectId, username });
+  const { mutate: changePermission } = AuthService.useChangePermission();
+
+  const handleSubmit = (permissionName: PermissionName, granting: boolean) => {
+    changePermission(
+      {
+        objectType,
+        objectId,
+        username,
+        permission: permissionName,
+        granting,
+      },
+      {
+        onSuccess: () =>
+          toast.success(`Permission ${permissionName} ${granting ? "granted" : "revoked"}`),
+      },
+    );
+  };
 
   const permissions = useMemo(() => {
     if (!query.data) return [];
@@ -39,11 +56,15 @@ const PermissionForm = () => {
       <span className="text-muted-foreground text-sm">
         Hover the permission buttons to see tooltip with explanation.
       </span>
-      <div className="flex items-center gap-4 mt-4">
+      <div className="flex items-center gap-4 mt-4 flex-wrap">
         <TooltipProvider delayDuration={700}>
           {query?.data
             ? permissions.map((permission) => (
-                <PermissionButton key={permission.permission} {...permission} />
+                <PermissionButton
+                  key={permission.permission}
+                  {...permission}
+                  onClick={handleSubmit}
+                />
               ))
             : Array.from({ length: Object.keys(Permission).length }).map((_, index) => (
                 <Skeleton key={index} className="w-20 h-10" />
@@ -83,6 +104,7 @@ interface PermissionButtonProps {
   granted: boolean;
   grantedByParent: boolean;
   grantedByHigherPermission: boolean;
+  onClick: (permission: PermissionName, grant: boolean) => void;
 }
 
 const PermissionButton = ({
@@ -90,15 +112,27 @@ const PermissionButton = ({
   granted,
   grantedByParent,
   grantedByHigherPermission,
+  onClick,
 }: PermissionButtonProps) => {
   const content = useMemo(
     () => getTooltipContent(granted, grantedByParent, grantedByHigherPermission),
     [granted, grantedByParent, grantedByHigherPermission],
   );
+
+  const handleClick = () => {
+    if (grantedByParent) return;
+    if (grantedByHigherPermission) {
+      onClick(permission, true);
+    } else {
+      onClick(permission, !granted);
+    }
+  };
+
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <Button
+          onClick={handleClick}
           className={cn("text-foreground hover:text-background border border-transparent", {
             "bg-success": granted,
             "bg-success opacity-50 cursor-not-allowed": grantedByParent,

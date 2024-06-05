@@ -1,3 +1,5 @@
+import {ObjectType} from "@/types/Common.ts";
+
 interface StateContextType<T> {
   auth: T;
   setAuth: React.Dispatch<React.SetStateAction<T>>;
@@ -50,4 +52,12 @@ export enum Role {
   USER = "USER",
   MANAGER = "MANAGER",
   ADMIN = "ADMIN",
+}
+
+export interface ChangePermissionData {
+  objectType: ObjectType;
+  objectId: number;
+  username: string;
+  permission: PermissionName;
+  granting: boolean;
 }
