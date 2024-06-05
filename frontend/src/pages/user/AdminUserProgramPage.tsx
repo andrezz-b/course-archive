@@ -86,6 +86,7 @@ const AdminUserProgramPage = () => {
               objectType={ObjectType.PROGRAM}
               objectId={selectedRow.id}
               username={userQuery.data.username}
+              title={`Permissions - '${selectedRow.name}'`}
             />
           )}
         </DialogContent>

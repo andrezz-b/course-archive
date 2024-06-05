@@ -18,9 +18,10 @@ interface PermissionFormProps {
   objectType: ObjectType;
   objectId: number;
   username: string;
+  title?: string;
 }
 
-const PermissionForm = ({ objectType, objectId, username }: PermissionFormProps) => {
+const PermissionForm = ({ objectType, objectId, username, title }: PermissionFormProps) => {
   const query = UserService.useGetObjectPermissions({ objectType, objectId, username });
   const { mutate: changePermission } = AuthService.useChangePermission();
 
@@ -53,9 +54,9 @@ const PermissionForm = ({ objectType, objectId, username }: PermissionFormProps)
 
   return (
     <div>
-      <h4 className="mb">Permission form</h4>
+      <h4 className="mb">{title ? title : `Change Permissions`}</h4>
       <span className="text-muted-foreground text-sm">
-        Hover the permission buttons to see tooltip with explanation.
+        Hover the permission buttons to see more information.
       </span>
       <div className="flex items-center gap-4 mt-4 flex-wrap">
         <TooltipProvider delayDuration={700}>
@@ -135,10 +136,10 @@ const PermissionButton = ({
         <Button
           onClick={handleClick}
           className={cn("text-foreground hover:text-background border border-transparent", {
-            "bg-success": granted,
+            "bg-success text-success-foreground": granted,
             "bg-success opacity-50 cursor-not-allowed": grantedByParent,
             "bg-muted": !granted && !grantedByHigherPermission,
-            "border-success border bg-transparent": grantedByHigherPermission,
+            "border-success border bg-transparent text-foreground": grantedByHigherPermission,
           })}
         >
           {permission}

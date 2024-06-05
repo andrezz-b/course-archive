@@ -86,6 +86,7 @@ const AdminUserCollegePage = () => {
               objectType={ObjectType.COLLEGE}
               objectId={selectedRow.id}
               username={userQuery.data.username}
+              title={`Permissions - '${selectedRow.name}'`}
             />
           )}
         </DialogContent>
