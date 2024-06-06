@@ -129,6 +129,7 @@ const AdminProgramListingPage = () => {
               defaultValues={{
                 degreeTitle: selectedRow.degreeTitle ?? "",
                 degreeTitleAbbreviation: selectedRow.degreeTitleAbbreviation ?? "",
+                degreeType: selectedRow.degreeType ?? "",
                 description: selectedRow.description ?? "",
                 duration: selectedRow.duration ?? "",
               }}

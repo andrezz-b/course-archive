@@ -15,13 +15,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { User } from "@/types/User";
 import useCurrentUser from "@/hooks/useCurrentUser.ts";
 
 const Navbar = () => {
   const { auth } = useAuth();
   const logout = useLogout();
-  const user = useCurrentUser();
 
   const Links = auth ? AuthNavbar.links : NoAuthNavbar.links;
   const SheetLinks = auth ? AuthNavbar.sheetLinks : NoAuthNavbar.sheetLinks;
@@ -35,7 +33,7 @@ const Navbar = () => {
         </div>
         <div className="hidden md:flex items-center">
           <ul className="flex items-center gap-1 lg:gap-5 h-10">
-            <Links logout={logout} user={user} />
+            <Links logout={logout} />
             <Separator orientation="vertical" />
             <li>
               <ThemeToggle />
@@ -105,81 +103,104 @@ const AuthNavbar = {
       >
         <SheetClose>Home</SheetClose>
       </NavLink>
+      <Separator />
       <NavLink
-        to="/register"
+        to="/college"
         className={({ isActive }) => (isActive ? "text-primary font-semibold" : undefined)}
       >
-        <SheetClose>Account</SheetClose>
+        <SheetClose>Colleges</SheetClose>
+      </NavLink>
+      <NavLink
+        to="/program"
+        className={({ isActive }) => (isActive ? "text-primary font-semibold" : undefined)}
+      >
+        <SheetClose>Programs</SheetClose>
+      </NavLink>
+      <NavLink
+        to="/course"
+        className={({ isActive }) => (isActive ? "text-primary font-semibold" : undefined)}
+      >
+        <SheetClose>Courses</SheetClose>
+      </NavLink>
+      <Separator />
+      <NavLink
+        to="/admin"
+        className={({ isActive }) => (isActive ? "text-primary font-semibold" : undefined)}
+      >
+        <SheetClose>Admin</SheetClose>
       </NavLink>
       <span onClick={logout}>
         <SheetClose>Logout</SheetClose>
       </span>
     </>
   )),
-  links: memo(({ logout, user }: { logout: () => void; user: User }) => (
-    <>
-      <li>
-        <NavLink to="/" className={({ isActive }) => (isActive ? "text-primary" : undefined)}>
-          <Button variant="ghost" className="font-semibold">
-            Home
-          </Button>
-        </NavLink>
-      </li>
-      <li>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="flex items-center font-semibold">
-              <span>Browse</span>
-              <ChevronDown className="h-3 w-3 ml-1 mt-1" />
+  links: memo(({ logout }: { logout: () => void }) => {
+    const user = useCurrentUser();
+    return (
+      <>
+        <li>
+          <NavLink to="/" className={({ isActive }) => (isActive ? "text-primary" : undefined)}>
+            <Button variant="ghost" className="font-semibold">
+              Home
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-30">
-            <DropdownMenuItem asChild>
-              <Link to="/college" className="cursor-pointer">
-                Colleges
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to="/program" className="cursor-pointer">
-                Programs
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to="/course" className="cursor-pointer">
-                Courses
-              </Link>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </li>
-      <li>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="flex items-center font-semibold">
-              <span>Account</span>
-              <ChevronDown className="h-3 w-3 ml-1 mt-1" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-30">
-            <DropdownMenuLabel>{user.username}</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              <Link to="/admin" className="cursor-pointer">
-                <Shield className="w-4 h-4 mt-1 mr-2" />
-                Admin
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={logout} className="cursor-pointer">
-              <LogOut className="mr-2 h-4 w-4" />
-              <Button variant="ghost" className="p-0 m-0 h-auto">
-                Log out
+          </NavLink>
+        </li>
+        <li>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="flex items-center font-semibold">
+                <span>Browse</span>
+                <ChevronDown className="h-3 w-3 ml-1 mt-1" />
               </Button>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </li>
-    </>
-  )),
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-30">
+              <DropdownMenuItem asChild>
+                <Link to="/college" className="cursor-pointer">
+                  Colleges
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/program" className="cursor-pointer">
+                  Programs
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/course" className="cursor-pointer">
+                  Courses
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </li>
+        <li>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="flex items-center font-semibold">
+                <span>Account</span>
+                <ChevronDown className="h-3 w-3 ml-1 mt-1" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-30">
+              <DropdownMenuLabel>{user.username}</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link to="/admin" className="cursor-pointer">
+                  <Shield className="w-4 h-4 mt-1 mr-2" />
+                  Admin
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={logout} className="cursor-pointer">
+                <LogOut className="mr-2 h-4 w-4" />
+                <Button variant="ghost" className="p-0 m-0 h-auto">
+                  Log out
+                </Button>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </li>
+      </>
+    );
+  }),
 };
 
 export default Navbar;
