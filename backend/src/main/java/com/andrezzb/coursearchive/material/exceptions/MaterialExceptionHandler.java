@@ -14,7 +14,7 @@ import com.andrezzb.coursearchive.exceptions.ErrorObject;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class MaterialExceptionHandler {
 
-  @ExceptionHandler({MaterialNotFoundException.class, MaterialGroupNotFoundException.class})
+  @ExceptionHandler({MaterialNotFoundException.class, MaterialGroupNotFoundException.class, CommentNotFoundException.class})
   public ResponseEntity<ErrorObject> handle(RuntimeException ex) {
     List<String> errors = Collections.singletonList(ex.getMessage());
     final ErrorObject errorObject = new ErrorObject(HttpStatus.NOT_FOUND, errors);

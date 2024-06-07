@@ -1,7 +1,7 @@
 package com.andrezzb.coursearchive.material.controllers;
 
 import com.andrezzb.coursearchive.material.dto.MaterialDto;
-import com.andrezzb.coursearchive.material.dto.VoteDto;
+import com.andrezzb.coursearchive.material.dto.VoteDataDto;
 import com.andrezzb.coursearchive.material.models.Vote;
 import com.andrezzb.coursearchive.material.services.VoteService;
 import jakarta.validation.Valid;
@@ -21,9 +21,9 @@ public class VoteController {
 
   @PostMapping("/{materialId}")
   public ResponseEntity<MaterialDto> vote(@PathVariable Long materialId,
-    @Valid @RequestBody VoteDto voteDto) {
+    @Valid @RequestBody VoteDataDto voteDataDto) {
     String username = SecurityContextHolder.getContext().getAuthentication().getName();
-    var material = voteService.vote(materialId, username, Vote.VoteType.fromString(voteDto.getVoteType()));
+    var material = voteService.vote(materialId, username, Vote.VoteType.fromString(voteDataDto.getVoteType()));
     return ResponseEntity.ok(material);
   }
 }

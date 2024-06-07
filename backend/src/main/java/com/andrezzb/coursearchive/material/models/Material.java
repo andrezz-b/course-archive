@@ -87,6 +87,18 @@ public class Material implements AclSecured {
     int downVotes = (int) votes.stream().filter(v -> v.getVoteType() == Vote.VoteType.DOWNVOTE).count();
     return upVotes - downVotes;
   }
+  @OneToMany(mappedBy = "material", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Comment> comments = new ArrayList<>();
+
+  public void addComment(Comment comment) {
+    comments.add(comment);
+    comment.setMaterial(this);
+  }
+
+  public void removeComment(Comment comment) {
+    comments.remove(comment);
+    comment.setMaterial(null);
+  }
 
   public void addFile(MaterialFile file) {
     files.add(file);

@@ -5,7 +5,7 @@ import com.andrezzb.coursearchive.validators.ValidEnum;
 import lombok.Data;
 
 @Data
-public class VoteDto {
+public class VoteDataDto {
   @ValidEnum(enumClazz = Vote.VoteType.class, ignoreCase = true)
   private String voteType;
 }
