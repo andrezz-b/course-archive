@@ -1,5 +1,6 @@
 package com.andrezzb.coursearchive.material.services;
 
+import com.andrezzb.coursearchive.material.dto.MaterialDto;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeMap;
 import org.springframework.data.domain.Page;
@@ -42,10 +43,11 @@ public class MaterialService {
   }
 
   @PreAuthorize("hasPermission(#courseYearId, 'com.andrezzb.coursearchive.course.models.CourseYear', 'read') || hasRole('MANAGER')")
-  public Page<Material> findAllMaterialsPaged(Pageable p, List<String> filterField, List<Object> filterValue,
+  public Page<MaterialDto> findAllMaterialsPaged(Pageable p, List<String> filterField, List<Object> filterValue,
       Long courseYearId, Long materialGroupId) {
-    return materialRepository.findAllByFilterFieldAndValue(p, filterField, filterValue,
+    var materials = materialRepository.findAllByFilterFieldAndValue(p, filterField, filterValue,
         materialGroupId, courseYearId);
+    return materials.map(material -> modelMapper.map(material, MaterialDto.class));
   }
 
   @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.material.models.Material', 'read') || hasRole('MANAGER')")

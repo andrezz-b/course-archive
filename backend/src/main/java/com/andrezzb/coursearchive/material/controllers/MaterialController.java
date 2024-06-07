@@ -1,5 +1,6 @@
 package com.andrezzb.coursearchive.material.controllers;
 
+import com.andrezzb.coursearchive.material.dto.MaterialDto;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -47,7 +48,7 @@ public class MaterialController {
   }
 
   @GetMapping("/")
-  public ResponseEntity<Page<Material>> getAllMaterials(
+  public ResponseEntity<Page<MaterialDto>> getAllMaterials(
     @PositiveOrZero @RequestParam(defaultValue = "0") int page,
     @Positive @RequestParam(defaultValue = "5") int size,
     @ValidEnum(enumClazz = Sort.Direction.class, ignoreCase = true)

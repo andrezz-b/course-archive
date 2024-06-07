@@ -24,6 +24,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @Data
 @ToString(exclude = "materialGroup")
@@ -58,6 +59,34 @@ public class Material implements AclSecured {
   @OneToMany(mappedBy = "material", orphanRemoval = true,
       cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
   private List<MaterialFile> files = new ArrayList<>();
+
+  @OneToMany(mappedBy = "material", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Vote> votes = new ArrayList<>();
+
+  public void addVote(Vote vote) {
+    votes.add(vote);
+    vote.setMaterial(this);
+  }
+
+  public void removeVote(Vote vote) {
+    votes.remove(vote);
+    vote.setMaterial(null);
+  }
+
+  public Vote.VoteType getCurrentUserVote() {
+    String username = SecurityContextHolder.getContext().getAuthentication().getName();
+    return votes.stream()
+        .filter(v -> v.getUser().getUsername().equals(username))
+        .map(Vote::getVoteType)
+        .findFirst()
+        .orElse(null);
+  }
+
+  public int getVoteCount() {
+    int upVotes = (int) votes.stream().filter(v -> v.getVoteType() == Vote.VoteType.UPVOTE).count();
+    int downVotes = (int) votes.stream().filter(v -> v.getVoteType() == Vote.VoteType.DOWNVOTE).count();
+    return upVotes - downVotes;
+  }
 
   public void addFile(MaterialFile file) {
     files.add(file);
