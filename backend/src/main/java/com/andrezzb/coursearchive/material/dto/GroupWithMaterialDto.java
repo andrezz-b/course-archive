@@ -10,5 +10,5 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class GroupWithMaterialDto extends MaterialGroupDto {
-  private List<Material> materials;
+  private List<MaterialDto> materials;
 }

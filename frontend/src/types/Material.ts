@@ -4,9 +4,14 @@ export interface Material {
 	id: number;
 	name: string;
 	description: string | null;
-	createdAt: string;
-	updatedAt: string;
 	files: Array<MaterialFile>;
+  voteCount: number;
+  currentUserVote: MaterialVote | null;
+}
+
+export enum MaterialVote {
+  DOWNVOTE = "DOWNVOTE",
+  UPVOTE = "UPVOTE",
 }
 
 export interface MaterialFile {
@@ -35,3 +40,8 @@ export type MaterialCreateData = z.infer<typeof MaterialCreateSchema>;
 export const MaterialEditSchema = MaterialCreateSchema.omit({ file: true });
 
 export type MaterialEditData = z.infer<typeof MaterialEditSchema>;
+
+export interface MaterialVoteData {
+  voteType: MaterialVote;
+  materialId: number;
+}

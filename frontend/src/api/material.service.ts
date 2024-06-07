@@ -1,5 +1,5 @@
 import type { GenericObjectService } from "./GenericObject.service";
-import { Material, MaterialCreateData, MaterialEditData } from "@/types/Material.ts";
+import {Material, MaterialCreateData, MaterialEditData, MaterialVoteData} from "@/types/Material.ts";
 import useAxiosPrivate from "@/hooks/useAxiosPrivate.ts";
 import {useMutation, UseMutationResult, useQueryClient} from "@tanstack/react-query";
 import { ApiError } from "@/api/config/ApiError.ts";
@@ -11,6 +11,7 @@ type MaterialService = Pick<
 	"useCreate" | "useUpdateById" | "useDeleteById"
 > & {
 	useGetFile: () => UseMutationResult<Blob, ApiError, number>
+  useVote: () => UseMutationResult<Material, ApiError, MaterialVoteData>
 };
 
 export const MaterialService: MaterialService = {
@@ -117,5 +118,26 @@ export const MaterialService: MaterialService = {
 			},
 			...mutationOptions,
 		});
-	}
+	},
+
+  useVote: () => {
+    const axios = useAxiosPrivate();
+    const queryClient = useQueryClient();
+
+    return useMutation({
+      mutationFn: async ({ voteType, materialId }) => {
+        try {
+          const { data } = await axios.post<Material>(`/material/vote/${materialId}`, {voteType});
+          return data;
+        } catch (error) {
+          throw new ApiError(error);
+        }
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ["material-group", "all"],
+        })
+      }
+    });
+  },
 };
