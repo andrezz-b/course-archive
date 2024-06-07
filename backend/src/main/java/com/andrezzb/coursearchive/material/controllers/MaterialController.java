@@ -76,9 +76,9 @@ public class MaterialController {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<Material> getMaterialById(@PathVariable Long id) {
+  public ResponseEntity<MaterialDto> getMaterialById(@PathVariable Long id) {
     var material = materialService.findMaterialById(id);
-    return ResponseEntity.ok(material);
+    return ResponseEntity.ok(materialService.convertMaterialToDto(material));
   }
 
   @GetMapping("/file/{materialId}")

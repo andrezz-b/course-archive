@@ -12,4 +12,5 @@ public class CommentDto {
   private LocalDateTime updatedAt;
   private boolean edited;
   private boolean isCurrentUser;
+  private String username;
 }

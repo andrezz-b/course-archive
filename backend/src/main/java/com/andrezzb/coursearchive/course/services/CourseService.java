@@ -48,10 +48,14 @@ public class CourseService {
     return courseRepository.findById(id).orElseThrow(() -> new CourseNotFoundException(id));
   }
 
+  public CourseDto mapCourseToDto(Course course) {
+    return modelMapper.map(course, CourseDto.class);
+  }
+
   @Transactional
   @PreAuthorize(
     "hasPermission(#courseDto.programId, 'com.andrezzb.coursearchive.program.models.Program', 'create') || hasRole('MANAGER')")
-  public Course createCourse(CourseCreateDto courseDto) {
+  public CourseDto createCourse(CourseCreateDto courseDto) {
     var program = programService.findProgram(courseDto.getProgramId());
     Course course = modelMapper.map(courseDto, Course.class);
     course.setProgram(program);
@@ -60,15 +64,16 @@ public class CourseService {
 
     String username = SecurityContextHolder.getContext().getAuthentication().getName();
     aclUtilService.grantPermission(savedCourse, username, AclPermission.ADMINISTRATION);
-    return savedCourse;
+    return modelMapper.map(savedCourse, CourseDto.class);
   }
 
   @PreAuthorize(
     "hasPermission(#id, 'com.andrezzb.coursearchive.course.models.Course', 'write') || hasRole('MANAGER')")
-  public Course updatCourse(Long id, CourseUpdateDto courseDto) {
+  public CourseDto updatCourse(Long id, CourseUpdateDto courseDto) {
     Course course = findCourseById(id);
     modelMapper.map(courseDto, course);
-    return courseRepository.save(course);
+    var savedCourse = courseRepository.save(course);
+    return modelMapper.map(savedCourse, CourseDto.class);
   }
 
   @PreAuthorize(

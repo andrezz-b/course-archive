@@ -60,19 +60,19 @@ public class CourseController {
   }
 
   @PostMapping("/")
-  public ResponseEntity<Course> createCourse(@Valid @RequestBody CourseCreateDto courseCreateDto) {
+  public ResponseEntity<CourseDto> createCourse(@Valid @RequestBody CourseCreateDto courseCreateDto) {
     var course = courseService.createCourse(courseCreateDto);
     return ResponseEntity.status(HttpStatus.CREATED).body(course);
   }
 
   @GetMapping("/{id}")
-  private ResponseEntity<Course> getCourseById(@PathVariable Long id) {
+  private ResponseEntity<CourseDto> getCourseById(@PathVariable Long id) {
     final var course = courseService.findCourseById(id);
-    return ResponseEntity.ok(course);
+    return ResponseEntity.ok(courseService.mapCourseToDto(course));
   }
 
   @PutMapping("/{id}")
-  private ResponseEntity<Course> updateCourseById(@PathVariable Long id,
+  private ResponseEntity<CourseDto> updateCourseById(@PathVariable Long id,
     @Valid @RequestBody CourseUpdateDto courseUpdateDto) {
     var course = courseService.updatCourse(id, courseUpdateDto);
     return ResponseEntity.ok(course);

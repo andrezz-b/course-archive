@@ -56,6 +56,10 @@ public class MaterialService {
         .orElseThrow(() -> new MaterialNotFoundException(id));
   }
 
+  public MaterialDto convertMaterialToDto(Material material) {
+    return modelMapper.map(material, MaterialDto.class);
+  }
+
   @Transactional
   @PreAuthorize("hasPermission(#createDto.materialGroupId, 'com.andrezzb.coursearchive.material.models.MaterialGroup', 'create') || hasRole('MANAGER')")
   public Material createMaterial(MaterialCreateDto createDto, MultipartFile file) {

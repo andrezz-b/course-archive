@@ -1,6 +1,7 @@
 package com.andrezzb.coursearchive.material.controllers;
 
-import com.andrezzb.coursearchive.material.dto.CommentDataDto;
+import com.andrezzb.coursearchive.material.dto.CommentCreateDto;
+import com.andrezzb.coursearchive.material.dto.CommentUpdateDto;
 import com.andrezzb.coursearchive.material.dto.CommentDto;
 import com.andrezzb.coursearchive.material.models.Comment;
 import com.andrezzb.coursearchive.material.services.CommentService;
@@ -28,31 +29,31 @@ public class CommentController {
     this.commentService = commentService;
   }
 
-  @GetMapping("/{materialId}")
-  public ResponseEntity<Page<CommentDto>> getCommentsPaged(@PathVariable Long materialId,
+  @GetMapping("/")
+  public ResponseEntity<Page<CommentDto>> getCommentsPaged(
     @PositiveOrZero @RequestParam(defaultValue = "0") int page,
-    @Positive @RequestParam(defaultValue = "5") int size,
+    @Positive @RequestParam(defaultValue = "50") int size,
     @ValidEnum(enumClazz = Sort.Direction.class, ignoreCase = true)
     @RequestParam(defaultValue = "asc") List<String> sortDirection,
     @ValidEnum(enumClazz = Comment.SortField.class) @RequestParam(defaultValue = "createdAt")
-    List<String> sortField) {
+    List<String> sortField, @RequestParam Long materialId) {
     Pageable p = createPageRequest(page, size, sortField, sortDirection);
     var comments = commentService.findAllCommentsPaged(materialId, p);
     return ResponseEntity.ok(comments);
   }
 
 
-  @PostMapping("/{materialId}")
-  public ResponseEntity<CommentDto> createComment(@PathVariable Long materialId, @Valid @RequestBody
-    CommentDataDto commentDto) {
+  @PostMapping("/")
+  public ResponseEntity<CommentDto> createComment(
+    @Valid @RequestBody CommentCreateDto commentDto) {
     String username = SecurityContextHolder.getContext().getAuthentication().getName();
-    var comment = commentService.createComment(materialId, username, commentDto.getText());
+    var comment = commentService.createComment(commentDto.getMaterialId(), username, commentDto.getText());
     return ResponseEntity.ok(comment);
   }
 
   @PutMapping("/{commentId}")
-  public ResponseEntity<CommentDto> updateComment(@PathVariable Long commentId, @Valid @RequestBody
-  CommentDataDto commentDto) {
+  public ResponseEntity<CommentDto> updateComment(@PathVariable Long commentId,
+    @Valid @RequestBody CommentUpdateDto commentDto) {
     var comment = commentService.updateComment(commentId, commentDto.getText());
     return ResponseEntity.ok(comment);
   }

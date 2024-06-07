@@ -1,12 +1,8 @@
 import { Card, CardContent, CardDescription } from "@/components/ui/card.tsx";
-import { Button } from "@/components/ui/button.tsx";
-import { CircleChevronDown, CircleChevronUp, File } from "lucide-react";
 import { useParams } from "react-router-dom";
 import { MaterialGroupService } from "@/api/material-group.service.ts";
 import { keepPreviousData } from "@tanstack/react-query";
 import { MaterialGroup } from "@/types/MaterialGroup.ts";
-import { Material, MaterialVote } from "@/types/Material.ts";
-import { MaterialService } from "@/api/material.service.ts";
 import {
   Accordion,
   AccordionContent,
@@ -16,7 +12,7 @@ import {
 import useLocalStorage from "@/hooks/useLocalStorage.ts";
 import { useMemo } from "react";
 import Loading from "@/components/Loading.tsx";
-import { cn } from "@/lib/utils.ts";
+import MaterialItem from "@/components/material/MaterialItem.tsx";
 
 const CourseYearPage = () => {
   const { courseYearId } = useParams<{ courseYearId: string }>();
@@ -90,60 +86,6 @@ const MaterialGroupCard = ({ group }: MaterialGroupCardProps) => {
         </div>
       </AccordionContent>
     </AccordionItem>
-  );
-};
-
-interface MaterialItemProps {
-  material: Material;
-}
-
-const MaterialItem = ({ material }: MaterialItemProps) => {
-  const { mutate: getFile } = MaterialService.useGetFile();
-  const { mutate: vote } = MaterialService.useVote();
-  const openFile = () => {
-    const newWindow = window.open();
-    getFile(material.id, {
-      onSuccess: (data) => {
-        const url = window.URL.createObjectURL(data);
-        if (newWindow) newWindow.location.href = url;
-      },
-    });
-  };
-
-  const handleVote = (voteType: MaterialVote) => {
-    vote({ materialId: material.id, voteType });
-  };
-
-  return (
-    <div className="flex items-center gap-2 p-4 border rounded-md my-2">
-      <div className="flex flex-col items-center gap-1">
-        <Button
-          onClick={() => handleVote(MaterialVote.UPVOTE)}
-          variant="ghost"
-          className="p-1 h-auto"
-        >
-          <CircleChevronUp
-            className={cn({ "fill-amber-600": material.currentUserVote === MaterialVote.UPVOTE })}
-          />
-        </Button>
-        {material.voteCount}
-        <Button
-          onClick={() => handleVote(MaterialVote.DOWNVOTE)}
-          variant="ghost"
-          className="p-1 h-auto"
-        >
-          <CircleChevronDown
-            className={cn({
-              "fill-blue-500": material.currentUserVote === MaterialVote.DOWNVOTE,
-            })}
-          />
-        </Button>
-      </div>
-      <Button variant="link" onClick={openFile} className="p-2 h-auto flex items-center gap-4">
-        <File className="w-6 h-6" />
-        <h4>{material.name}</h4>
-      </Button>
-    </div>
   );
 };
 

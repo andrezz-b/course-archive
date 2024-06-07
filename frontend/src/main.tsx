@@ -73,6 +73,15 @@ const router = createBrowserRouter([
                   return { Component: component.default };
                 },
                 errorElement: <ErrorPage />,
+                children: [],
+              },
+              {
+                path: "course-year/:courseYearId/material/:materialId",
+                async lazy() {
+                  const component = await import("./pages/material/MaterialPage.tsx");
+                  return { Component: component.default };
+                },
+                errorElement: <ErrorPage />,
               },
             ],
           },

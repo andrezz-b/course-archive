@@ -43,6 +43,10 @@ public class Comment implements AclSecured {
   @Column(name = "edited", nullable = false)
   private boolean edited = false;
 
+  public String getUsername() {
+    return this.getUser().getUsername();
+  }
+
   public boolean getIsCurrentUser() {
     var username = SecurityContextHolder.getContext().getAuthentication().getName();
     return this.getUser().getUsername().equals(username);

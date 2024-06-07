@@ -9,11 +9,6 @@ export interface Material {
   currentUserVote: MaterialVote | null;
 }
 
-export enum MaterialVote {
-  DOWNVOTE = "DOWNVOTE",
-  UPVOTE = "UPVOTE",
-}
-
 export interface MaterialFile {
 	id: number;
 	name: string;
@@ -40,6 +35,11 @@ export type MaterialCreateData = z.infer<typeof MaterialCreateSchema>;
 export const MaterialEditSchema = MaterialCreateSchema.omit({ file: true });
 
 export type MaterialEditData = z.infer<typeof MaterialEditSchema>;
+
+export enum MaterialVote {
+  DOWNVOTE = "DOWNVOTE",
+  UPVOTE = "UPVOTE",
+}
 
 export interface MaterialVoteData {
   voteType: MaterialVote;
