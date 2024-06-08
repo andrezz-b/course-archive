@@ -26,9 +26,10 @@ public class TagController {
   @GetMapping("/")
   public ResponseEntity<List<Tag>> getTags(@RequestParam Long courseYearId,
     @ValidEnum(enumClazz = Sort.Direction.class, ignoreCase = true)
-    @RequestParam(defaultValue = "asc") String sortDirection) {
+    @RequestParam(defaultValue = "asc") String sortDirection,
+    @RequestParam(required = false) String name) {
     var sort = tagService.getSort(Sort.Direction.fromString(sortDirection));
-    var tags = tagService.getTags(courseYearId, sort);
+    var tags = tagService.getTags(courseYearId, sort, name);
     return ResponseEntity.ok(tags);
   }
 
