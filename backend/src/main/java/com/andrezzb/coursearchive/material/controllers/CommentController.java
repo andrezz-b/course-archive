@@ -1,8 +1,8 @@
 package com.andrezzb.coursearchive.material.controllers;
 
-import com.andrezzb.coursearchive.material.dto.CommentCreateDto;
-import com.andrezzb.coursearchive.material.dto.CommentUpdateDto;
-import com.andrezzb.coursearchive.material.dto.CommentDto;
+import com.andrezzb.coursearchive.material.dto.comment.CommentCreateDto;
+import com.andrezzb.coursearchive.material.dto.comment.CommentUpdateDto;
+import com.andrezzb.coursearchive.material.dto.comment.CommentDto;
 import com.andrezzb.coursearchive.material.models.Comment;
 import com.andrezzb.coursearchive.material.services.CommentService;
 import com.andrezzb.coursearchive.validators.ValidEnum;

@@ -1,4 +1,4 @@
-package com.andrezzb.coursearchive.material.dto;
+package com.andrezzb.coursearchive.material.dto.comment;
 
 import lombok.Data;
 

@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.andrezzb.coursearchive.material.models.Tag;
 import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -31,7 +32,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(name = "course_year",
-    uniqueConstraints = @UniqueConstraint(columnNames = {"course_id", "academic_year"}))
+  uniqueConstraints = @UniqueConstraint(columnNames = {"course_id", "academic_year"}))
 public class CourseYear implements AclSecured {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -73,6 +74,9 @@ public class CourseYear implements AclSecured {
   private LocalDateTime updatedAt;
 
   @OneToMany(mappedBy = "courseYear", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Tag> tags = new ArrayList<>();
+
+  @OneToMany(mappedBy = "courseYear", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<MaterialGroup> materialGroups = new ArrayList<>();
 
   public void addMaterialGroup(MaterialGroup materialGroup) {
@@ -93,6 +97,7 @@ public class CourseYear implements AclSecured {
   public enum FilterField implements FilterValueMapper {
     academicYear
   }
+
 
   public enum SortField {
     id, academicYear

@@ -1,4 +1,4 @@
-package com.andrezzb.coursearchive.material.dto;
+package com.andrezzb.coursearchive.material.dto.comment;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;

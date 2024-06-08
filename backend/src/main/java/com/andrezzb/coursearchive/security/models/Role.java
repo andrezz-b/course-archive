@@ -18,7 +18,7 @@ public class Role {
   private String name;
 
   @ManyToMany(mappedBy = "roles")
-  private Set<UserEntity> posts = new HashSet<>();
+  private Set<UserEntity> users = new HashSet<>();
 
   @Override
   public String toString() {

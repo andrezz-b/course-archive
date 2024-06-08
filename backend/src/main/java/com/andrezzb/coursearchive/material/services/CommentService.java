@@ -1,6 +1,6 @@
 package com.andrezzb.coursearchive.material.services;
 
-import com.andrezzb.coursearchive.material.dto.CommentDto;
+import com.andrezzb.coursearchive.material.dto.comment.CommentDto;
 import com.andrezzb.coursearchive.material.exceptions.CommentNotFoundException;
 import com.andrezzb.coursearchive.material.models.Comment;
 import com.andrezzb.coursearchive.material.repository.CommentRepository;

@@ -2,8 +2,11 @@ package com.andrezzb.coursearchive.material.models;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import jakarta.persistence.*;
 import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -11,17 +14,6 @@ import com.andrezzb.coursearchive.file.models.MaterialFile;
 import com.andrezzb.coursearchive.repository.FilterValueMapper;
 import com.andrezzb.coursearchive.security.models.AclSecured;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -57,8 +49,13 @@ public class Material implements AclSecured {
   private LocalDateTime updatedAt;
 
   @OneToMany(mappedBy = "material", orphanRemoval = true,
-      cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
+    cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
   private List<MaterialFile> files = new ArrayList<>();
+
+  @ManyToMany
+  @JoinTable(name = "material_tag", joinColumns = @JoinColumn(name = "material_id"),
+    inverseJoinColumns = @JoinColumn(name = "tag_id"))
+  private Set<Tag> tags = new HashSet<>();
 
   @OneToMany(mappedBy = "material", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Vote> votes = new ArrayList<>();
@@ -75,18 +72,17 @@ public class Material implements AclSecured {
 
   public Vote.VoteType getCurrentUserVote() {
     String username = SecurityContextHolder.getContext().getAuthentication().getName();
-    return votes.stream()
-        .filter(v -> v.getUser().getUsername().equals(username))
-        .map(Vote::getVoteType)
-        .findFirst()
-        .orElse(null);
+    return votes.stream().filter(v -> v.getUser().getUsername().equals(username))
+      .map(Vote::getVoteType).findFirst().orElse(null);
   }
 
   public int getVoteCount() {
     int upVotes = (int) votes.stream().filter(v -> v.getVoteType() == Vote.VoteType.UPVOTE).count();
-    int downVotes = (int) votes.stream().filter(v -> v.getVoteType() == Vote.VoteType.DOWNVOTE).count();
+    int downVotes =
+      (int) votes.stream().filter(v -> v.getVoteType() == Vote.VoteType.DOWNVOTE).count();
     return upVotes - downVotes;
   }
+
   @OneToMany(mappedBy = "material", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Comment> comments = new ArrayList<>();
 
@@ -118,6 +114,7 @@ public class Material implements AclSecured {
   public enum FilterField implements FilterValueMapper {
     description, name
   }
+
 
   public enum SortField {
     id, name, createdAt, updatedAt
