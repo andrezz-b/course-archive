@@ -23,12 +23,12 @@ interface GenericObjectServiceFactoryOptions {
 export interface GenericObjectService<Entity, CreateData, EditData> {
   useGetAll: (
     params?: Record<string, unknown>,
-    options?: Omit<UndefinedInitialDataOptions<Page<Entity>, ApiError>, "queryKey" | "queryFn" >,
+    options?: Omit<UndefinedInitialDataOptions<Page<Entity>, ApiError>, "queryKey" | "queryFn">,
   ) => UseQueryResult<Page<Entity>, ApiError>;
 
   useGetById: (
     id?: number,
-    options?: Omit<DefinedInitialDataOptions<Entity, ApiError>, "queryKey" | "queryFn" >,
+    options?: Omit<DefinedInitialDataOptions<Entity, ApiError>, "queryKey" | "queryFn">,
   ) => UseQueryResult<Entity, ApiError>;
 
   useCreate: (
@@ -41,7 +41,7 @@ export interface GenericObjectService<Entity, CreateData, EditData> {
 
   useDeleteById: (
     mutationOptions?: Omit<UseMutationOptions<undefined, ApiError, WithId>, "mutationFn">,
-  ) => UseMutationResult<undefined, ApiError, WithId>
+  ) => UseMutationResult<undefined, ApiError, WithId>;
 }
 
 export function createGenericObjectService<
@@ -73,8 +73,8 @@ export function createGenericObjectService<
             const { data } = await axios.get(`/${entityEndpoint}/`, {
               params: definedParams,
               paramsSerializer: {
-                indexes: null
-              }
+                indexes: null,
+              },
             });
             return data;
           } catch (error) {
@@ -142,9 +142,7 @@ export function createGenericObjectService<
       });
     },
 
-    useUpdateById: (
-      mutationOptions
-    ) => {
+    useUpdateById: (mutationOptions) => {
       const axios = useAxiosPrivate();
       const queryClient = useQueryClient();
 
@@ -187,7 +185,7 @@ export function createGenericObjectService<
       const queryClient = useQueryClient();
 
       return useMutation({
-        mutationFn: async ({id}) => {
+        mutationFn: async ({ id }) => {
           try {
             await axios.delete<void>(`/${entityEndpoint}/${id}`);
           } catch (error) {
@@ -202,6 +200,6 @@ export function createGenericObjectService<
         },
         ...mutationOptions,
       });
-    }
+    },
   };
 }

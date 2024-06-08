@@ -50,6 +50,12 @@ public class TagService {
   public Tag updateTag(Long tagId, String name) {
     var tag = tagRepository.findById(tagId)
       .orElseThrow(() -> new TagNotFoundException("Tag not found with id: " + tagId));
+    var existingTag = tag.getCourseYear().getTags().stream()
+      .filter(t -> t.getName().equals(name))
+      .findFirst();
+    if (existingTag.isPresent()) {
+      throw new TagExistsException("Tag already exists with name: " + name);
+    }
     tag.setName(name);
     return tagRepository.save(tag);
   }
