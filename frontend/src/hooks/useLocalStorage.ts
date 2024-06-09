@@ -4,7 +4,13 @@ export default function useLocalStorage<T>(
   key: string,
   defaultValue: T
 ): [T, (value: T) => void] {
-  const [value, setValue] = useState(defaultValue);
+  const [value, setValue] = useState(() => {
+    const item = localStorage.getItem(key);
+    if (!item) {
+      return defaultValue;
+    }
+    return JSON.parse(item);
+  });
 
   useEffect(() => {
     const item = localStorage.getItem(key);

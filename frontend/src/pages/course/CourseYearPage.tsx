@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription } from "@/components/ui/card.tsx";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { MaterialGroupService } from "@/api/material-group.service.ts";
 import { keepPreviousData } from "@tanstack/react-query";
 import { MaterialGroup } from "@/types/MaterialGroup.ts";
@@ -26,11 +26,11 @@ import { Input } from "@/components/ui/input.tsx";
 import { TagService } from "@/api/tag.service.ts";
 import { MultiSelect } from "@/components/ui/multi-select.tsx";
 import { Separator } from "@/components/ui/separator.tsx";
+import { debounce } from "lodash-es";
 
 const CourseYearPage = () => {
   const [materialFormOpen, setMaterialFormOpen] = useState(false);
   const { courseYearId } = useParams<{ courseYearId: string }>();
-  const [selectedTags, setSelectedTags] = useState<Array<string>>([]);
   const defaultValue = useMemo(() => ({}), []);
   const [openValues, setOpenValues] = useLocalStorage<Record<string, Array<string>>>(
     "open-group-values",
@@ -65,10 +65,46 @@ const CourseYearPage = () => {
     });
   };
 
+  const [searchParams, setSearchParams] = useSearchParams({
+    tagIds: [],
+    materialName: "",
+  });
+
+  const updateMaterialName: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+    setMaterialName(e.target.value);
+    updateMaterialNameParam(e.target.value);
+  };
+
+  const updateMaterialNameParam = useMemo(
+    () =>
+      debounce(
+        (value) =>
+          setSearchParams((prev) => {
+            prev.set("materialName", value);
+            if (!value) prev.delete("materialName");
+            return prev;
+          }),
+        500,
+      ),
+    [setSearchParams],
+  );
+  const updateSelectedTags = (tags: Array<string>) => {
+    setSearchParams((prev) => {
+      prev.delete("tagIds");
+      tags.forEach((tag) => prev.append("tagIds", tag));
+      return prev;
+    });
+    setSelectedTags(tags);
+  };
+
+  const [selectedTags, setSelectedTags] = useState<Array<string>>(searchParams.getAll("tagIds")!);
+  const [materialName, setMaterialName] = useState<string>(searchParams.get("materialName")!);
   const groupQuery = MaterialGroupService.useGetAll(
     {
       courseYearId,
+      materialName: searchParams.get("materialName"),
       size: 100,
+      tagIds: searchParams.getAll("tagIds"),
     },
     {
       placeholderData: keepPreviousData,
@@ -79,11 +115,16 @@ const CourseYearPage = () => {
     <Card className="w-full md:px-10 border-none space-y-4 relative">
       <div className="flex justify-between flex-col md:flex-row md:items-center">
         <div className="flex flex-col md:flex-row md:h-10 gap-1">
-          <Input placeholder="Search..." className="md:w-[250px]" />
+          <Input
+            placeholder="Search..."
+            className="md:w-[250px]"
+            value={materialName}
+            onChange={updateMaterialName}
+          />
           <MultiSelect
             className="py-1"
             options={tagOptions}
-            onValueChange={setSelectedTags}
+            onValueChange={updateSelectedTags}
             defaultValue={selectedTags}
             placeholder="Tags"
           />
@@ -107,7 +148,12 @@ const CourseYearPage = () => {
         </Dialog>
       </div>
       <CardContent className="flex flex-col gap-8 p-0">
-        <Accordion type="multiple" value={currentOpenValues} onValueChange={updateValues}>
+        <Accordion
+          type="multiple"
+          value={currentOpenValues}
+          onValueChange={updateValues}
+          defaultValue={currentOpenValues}
+        >
           {groupQuery.isLoading ? (
             <Loading />
           ) : !groupQuery.data?.content.length ? (
@@ -130,11 +176,15 @@ const MaterialGroupCard = ({ group }: MaterialGroupCardProps) => {
   return (
     <AccordionItem value={group.id.toString()}>
       <AccordionTrigger>
-        <h3 className="text-2xl">{group.name}</h3>
+        <h3 className="text-2xl">
+          {group.name}
+          <span className="text-muted-foreground"> ({group.materials.length})</span>
+        </h3>
       </AccordionTrigger>
       <AccordionContent>
         {group.description && <CardDescription>{group.description}</CardDescription>}
         <div>
+          {!group.materials?.length && <span>No materials found</span>}
           {group.materials?.map((material) => (
             <MaterialItem key={material.id} material={material} />
           ))}

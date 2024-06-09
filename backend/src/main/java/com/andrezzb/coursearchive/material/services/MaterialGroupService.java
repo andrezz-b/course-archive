@@ -1,5 +1,6 @@
 package com.andrezzb.coursearchive.material.services;
 
+import org.apache.tika.utils.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -98,6 +99,28 @@ public class MaterialGroupService {
       throw new IllegalStateException("Group has materials, cannot delete");
     }
     materialGroupRepository.deleteById(id);
+  }
+
+  public static Page<GroupWithMaterialDto> filterMaterials(Page<GroupWithMaterialDto> materialGroupsPaged,
+    String materialName, List<Long> tagIds) {
+
+    for (GroupWithMaterialDto group : materialGroupsPaged.getContent()) {
+      var materialStream = group.getMaterials().stream();
+
+      if (!StringUtils.isBlank(materialName)) {
+        materialStream =
+          materialStream.filter(material -> material.getName().contains(materialName));
+      }
+
+      if (tagIds != null && !tagIds.isEmpty()) {
+        materialStream = materialStream.filter(
+          material -> tagIds.stream().allMatch(tagId -> material.getTags().stream().anyMatch(tag -> tag.getId().equals(tagId)))
+        );
+      }
+      group.setMaterials(materialStream.toList());
+    }
+
+    return materialGroupsPaged;
   }
 
   Short getNewDisplayOrder(Long courseYearId, Short oldOrder, Short newOrder) {

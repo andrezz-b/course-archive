@@ -221,7 +221,9 @@ const CommentItem = ({ comment }: CommentItemProps) => {
         </div>
       ) : (
         <>
-          <p>{comment.text}</p>
+          <p>
+            <span className="whitespace-pre-line">{comment.text}</span>
+          </p>
           {comment.edited && (
             <span className="text-muted-foreground text-xs mt-1 italic">(Edited)</span>
           )}

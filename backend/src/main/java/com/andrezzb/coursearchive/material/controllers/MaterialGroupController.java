@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
+import static com.andrezzb.coursearchive.material.services.MaterialGroupService.filterMaterials;
 import static com.andrezzb.coursearchive.utils.PageRequestUtils.createPageRequest;
 
 
@@ -51,14 +52,16 @@ public class MaterialGroupController {
     @RequestParam(defaultValue = "displayOrder") List<String> sortField,
     @ValidEnum(enumClazz = MaterialGroup.FilterField.class, required = false)
     @RequestParam(required = false) List<String> filterField,
-    @RequestParam(required = false) List<String> filterValue, @RequestParam Long courseYearId) {
+    @RequestParam(required = false) List<String> filterValue, @RequestParam Long courseYearId,
+    @RequestParam(required = false) String materialName,
+    @RequestParam(required = false) List<Long> tagIds) {
 
     var filterValueObj =
       FilterValueMapper.mapFilterValue(MaterialGroup.FilterField.class, filterField, filterValue);
     Pageable p = createPageRequest(page, size, sortField, sortDirection);
     final var materialGroupsPaged =
       materialGroupService.findAllMaterialGroupsPaged(p, filterField, filterValueObj, courseYearId);
-    return ResponseEntity.ok(materialGroupsPaged);
+    return ResponseEntity.ok(filterMaterials(materialGroupsPaged, materialName, tagIds));
   }
 
   @PostMapping("/")
