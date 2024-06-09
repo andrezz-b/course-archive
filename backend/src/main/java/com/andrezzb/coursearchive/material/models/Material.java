@@ -59,7 +59,7 @@ public class Material implements AclSecured {
   private List<Vote> votes = new ArrayList<>();
 
   @Column(name = "vote_count")
-  private int voteCount;
+  private int voteCount = 0;
 
   public void addVote(Vote vote) {
     votes.add(vote);
