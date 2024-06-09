@@ -15,7 +15,7 @@ import { Combobox } from "@/components/ui/combobox.tsx";
 import { MaterialGroupService } from "@/api/material-group.service.ts";
 
 interface MaterialCreateFormProps {
-  materialGroupId: number;
+  materialGroupId?: number;
   closeDialog: () => void;
 }
 
@@ -50,7 +50,7 @@ const MaterialCreateForm = ({ materialGroupId, closeDialog }: MaterialCreateForm
   const { mutate: createMaterial } = MaterialService.useCreate();
   const form = useForm<MaterialCreateData>({
     defaultValues: {
-      materialGroupId,
+      materialGroupId: materialGroupId ?? undefined,
       name: "",
       description: "",
       tagIds: [],
@@ -124,7 +124,7 @@ const MaterialCreateForm = ({ materialGroupId, closeDialog }: MaterialCreateForm
                 <Combobox
                   options={groupsOptions}
                   onValueChange={field.onChange}
-                  value={field.value.toString()}
+                  value={field.value?.toString()}
                   placeholder="Select group..."
                 />
               </FormControl>

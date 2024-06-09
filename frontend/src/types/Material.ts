@@ -28,7 +28,9 @@ export const MaterialCreateSchema = z.object({
 			(value) => value.length === 1 && value[0].size < 5 * 1024 * 1024,
 			"File size should be less than 5MB",
 		),
-	materialGroupId: z.coerce.number().min(1, "Material group is required"),
+	materialGroupId: z.coerce.number({
+    invalid_type_error: "Material group is required",
+  }).min(1, "Material group is required"),
 	description: z.string().max(512, "Description should be less than 512 characters").optional(),
   tagIds: z.array(z.coerce.number()).optional(),
 });

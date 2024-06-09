@@ -23,7 +23,10 @@ interface ComboboxProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 export const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
-  ({ options, onValueChange, value, placeholder = "Select item...", className, ...props }, ref) => {
+  (
+    { options, onValueChange, value = "", placeholder = "Select item...", className, ...props },
+    ref,
+  ) => {
     const [open, setOpen] = React.useState(false);
     const [selectedValue, setSelectedValue] = React.useState<string>(value);
 
@@ -52,7 +55,7 @@ export const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50 justify-self-end" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[200px] p-0">
+        <PopoverContent align="start" className="w-[200px] p-0">
           <Command>
             <CommandInput placeholder="Search..." />
             <CommandList>

@@ -84,7 +84,6 @@ const CommentInput = ({ materialId }: { materialId: number }) => {
   });
 
   const submitHandler: SubmitHandler<CommentItemForm> = (data) => {
-    console.log(data);
     createComment(
       { text: data.text, materialId },
       {

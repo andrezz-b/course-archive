@@ -127,6 +127,7 @@ export const MaterialService: MaterialService = {
 
   useGetById: (id, options) => {
     const axios = useAxiosPrivate();
+    const queryClient = useQueryClient();
 
     return useQuery({
       queryKey: ["material", id],
@@ -140,8 +141,22 @@ export const MaterialService: MaterialService = {
       },
       enabled: options?.enabled ?? !!id,
       staleTime: options?.staleTime ?? 60e3,
-      // TODO: Implement initialData
-      // initialData: () => {},
+      initialData: () => {
+        const values = queryClient.getQueriesData<Page<MaterialGroup>>({
+          stale: false,
+          queryKey: ["material-group", "all"],
+        });
+        for (const [, data] of values) {
+          if (!data?.content) continue;
+          for (const group of data.content) {
+            const material = group.materials.find((item) => item.id === id);
+            if (material) {
+              return material;
+            }
+          }
+        }
+        return undefined;
+      },
       ...options,
     });
   },
