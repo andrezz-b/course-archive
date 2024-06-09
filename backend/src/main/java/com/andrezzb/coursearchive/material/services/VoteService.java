@@ -49,6 +49,8 @@ public class VoteService {
       material.addVote(vote);
     }
 
+    material.setVoteCount(material.calculateVoteCount());
+
     return modelMapper.map(materialRepository.save(material), MaterialDto.class);
   }
 }

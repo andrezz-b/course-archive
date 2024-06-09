@@ -16,7 +16,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@ToString(exclude = "courseYear")
+@ToString(exclude = {"courseYear"})
 @NoArgsConstructor
 @Entity
 @Table(name = "material_group",
@@ -53,7 +53,7 @@ public class MaterialGroup implements AclSecured {
 
 
     @OneToMany(mappedBy = "materialGroup", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("name ASC")
+    @OrderBy("voteCount DESC, name ASC")
     private List<Material> materials = new ArrayList<>();
 
     public void addMaterial(Material material) {

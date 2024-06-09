@@ -46,7 +46,7 @@ const MaterialPage = () => {
       )}
       <div className="mt-4 space-y-4 md:max-w-[70%]">
         <CommentInput materialId={parseInt(materialId!, 10)} />
-        <div className="flex justify-between">
+        <div className="flex justify-between flex-col md:flex-row">
           <h4 className="text-lg font-bold">Comments ({commentQuery.data?.totalElements})</h4>
           <Select onValueChange={setSortValue} defaultValue={sortValue}>
             <SelectTrigger className="max-w-[200px] overflow-hidden whitespace-nowrap">

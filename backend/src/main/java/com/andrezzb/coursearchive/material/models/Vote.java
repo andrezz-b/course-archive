@@ -4,8 +4,10 @@ import com.andrezzb.coursearchive.security.models.UserEntity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
+@ToString(exclude = {"material", "user"})
 @NoArgsConstructor
 @Entity
 @Table(name = "votes")

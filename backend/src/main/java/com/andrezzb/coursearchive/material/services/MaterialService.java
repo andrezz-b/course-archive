@@ -1,6 +1,7 @@
 package com.andrezzb.coursearchive.material.services;
 
 import com.andrezzb.coursearchive.material.dto.MaterialDto;
+import com.andrezzb.coursearchive.material.models.Tag;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeMap;
 import org.springframework.data.domain.Page;
@@ -19,6 +20,8 @@ import com.andrezzb.coursearchive.material.repository.MaterialRepository;
 import com.andrezzb.coursearchive.security.acl.AclPermission;
 import com.andrezzb.coursearchive.security.services.AclUtilService;
 
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 @Service
@@ -40,9 +43,7 @@ public class MaterialService {
     this.fileService = fileService;
     this.tagService = tagService;
 
-    TypeMap<MaterialUpdateDto, Material> typeMap =
-        this.modelMapper.createTypeMap(MaterialUpdateDto.class, Material.class);
-    typeMap.addMappings(mapper -> mapper.skip(Material::setId));
+//    TypeMap<Material, MaterialDto> typeMap = this.modelMapper.createTypeMap(Material.class, MaterialDto.class);
   }
 
   @PreAuthorize("hasPermission(#courseYearId, 'com.andrezzb.coursearchive.course.models.CourseYear', 'read') || hasRole('MANAGER')")

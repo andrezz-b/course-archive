@@ -5,10 +5,7 @@ import com.andrezzb.coursearchive.material.models.Tag;
 import com.andrezzb.coursearchive.material.models.Vote;
 import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Data
 public class MaterialDto {
@@ -16,7 +13,11 @@ public class MaterialDto {
   private String name;
   private String description;
   private List<MaterialFile> files = new ArrayList<>();
-  private Set<Tag> tags = new HashSet<>();
+  private Set<Tag> tags = new LinkedHashSet<>();
   private int voteCount;
   private Vote.VoteType currentUserVote;
+
+  public void setTags(Collection<Tag> tags) {
+    this.tags = new LinkedHashSet<>(tags);
+  }
 }

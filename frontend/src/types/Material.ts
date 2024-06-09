@@ -1,10 +1,12 @@
 import { z } from "zod";
+import {Tag} from "@/types/Tag.ts";
 
 export interface Material {
 	id: number;
 	name: string;
 	description: string | null;
 	files: Array<MaterialFile>;
+  tags: Array<Tag>;
   voteCount: number;
   currentUserVote: MaterialVote | null;
 }
@@ -26,8 +28,9 @@ export const MaterialCreateSchema = z.object({
 			(value) => value.length === 1 && value[0].size < 5 * 1024 * 1024,
 			"File size should be less than 5MB",
 		),
-	materialGroupId: z.coerce.number(),
+	materialGroupId: z.coerce.number().min(1, "Material group is required"),
 	description: z.string().max(512, "Description should be less than 512 characters").optional(),
+  tagIds: z.array(z.coerce.number()).optional(),
 });
 
 export type MaterialCreateData = z.infer<typeof MaterialCreateSchema>;

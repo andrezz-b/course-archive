@@ -1,10 +1,7 @@
 package com.andrezzb.coursearchive.material.models;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import jakarta.persistence.*;
 import lombok.ToString;
@@ -55,10 +52,14 @@ public class Material implements AclSecured {
   @ManyToMany
   @JoinTable(name = "material_tag", joinColumns = @JoinColumn(name = "material_id", referencedColumnName = "id"),
     inverseJoinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "id"))
-  private Set<Tag> tags = new HashSet<>();
+  @OrderBy
+  private Set<Tag> tags = new LinkedHashSet<>();
 
   @OneToMany(mappedBy = "material", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Vote> votes = new ArrayList<>();
+
+  @Column(name = "vote_count")
+  private int voteCount;
 
   public void addVote(Vote vote) {
     votes.add(vote);
@@ -76,7 +77,7 @@ public class Material implements AclSecured {
       .map(Vote::getVoteType).findFirst().orElse(null);
   }
 
-  public int getVoteCount() {
+  public int calculateVoteCount() {
     int upVotes = (int) votes.stream().filter(v -> v.getVoteType() == Vote.VoteType.UPVOTE).count();
     int downVotes =
       (int) votes.stream().filter(v -> v.getVoteType() == Vote.VoteType.DOWNVOTE).count();
