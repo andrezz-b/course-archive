@@ -31,10 +31,6 @@ public class Tag implements AclSecured {
   @JsonIgnore
   private CourseYear courseYear;
 
-  @ManyToMany(mappedBy = "tags")
-  @JsonIgnore
-  private Set<Material> materials = new HashSet<>();
-
   @CreationTimestamp
   @Column(name = "created_at", updatable = false)
   private LocalDateTime createdAt;

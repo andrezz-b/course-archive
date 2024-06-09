@@ -28,14 +28,17 @@ public class MaterialService {
   private final ModelMapper modelMapper;
   private final MaterialGroupService materialGroupService;
   private final FileService fileService;
+  private final TagService tagService;
 
   public MaterialService(MaterialRepository materialRepository, AclUtilService aclUtilService,
-      ModelMapper modelMapper, MaterialGroupService materialGroupService, FileService fileService) {
+      ModelMapper modelMapper, MaterialGroupService materialGroupService, FileService fileService,
+    TagService tagService) {
     this.materialRepository = materialRepository;
     this.aclUtilService = aclUtilService;
     this.modelMapper = modelMapper;
     this.materialGroupService = materialGroupService;
     this.fileService = fileService;
+    this.tagService = tagService;
 
     TypeMap<MaterialUpdateDto, Material> typeMap =
         this.modelMapper.createTypeMap(MaterialUpdateDto.class, Material.class);
@@ -67,6 +70,7 @@ public class MaterialService {
     Material material = modelMapper.map(createDto, Material.class);
     material.setMaterialGroup(materialGroup);
     material.setId(null);
+    tagService.addTagsToMaterial(material, createDto.getTagIds());
     Material savedMaterial = materialRepository.save(material);
 
     try {
@@ -91,6 +95,7 @@ public class MaterialService {
       material.setMaterialGroup(materialGroup);
     }
     modelMapper.map(updateDto, material);
+    tagService.addTagsToMaterial(material, updateDto.getTagIds());
     return materialRepository.save(material);
   }
 

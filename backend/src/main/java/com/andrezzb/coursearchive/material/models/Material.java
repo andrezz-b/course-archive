@@ -53,8 +53,8 @@ public class Material implements AclSecured {
   private List<MaterialFile> files = new ArrayList<>();
 
   @ManyToMany
-  @JoinTable(name = "material_tag", joinColumns = @JoinColumn(name = "material_id"),
-    inverseJoinColumns = @JoinColumn(name = "tag_id"))
+  @JoinTable(name = "material_tag", joinColumns = @JoinColumn(name = "material_id", referencedColumnName = "id"),
+    inverseJoinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "id"))
   private Set<Tag> tags = new HashSet<>();
 
   @OneToMany(mappedBy = "material", cascade = CascadeType.ALL, orphanRemoval = true)
