@@ -10,10 +10,11 @@ import { DataTable } from "../../components/ui/data-table";
 import { useMemo, useState } from "react";
 import { keepPreviousData } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Pencil } from "lucide-react";
+import { Pencil, Trash } from "lucide-react";
 import { ProgramService } from "@/api/program.service";
 import GenericForm from "@/components/GenericForm";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 type OnSubmit = (
   data: ProgramCreateData | ProgramEditData,
@@ -32,6 +33,16 @@ const AdminProgramListingPage = () => {
   );
   const { mutate: createProgram } = ProgramService.useCreate();
   const { mutate: updateProgram } = ProgramService.useUpdateById();
+  const { mutate: deleteProgram } = ProgramService.useDeleteById();
+
+  const handleDelete = (id: number) =>
+    deleteProgram(
+      { id },
+      {
+        onSuccess: () => toast.success("College deleted successfully"),
+        onError: (error) => toast.error(error.getErrorMessage()),
+      },
+    );
 
   const handleEdit = (program: Program) => {
     setSelectedRow(program);
@@ -97,10 +108,24 @@ const AdminProgramListingPage = () => {
         header: "Actions",
         cell: ({ row }) => {
           return (
-            <Button variant="ghost" className="p-1 h-auto" onClick={() => handleEdit(row.original)}>
-              <span className="sr-only">edit program</span>
-              <Pencil className="h-4 w-4" />
-            </Button>
+            <>
+              <Button
+                variant="ghost"
+                className="p-1 h-auto"
+                onClick={() => handleEdit(row.original)}
+              >
+                <span className="sr-only">edit program</span>
+                <Pencil className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                className="p-1 h-auto"
+                onClick={() => handleDelete(row.original.id)}
+              >
+                <span className="sr-only">delete program</span>
+                <Trash className="w-4 h-4 text-destructive" />
+              </Button>
+            </>
           );
         },
       },

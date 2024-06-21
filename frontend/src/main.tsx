@@ -43,6 +43,14 @@ const router = createBrowserRouter([
             errorElement: <ErrorPage />,
           },
           {
+            path: "/program/:programId",
+            async lazy() {
+              const component = await import("./pages/program/ProgramPage.tsx");
+              return { Component: component.default };
+            },
+            errorElement: <ErrorPage />,
+          },
+          {
             path: "/course",
             async lazy() {
               const component = await import("./pages/course/CourseListingPage.tsx");

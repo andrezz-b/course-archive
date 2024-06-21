@@ -59,8 +59,8 @@ const MaterialItem = ({ material, showCommentsLink = true }: MaterialItemProps) 
           onClick={openFile}
           className="pl-0 justify-start h-auto flex items-center gap-4"
         >
-          <File className="w-6 h-6" />
-          <h4>{material.name}</h4>
+          <File className="min-w-6 min-h-6" />
+          <h4 className="text-wrap">{material.name}</h4>
         </Button>
         {showCommentsLink && (
           <Link to={`./material/${material.id}`} className="">

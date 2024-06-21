@@ -11,9 +11,10 @@ import { CollegeService } from "@/api/college.service";
 import { useMemo, useState } from "react";
 import { keepPreviousData } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Pencil } from "lucide-react";
+import { Pencil, Trash } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import GenericForm from "@/components/GenericForm";
+import { toast } from "sonner";
 
 type OnSubmit = (
   data: CollegeCreateData | CollegeEditData,
@@ -24,6 +25,7 @@ const AdminCollegesListingPage = () => {
   const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 10 });
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState<College | undefined>(undefined);
+  const { mutate: deleteCollege } = CollegeService.useDeleteById();
   const { mutate: editCollege } = CollegeService.useUpdateById();
   const { mutate: createCollege } = CollegeService.useCreate();
   const query = CollegeService.useGetAll(
@@ -32,6 +34,15 @@ const AdminCollegesListingPage = () => {
       placeholderData: keepPreviousData,
     },
   );
+
+  const handleDelete = (id: number) =>
+    deleteCollege(
+      { id },
+      {
+        onSuccess: () => toast.success("College deleted successfully"),
+        onError: (error) => toast.error(error.getErrorMessage()),
+      },
+    );
 
   const handleEdit = (college: College) => {
     setSelectedRow(college);
@@ -77,10 +88,24 @@ const AdminCollegesListingPage = () => {
         header: "Actions",
         cell: ({ row }) => {
           return (
-            <Button variant="ghost" className="p-1 h-auto" onClick={() => handleEdit(row.original)}>
-              <span className="sr-only">edit college</span>
-              <Pencil className="h-4 w-4" />
-            </Button>
+            <>
+              <Button
+                variant="ghost"
+                className="p-1 h-auto"
+                onClick={() => handleEdit(row.original)}
+              >
+                <span className="sr-only">edit college</span>
+                <Pencil className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                className="p-1 h-auto"
+                onClick={() => handleDelete(row.original.id)}
+              >
+                <span className="sr-only">delete college</span>
+                <Trash className="w-4 h-4 text-destructive" />
+              </Button>
+            </>
           );
         },
       },

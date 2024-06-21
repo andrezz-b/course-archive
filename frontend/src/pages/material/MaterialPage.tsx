@@ -4,7 +4,7 @@ import MaterialItem from "@/components/material/MaterialItem.tsx";
 import { Skeleton } from "@/components/ui/skeleton.tsx";
 import { CommentService } from "@/api/comment.service.ts";
 import { CommentEditSchema, CommentSort, MaterialComment } from "@/types/MaterialComment.ts";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Separator } from "@/components/ui/separator.tsx";
 import { Check, Pencil, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button.tsx";
@@ -147,6 +147,11 @@ interface CommentItemForm {
 
 const CommentItem = ({ comment }: CommentItemProps) => {
   const { mutate: updateComment } = CommentService.useUpdateById();
+  const { mutate: mutateDeleteComment } = CommentService.useDeleteById();
+  const deleteComment = useCallback(
+    () => mutateDeleteComment({ id: comment.id }),
+    [comment.id, mutateDeleteComment],
+  );
   const form = useForm<CommentItemForm>({
     defaultValues: {
       text: comment.text,
@@ -206,7 +211,7 @@ const CommentItem = ({ comment }: CommentItemProps) => {
                 <Pencil className="w-4 h-4" />
               </Button>
             )}
-            <Button variant="ghost" className="p-1 h-auto" type="button">
+            <Button variant="ghost" className="p-1 h-auto" type="button" onClick={deleteComment}>
               <Trash className="w-4 h-4 text-destructive" />
             </Button>
           </div>
