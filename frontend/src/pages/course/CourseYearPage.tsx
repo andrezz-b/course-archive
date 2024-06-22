@@ -27,6 +27,7 @@ import { TagService } from "@/api/tag.service.ts";
 import { MultiSelect } from "@/components/ui/multi-select.tsx";
 import { Separator } from "@/components/ui/separator.tsx";
 import { debounce } from "lodash-es";
+import { CourseYearService } from "@/api/course-year.service.ts";
 
 const CourseYearPage = () => {
   const [materialFormOpen, setMaterialFormOpen] = useState(false);
@@ -113,6 +114,7 @@ const CourseYearPage = () => {
 
   return (
     <Card className="w-full md:px-10 border-none space-y-4 relative">
+      <GeneralInfo courseYearId={courseYearId} />
       <div className="flex justify-between flex-col md:flex-row md:items-center">
         <div className="flex flex-col md:flex-row md:h-10 gap-1">
           <Input
@@ -184,13 +186,55 @@ const MaterialGroupCard = ({ group }: MaterialGroupCardProps) => {
       <AccordionContent>
         {group.description && <CardDescription>{group.description}</CardDescription>}
         <div>
-          {!group.materials?.length && <span>No materials found</span>}
+          {!group.materials?.length && <div className="pt-2 text-lg">No materials found</div>}
           {group.materials?.map((material) => (
             <MaterialItem key={material.id} material={material} />
           ))}
         </div>
       </AccordionContent>
     </AccordionItem>
+  );
+};
+
+interface GeneralInfoProps {
+  courseYearId?: string;
+}
+
+const GeneralInfo = ({ courseYearId }: GeneralInfoProps) => {
+  const { data: courseYear } = CourseYearService.useGetById(
+    courseYearId ? parseInt(courseYearId) : undefined,
+  );
+  return (
+    <Accordion type="single" collapsible>
+      <AccordionItem value="general-info">
+        <AccordionTrigger>
+          <h3 className="text-lg">General Information</h3>
+        </AccordionTrigger>
+        <AccordionContent>
+          {courseYear && (
+            <div className="flex flex-col gap-1">
+              <InfoItem title="Professor" value={courseYear.professor} />
+              <InfoItem title="Assistant" value={courseYear.assistant} />
+              <InfoItem title="Enrolled" value={courseYear.enrollmentCount} />
+              <InfoItem title="Passed" value={courseYear.passedCount} />
+              <InfoItem title="Lectures" value={courseYear.lectureCount} />
+              <InfoItem title="Labs" value={courseYear.laboratoryCount} />
+              <InfoItem title="Excresises" value={courseYear.exerciseCount} />
+            </div>
+          )}
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
+  );
+};
+
+const InfoItem = ({ title, value }: { title: string; value?: number | string | null }) => {
+  if (value === undefined || value === null) return null;
+  if (typeof value === "string" && value.trim() === "") return null;
+  return (
+    <div>
+      {title}: <strong>{value}</strong>
+    </div>
   );
 };
 
