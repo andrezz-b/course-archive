@@ -1,100 +1,74 @@
-import { Material, MaterialEditData } from "@/types/Material.ts";
+import { Material } from "@/types/Material.ts";
 import { MaterialService } from "@/api/material.service.ts";
-import { MouseEventHandler, useCallback, useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button.tsx";
-import { Check, File, Pencil, Trash } from "lucide-react";
-import { Input } from "@/components/ui/input.tsx";
+import { File, Pencil, Trash } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "@/components/ui/dialog.tsx";
+import MaterialCreateForm from "@/components/material/MaterialCreateForm.tsx";
 
 interface AdminMaterialItemProps {
-	material: Material;
-	materialGroupId: number;
+  material: Material;
+  materialGroupId: number;
 }
 
 const AdminMaterialItem = ({ material, materialGroupId }: AdminMaterialItemProps) => {
-	const { mutate: updateMaterial } = MaterialService.useUpdateById();
-	const { mutate: getFile } = MaterialService.useGetFile();
-	const { mutate: deleteMaterial } = MaterialService.useDeleteById();
+  const { mutate: getFile } = MaterialService.useGetFile();
+  const { mutate: deleteMaterial } = MaterialService.useDeleteById();
+  const [dialogOpen, setDialogOpen] = useState(false);
 
-	const [isEditing, setIsEditing] = useState(false);
+  const openFile = () => {
+    const newWindow = window.open();
+    getFile(material.id, {
+      onSuccess: (data) => {
+        const url = window.URL.createObjectURL(data);
+        if (newWindow) newWindow.location.href = url;
+      },
+    });
+  };
 
-	const form = useForm<MaterialEditData>({
-		defaultValues: {
-			name: material.name,
-			description: material.description ?? "",
-			materialGroupId,
-		},
-	});
+  const handleDelete = useCallback(
+    () =>
+      deleteMaterial(
+        { id: material.id },
+        {
+          onSuccess: () => toast.success("Material deleted successfully"),
+          onError: (error) => toast.error(error.getErrorMessage()),
+        },
+      ),
+    [material.id, deleteMaterial],
+  );
 
-	const handleEditSubmit: SubmitHandler<MaterialEditData> = (data) => {
-		setIsEditing(false);
-		if (data.name !== material.name) {
-			updateMaterial(
-				{ id: material.id, ...data },
-				{
-					onSuccess: () => toast.success("Material updated successfully"),
-				},
-			);
-		}
-	};
+  return (
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <div className="flex items-center gap-2 px-4 py-2">
+        <Button variant="ghost" onClick={openFile} className="p-2 h-auto">
+          <File className="w-6 h-6" />
+        </Button>
 
-	const enableEditing: MouseEventHandler = (e) => {
-		e.preventDefault();
-		setIsEditing(true);
-		setTimeout(() => form.setFocus("name"), 0);
-	};
+        <div className="flex gap-4">
+          <h5>{material.name}</h5>
+          <DialogTrigger asChild>
+            <Button variant="ghost" className="p-1 h-auto" type="button">
+              <Pencil className="w-5 h-5" />
+            </Button>
+          </DialogTrigger>
 
-	const openFile = () => {
-		const newWindow = window.open();
-		getFile(material.id, {
-			onSuccess: (data) => {
-				const url = window.URL.createObjectURL(data);
-				if (newWindow) newWindow.location.href = url;
-			},
-		});
-	};
-
-	const handleDelete = useCallback(
-		() =>
-			deleteMaterial(
-				{ id: material.id },
-				{
-					onError: (error) => toast.error(error.getErrorMessage()),
-				},
-			),
-		[material.id, deleteMaterial],
-	);
-
-	return (
-		<div className="flex items-center gap-2 px-4 py-2">
-			<Button variant="ghost" onClick={openFile} className="p-2 h-auto">
-				<File className="w-6 h-6" />
-			</Button>
-
-			<form onSubmit={form.handleSubmit(handleEditSubmit)} className="flex gap-4">
-				{isEditing ? (
-					<>
-						<Input className="p-0 text-lg" {...form.register("name")} />
-						<Button variant="ghost" className="p-1 h-auto" type="submit">
-							<Check className="w-5 h-5" />
-						</Button>
-					</>
-				) : (
-					<>
-						<h5 onClick={enableEditing}>{material.name}</h5>
-						<Button variant="ghost" className="p-1 h-auto" type="button" onClick={enableEditing}>
-							<Pencil className="w-5 h-5" />
-						</Button>
-					</>
-				)}
-
-				<Button variant="ghost" className="p-1 h-auto" onClick={handleDelete}>
-					<Trash className="w-5 h-5 text-destructive" />
-				</Button>
-			</form>
-		</div>
-	);
+          <Button variant="ghost" className="p-1 h-auto" onClick={handleDelete}>
+            <Trash className="w-5 h-5 text-destructive" />
+          </Button>
+          <DialogContent>
+            <DialogHeader>Edit - {material.name}</DialogHeader>
+            <MaterialCreateForm
+              closeDialog={() => setDialogOpen(false)}
+              material={material}
+              materialGroupId={materialGroupId}
+            />
+          </DialogContent>
+        </div>
+      </div>
+    </Dialog>
+  );
 };
 
 export default AdminMaterialItem;

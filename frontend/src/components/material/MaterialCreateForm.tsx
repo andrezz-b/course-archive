@@ -5,7 +5,12 @@ import { Button } from "../ui/button";
 import { LoaderCircle } from "lucide-react";
 import { VALID_FILE_TYPES } from "@/types/Common.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { MaterialCreateData, MaterialCreateSchema } from "@/types/Material.ts";
+import {
+  Material,
+  MaterialCreateData,
+  MaterialCreateSchema,
+  MaterialEditSchema,
+} from "@/types/Material.ts";
 import { MaterialService } from "@/api/material.service.ts";
 import { useParams } from "react-router-dom";
 import { TagService } from "@/api/tag.service.ts";
@@ -17,9 +22,16 @@ import { MaterialGroupService } from "@/api/material-group.service.ts";
 interface MaterialCreateFormProps {
   materialGroupId?: number;
   closeDialog: () => void;
+  material?: Material;
 }
 
-const MaterialCreateForm = ({ materialGroupId, closeDialog }: MaterialCreateFormProps) => {
+const MaterialCreateForm = ({
+  materialGroupId,
+  closeDialog,
+  material,
+}: MaterialCreateFormProps) => {
+  const isEdit = useMemo(() => !!material, [material]);
+  const { mutate: updateMaterial } = MaterialService.useUpdateById();
   const { courseYearId } = useParams<{ courseYearId: string }>();
   const tagsQuery = TagService.useGetAll({
     courseYearId,
@@ -27,6 +39,7 @@ const MaterialCreateForm = ({ materialGroupId, closeDialog }: MaterialCreateForm
 
   const groupsQuery = MaterialGroupService.useGetAll({
     courseYearId,
+    size: 999,
   });
 
   const groupsOptions = useMemo(() => {
@@ -51,29 +64,48 @@ const MaterialCreateForm = ({ materialGroupId, closeDialog }: MaterialCreateForm
   const form = useForm<MaterialCreateData>({
     defaultValues: {
       materialGroupId: materialGroupId ?? undefined,
-      name: "",
-      description: "",
-      tagIds: [],
+      name: material?.name ?? "",
+      description: material?.description ?? "",
+      tagIds: material?.tags.map((v) => v.id) ?? [],
     },
-    resolver: zodResolver(MaterialCreateSchema),
+    resolver: zodResolver(isEdit ? MaterialEditSchema : MaterialCreateSchema),
     mode: "onTouched",
   });
 
   const onSubmit: SubmitHandler<MaterialCreateData> = (data) =>
     new Promise<void>((resolve) => {
-      createMaterial(data, {
-        onSuccess: () => {
-          closeDialog();
-          resolve();
-        },
-        onError: (error) => {
-          form.setError("root.serverError", {
-            type: error.getStatusCode().toString(),
-            message: error.getErrorMessage(),
-          });
-          resolve();
-        },
-      });
+      if (isEdit) {
+        updateMaterial(
+          { ...data, id: material!.id },
+          {
+            onSuccess: () => {
+              closeDialog();
+              resolve();
+            },
+            onError: (error) => {
+              form.setError("root.serverError", {
+                type: error.getStatusCode().toString(),
+                message: error.getErrorMessage(),
+              });
+              resolve();
+            },
+          },
+        );
+      } else {
+        createMaterial(data, {
+          onSuccess: () => {
+            closeDialog();
+            resolve();
+          },
+          onError: (error) => {
+            form.setError("root.serverError", {
+              type: error.getStatusCode().toString(),
+              message: error.getErrorMessage(),
+            });
+            resolve();
+          },
+        });
+      }
     });
   return (
     <Form {...form}>
@@ -95,25 +127,27 @@ const MaterialCreateForm = ({ materialGroupId, closeDialog }: MaterialCreateForm
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="file"
-          render={({ field: { value, onChange, ...fieldProps } }) => (
-            <FormItem>
-              <FormLabel>File:</FormLabel>
-              <FormControl>
-                <Input
-                  {...fieldProps}
-                  accept={`${VALID_FILE_TYPES.join(",")},.md`}
-                  placeholder="Choose file"
-                  type="file"
-                  onChange={(event) => onChange(event.target.files)}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {!isEdit && (
+          <FormField
+            control={form.control}
+            name="file"
+            render={({ field: { value, onChange, ...fieldProps } }) => (
+              <FormItem>
+                <FormLabel>File:</FormLabel>
+                <FormControl>
+                  <Input
+                    {...fieldProps}
+                    accept={`${VALID_FILE_TYPES.join(",")},.md`}
+                    placeholder="Choose file"
+                    type="file"
+                    onChange={(event) => onChange(event.target.files)}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
         <FormField
           control={form.control}
           name="materialGroupId"

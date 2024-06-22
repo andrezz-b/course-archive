@@ -34,7 +34,7 @@ public class MaterialService {
   private final TagService tagService;
 
   public MaterialService(MaterialRepository materialRepository, AclUtilService aclUtilService,
-      ModelMapper modelMapper, MaterialGroupService materialGroupService, FileService fileService,
+    ModelMapper modelMapper, MaterialGroupService materialGroupService, FileService fileService,
     TagService tagService) {
     this.materialRepository = materialRepository;
     this.aclUtilService = aclUtilService;
@@ -42,22 +42,22 @@ public class MaterialService {
     this.materialGroupService = materialGroupService;
     this.fileService = fileService;
     this.tagService = tagService;
-
-//    TypeMap<Material, MaterialDto> typeMap = this.modelMapper.createTypeMap(Material.class, MaterialDto.class);
   }
 
-  @PreAuthorize("hasPermission(#courseYearId, 'com.andrezzb.coursearchive.course.models.CourseYear', 'read') || hasRole('MANAGER')")
-  public Page<MaterialDto> findAllMaterialsPaged(Pageable p, List<String> filterField, List<Object> filterValue,
-      Long courseYearId, Long materialGroupId) {
-    var materials = materialRepository.findAllByFilterFieldAndValue(p, filterField, filterValue,
-        materialGroupId, courseYearId);
+  @PreAuthorize(
+    "hasPermission(#courseYearId, 'com.andrezzb.coursearchive.course.models.CourseYear', 'read') || hasRole('MANAGER')")
+  public Page<MaterialDto> findAllMaterialsPaged(Pageable p, List<String> filterField,
+    List<Object> filterValue, Long courseYearId, Long materialGroupId) {
+    var materials =
+      materialRepository.findAllByFilterFieldAndValue(p, filterField, filterValue, materialGroupId,
+        courseYearId);
     return materials.map(material -> modelMapper.map(material, MaterialDto.class));
   }
 
-  @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.material.models.Material', 'read') || hasRole('MANAGER')")
+  @PreAuthorize(
+    "hasPermission(#id, 'com.andrezzb.coursearchive.material.models.Material', 'read') || hasRole('MANAGER')")
   public Material findMaterialById(Long id) {
-    return materialRepository.findById(id)
-        .orElseThrow(() -> new MaterialNotFoundException(id));
+    return materialRepository.findById(id).orElseThrow(() -> new MaterialNotFoundException(id));
   }
 
   public MaterialDto convertMaterialToDto(Material material) {
@@ -65,7 +65,8 @@ public class MaterialService {
   }
 
   @Transactional
-  @PreAuthorize("hasPermission(#createDto.materialGroupId, 'com.andrezzb.coursearchive.material.models.MaterialGroup', 'create') || hasRole('MANAGER')")
+  @PreAuthorize(
+    "hasPermission(#createDto.materialGroupId, 'com.andrezzb.coursearchive.material.models.MaterialGroup', 'create') || hasRole('MANAGER')")
   public Material createMaterial(MaterialCreateDto createDto, MultipartFile file) {
     var materialGroup = materialGroupService.findMaterialGroup(createDto.getMaterialGroupId());
     Material material = modelMapper.map(createDto, Material.class);
@@ -87,21 +88,23 @@ public class MaterialService {
   }
 
   @Transactional
-  @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.material.models.Material', 'write') || hasRole('MANAGER')")
+  @PreAuthorize(
+    "hasPermission(#id, 'com.andrezzb.coursearchive.material.models.Material', 'write') || hasRole('MANAGER')")
   public Material updateMaterial(Long id, MaterialUpdateDto updateDto) {
     Material material = findMaterialById(id);
     if (updateDto.getMaterialGroupId() != null) {
-      var materialGroup =
-          materialGroupService.findMaterialGroup(updateDto.getMaterialGroupId());
+      var materialGroup = materialGroupService.findMaterialGroup(updateDto.getMaterialGroupId());
       material.setMaterialGroup(materialGroup);
     }
     modelMapper.map(updateDto, material);
+    material.setId(id);
     tagService.addTagsToMaterial(material, updateDto.getTagIds());
     return materialRepository.save(material);
   }
 
   @Transactional
-  @PreAuthorize("hasPermission(#id, 'com.andrezzb.coursearchive.material.models.Material', 'delete') || hasRole('MANAGER')")
+  @PreAuthorize(
+    "hasPermission(#id, 'com.andrezzb.coursearchive.material.models.Material', 'delete') || hasRole('MANAGER')")
   public void deleteMaterialById(Long id) {
     Material material;
     try {
