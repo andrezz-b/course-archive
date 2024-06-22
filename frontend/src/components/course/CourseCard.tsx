@@ -19,7 +19,7 @@ const CourseCard = ({ item: course }: InfiniteCardProps<Course>) => {
     <Card className="min-w-[300px] max-w-[400px] md:w-[325px] md:h-[365px] flex flex-col max-h-[400px]">
       <CardHeader className="flex flex-col justify-around h-[120px]">
         <CardTitle>{course.name}</CardTitle>
-        <CardDescription>{course.acronym}</CardDescription>
+        <CardDescription className="font-bold">{course.acronym}</CardDescription>
       </CardHeader>
       <CardContent className="flex-grow">
         <p>{course.credits} ECTS</p>

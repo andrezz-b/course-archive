@@ -11,6 +11,7 @@ const CoursePage = () => {
 
   const yearsQuery = CourseYearService.useGetAll({
     courseId,
+    size: 999,
   });
 
   if (courseQuery.isLoading) {

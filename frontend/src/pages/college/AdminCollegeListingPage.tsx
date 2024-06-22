@@ -5,8 +5,8 @@ import {
   CollegeEditData,
   CollegeEditSchema,
 } from "@/types/College";
-import { ColumnDef, PaginationState } from "@tanstack/react-table";
-import { DataTable } from "../../components/ui/data-table";
+import { ColumnDef } from "@tanstack/react-table";
+import { DataTable, DataTableColumnHeader } from "../../components/ui/data-table";
 import { CollegeService } from "@/api/college.service";
 import { useMemo, useState } from "react";
 import { keepPreviousData } from "@tanstack/react-query";
@@ -15,6 +15,7 @@ import { Pencil, Trash } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import GenericForm from "@/components/GenericForm";
 import { toast } from "sonner";
+import { useTableControls } from "@/hooks/useTableControls.ts";
 
 type OnSubmit = (
   data: CollegeCreateData | CollegeEditData,
@@ -22,18 +23,15 @@ type OnSubmit = (
 ) => Promise<{ type: string; message: string } | undefined>;
 
 const AdminCollegesListingPage = () => {
-  const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 10 });
+  const { requestParams, ...tableProps } = useTableControls();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState<College | undefined>(undefined);
   const { mutate: deleteCollege } = CollegeService.useDeleteById();
   const { mutate: editCollege } = CollegeService.useUpdateById();
   const { mutate: createCollege } = CollegeService.useCreate();
-  const query = CollegeService.useGetAll(
-    { page: pagination.pageIndex, size: pagination.pageSize },
-    {
-      placeholderData: keepPreviousData,
-    },
-  );
+  const query = CollegeService.useGetAll(requestParams, {
+    placeholderData: keepPreviousData,
+  });
 
   const handleDelete = (id: number) =>
     deleteCollege(
@@ -68,11 +66,11 @@ const AdminCollegesListingPage = () => {
         accessorKey: "id",
       },
       {
-        header: "Name",
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
         accessorKey: "name",
       },
       {
-        header: "Acronym",
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Acronym" />,
         accessorKey: "acronym",
       },
       {
@@ -142,9 +140,8 @@ const AdminCollegesListingPage = () => {
       <DataTable
         columns={columns}
         data={query.data?.content ?? defaultData}
-        setPagination={setPagination}
-        pagination={pagination}
         totalElements={query.data?.totalElements ?? -1}
+        {...tableProps}
       />
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>

@@ -7,7 +7,7 @@ import {
   CourseYearEditSchema,
 } from "@/types/CourseYear";
 import { keepPreviousData } from "@tanstack/react-query";
-import { ColumnDef, PaginationState } from "@tanstack/react-table";
+import { ColumnDef } from "@tanstack/react-table";
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Button } from "../ui/button";
@@ -15,6 +15,7 @@ import { ExternalLink, Pencil } from "lucide-react";
 import { DataTable } from "../ui/data-table";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import GenericForm from "../GenericForm";
+import { useTableControls } from "@/hooks/useTableControls.ts";
 
 type OnSubmit = (
   data: CourseYearCreateData | CourseYearEditData,
@@ -22,13 +23,13 @@ type OnSubmit = (
 ) => Promise<{ type: string; message: string } | undefined>;
 
 const AdminCourseYearListing = () => {
-  const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 10 });
+  const { requestParams, ...tableProps } = useTableControls();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState<CourseYear | undefined>(undefined);
   const { courseId } = useParams<{ courseId: string }>();
 
   const query = CourseYearService.useGetAll(
-    { courseId: courseId },
+    { courseId: courseId, ...requestParams },
     {
       placeholderData: keepPreviousData,
     },
@@ -56,7 +57,6 @@ const AdminCourseYearListing = () => {
 
   const handleSubmit: OnSubmit = async (data, id) =>
     new Promise((resolve) => {
-      console.log(data);
       if (CourseYearEditSchema.safeParse(data).success && id) {
         updateYear(
           { id, ...data },
@@ -129,9 +129,8 @@ const AdminCourseYearListing = () => {
       <DataTable
         columns={columns}
         data={query.data?.content ?? defaultData}
-        setPagination={setPagination}
-        pagination={pagination}
         totalElements={query.data?.totalElements ?? -1}
+        {...tableProps}
       />
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>

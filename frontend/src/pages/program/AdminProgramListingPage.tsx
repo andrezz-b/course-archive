@@ -5,8 +5,8 @@ import {
   ProgramEditData,
   ProgramEditSchema,
 } from "@/types/Program";
-import { ColumnDef, PaginationState } from "@tanstack/react-table";
-import { DataTable } from "../../components/ui/data-table";
+import { ColumnDef } from "@tanstack/react-table";
+import { DataTable, DataTableColumnHeader } from "../../components/ui/data-table";
 import { useMemo, useState } from "react";
 import { keepPreviousData } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ import { ProgramService } from "@/api/program.service";
 import GenericForm from "@/components/GenericForm";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { useTableControls } from "@/hooks/useTableControls.ts";
 
 type OnSubmit = (
   data: ProgramCreateData | ProgramEditData,
@@ -22,15 +23,12 @@ type OnSubmit = (
 ) => Promise<{ type: string; message: string } | undefined>;
 
 const AdminProgramListingPage = () => {
-  const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 10 });
+  const { requestParams, ...tableProps } = useTableControls();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState<Program | undefined>(undefined);
-  const query = ProgramService.useGetAll(
-    { page: pagination.pageIndex, size: pagination.pageSize },
-    {
-      placeholderData: keepPreviousData,
-    },
-  );
+  const query = ProgramService.useGetAll(requestParams, {
+    placeholderData: keepPreviousData,
+  });
   const { mutate: createProgram } = ProgramService.useCreate();
   const { mutate: updateProgram } = ProgramService.useUpdateById();
   const { mutate: deleteProgram } = ProgramService.useDeleteById();
@@ -39,7 +37,7 @@ const AdminProgramListingPage = () => {
     deleteProgram(
       { id },
       {
-        onSuccess: () => toast.success("College deleted successfully"),
+        onSuccess: () => toast.success("Program deleted successfully"),
         onError: (error) => toast.error(error.getErrorMessage()),
       },
     );
@@ -88,11 +86,11 @@ const AdminProgramListingPage = () => {
         accessorKey: "id",
       },
       {
-        header: "Name",
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
         accessorKey: "name",
       },
       {
-        header: "Duration",
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Duration" />,
         accessorKey: "duration",
       },
       {
@@ -100,8 +98,8 @@ const AdminProgramListingPage = () => {
         accessorKey: "degreeType",
       },
       {
-        header: "Degree Title",
-        accessorKey: "degreeTitle",
+        header: "Degree Abbreviation",
+        accessorKey: "degreeTitleAbbreviation",
       },
       {
         id: "actions",
@@ -142,9 +140,8 @@ const AdminProgramListingPage = () => {
       <DataTable
         columns={columns}
         data={query.data?.content ?? defaultData}
-        setPagination={setPagination}
-        pagination={pagination}
         totalElements={query.data?.totalElements ?? -1}
+        {...tableProps}
       />
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>

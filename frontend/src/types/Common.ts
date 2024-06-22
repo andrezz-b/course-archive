@@ -19,7 +19,8 @@ export interface FilterOption {
   label: string;
 }
 
-export const DISPLAY_LISTING_PAGE_SIZE = 6;
+export const DISPLAY_LISTING_PAGE_SIZE = 3;
+export const DISPLAY_TABLE_PAGE_SIZE = 10;
 
 export const VALID_FILE_TYPES = ["image/jpeg", "image/png", "application/pdf", "text/markdown", "text/plain"];
 

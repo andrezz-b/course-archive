@@ -223,13 +223,13 @@ export function DataTableColumnHeader<TData, TValue>({
     [debouncedSetFilterValue],
   );
   return (
-    <div className={cn("flex items-center gap-2", className)}>
+    <div className={cn("flex items-center gap-2 justify-start", className)}>
       {column.getCanFilter() ? (
         <Input
           value={inputValue ?? ""}
           onChange={onChangeHandler}
           placeholder={title}
-          className="border-b-2 border-x-0 border-t-0 h-auto rounded-none py-1 pl-2 max-w-[160px]"
+          className="border-b-2 border-x-0 border-t-0 h-auto rounded-none py-1 pl-2 max-w-[130px]"
         />
       ) : (
         <span className="max-w-[160px]">{title}</span>

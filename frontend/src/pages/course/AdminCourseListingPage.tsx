@@ -1,5 +1,5 @@
-import { ColumnDef, PaginationState } from "@tanstack/react-table";
-import { DataTable } from "../../components/ui/data-table";
+import { ColumnDef } from "@tanstack/react-table";
+import { DataTable, DataTableColumnHeader } from "../../components/ui/data-table";
 import { useMemo, useState } from "react";
 import { keepPreviousData } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,9 @@ import {
 } from "@/types/Course";
 import { CourseService } from "@/api/course.service";
 import { Link } from "react-router-dom";
-import { ExternalLink, Pencil } from "lucide-react";
+import { ExternalLink, Pencil, Trash } from "lucide-react";
+import { toast } from "sonner";
+import { useTableControls } from "@/hooks/useTableControls.ts";
 
 type OnSubmit = (
   data: CourseCreateData | CourseEditData,
@@ -22,17 +24,24 @@ type OnSubmit = (
 ) => Promise<{ type: string; message: string } | undefined>;
 
 const AdminCourseListingPage = () => {
-  const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 10 });
+  const { requestParams, ...tableProps } = useTableControls();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState<Course | undefined>(undefined);
-  const query = CourseService.useGetAll(
-    { page: pagination.pageIndex, size: pagination.pageSize },
-    {
-      placeholderData: keepPreviousData,
-    },
-  );
+  const query = CourseService.useGetAll(requestParams, {
+    placeholderData: keepPreviousData,
+  });
   const { mutate: createCourse } = CourseService.useCreate();
   const { mutate: updateCourse } = CourseService.useUpdateById();
+  const { mutate: deleteCourse } = CourseService.useDeleteById();
+
+  const handleDelete = (id: number) =>
+    deleteCourse(
+      { id },
+      {
+        onSuccess: () => toast.success("Course deleted successfully"),
+        onError: (error) => toast.error(error.getErrorMessage()),
+      },
+    );
 
   const handleEdit = (course: Course) => {
     setSelectedRow(course);
@@ -78,11 +87,11 @@ const AdminCourseListingPage = () => {
         accessorKey: "id",
       },
       {
-        header: "Name",
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
         accessorKey: "name",
       },
       {
-        header: "Acronym",
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Acronym" />,
         accessorKey: "acronym",
       },
       {
@@ -99,6 +108,12 @@ const AdminCourseListingPage = () => {
         cell: ({ row }) => {
           return (
             <div className="flex items-center">
+              <Link to={`./${row.original.id}`} className="p-1 block cursor-pointer">
+                <Button variant="ghost" className="p-1 h-auto">
+                  <span className="sr-only">open course</span>
+                  <ExternalLink className="h-4 w-4" />
+                </Button>
+              </Link>
               <Button
                 variant="ghost"
                 className="p-1 h-auto"
@@ -107,12 +122,14 @@ const AdminCourseListingPage = () => {
                 <span className="sr-only">edit course</span>
                 <Pencil className="h-4 w-4" />
               </Button>
-              <Link to={`./${row.original.id}`} className="p-1 block cursor-pointer">
-                <Button variant="ghost" className="p-1 h-auto">
-                  <span className="sr-only">open course</span>
-                  <ExternalLink className="h-4 w-4" />
-                </Button>
-              </Link>
+              <Button
+                variant="ghost"
+                className="p-1 h-auto"
+                onClick={() => handleDelete(row.original.id)}
+              >
+                <span className="sr-only">delete course</span>
+                <Trash className="h-4 w-4 text-destructive" />
+              </Button>
             </div>
           );
         },
@@ -130,9 +147,8 @@ const AdminCourseListingPage = () => {
       <DataTable
         columns={columns}
         data={query.data?.content ?? defaultData}
-        setPagination={setPagination}
-        pagination={pagination}
         totalElements={query.data?.totalElements ?? -1}
+        {...tableProps}
       />
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>

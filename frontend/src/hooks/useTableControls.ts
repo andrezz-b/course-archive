@@ -1,9 +1,9 @@
 import { useState, useMemo } from "react";
 import { PaginationState, SortingState, ColumnFiltersState } from "@tanstack/react-table";
-import { SortDirection } from "@/types/Common.ts";
+import {DISPLAY_TABLE_PAGE_SIZE, SortDirection} from "@/types/Common.ts";
 
 export function useTableControls() {
-  const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 10 });
+  const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: DISPLAY_TABLE_PAGE_SIZE });
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
