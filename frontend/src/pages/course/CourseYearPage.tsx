@@ -10,7 +10,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion.tsx";
 import useLocalStorage from "@/hooks/useLocalStorage.ts";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Loading from "@/components/Loading.tsx";
 import MaterialItem from "@/components/material/MaterialItem.tsx";
 import {
@@ -112,6 +112,15 @@ const CourseYearPage = () => {
     },
   );
 
+  const [isSearching, setIsSearching] = useState(false);
+  useEffect(() => {
+    if (searchParams.getAll("tagIds")?.length || searchParams.get("materialName")) {
+      setIsSearching(true);
+    } else {
+      setIsSearching(false);
+    }
+  }, [searchParams]);
+
   return (
     <Card className="w-full md:px-10 border-none space-y-4 relative">
       <GeneralInfo courseYearId={courseYearId} />
@@ -161,9 +170,12 @@ const CourseYearPage = () => {
           ) : !groupQuery.data?.content.length ? (
             <span>No materials available yet</span>
           ) : null}
-          {groupQuery.data?.content.map((group) => (
-            <MaterialGroupCard key={group.id} group={group} />
-          ))}
+          {groupQuery.data?.content.map((group) => {
+            if (isSearching && !group.materials.length) {
+              return null;
+            }
+            return <MaterialGroupCard key={group.id} group={group} />;
+          })}
         </Accordion>
       </CardContent>
     </Card>
