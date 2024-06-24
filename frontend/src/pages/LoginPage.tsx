@@ -49,7 +49,7 @@ const LoginPage = () => {
           password: values.password,
         },
         {
-          onSuccess: () => navigate(previousLocation),
+          onSuccess: () => navigate(previousLocation, { replace: true }),
           onError: (error) =>
             form.setError("root.serverError", {
               type: error.getStatusCode().toString(),

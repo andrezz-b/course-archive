@@ -1,5 +1,6 @@
 package com.andrezzb.coursearchive.security.services;
 
+import com.andrezzb.coursearchive.course.services.CourseService;
 import com.andrezzb.coursearchive.security.dto.UserDto;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -21,12 +22,14 @@ public class UserService {
   private final UserRepository userRepository;
   private final RoleRepository roleRepository;
   private final ModelMapper modelMapper;
+  private final CourseService courseService;
 
   public UserService(UserRepository userRepository, RoleRepository roleRepository,
-    ModelMapper modelMapper) {
+    ModelMapper modelMapper, CourseService courseService) {
     this.userRepository = userRepository;
     this.roleRepository = roleRepository;
     this.modelMapper = modelMapper;
+    this.courseService = courseService;
   }
 
   public boolean existsByUsername(String username) {
@@ -61,4 +64,25 @@ public class UserService {
     var users = userRepository.findAllByFilterFieldAndFilterValue(p, filterFields, filterValueObjs);
     return users.map(user -> modelMapper.map(user, UserDto.class));
   }
+
+  public UserEntity addFavoriteCourse(Long courseId, String name) {
+    var user = findByUsername(name);
+    var course = courseService.findCourseById(courseId);
+    boolean updated = user.getFavoriteCourses().add(course);
+    if (!updated) {
+      return user;
+    }
+    return userRepository.save(user);
+  }
+
+  public UserEntity removeFavoriteCourse(Long courseId, String name) {
+    var user = findByUsername(name);
+    var course = courseService.findCourseById(courseId);
+    boolean updated = user.getFavoriteCourses().remove(course);
+    if (!updated) {
+      return user;
+    }
+    return userRepository.save(user);
+  }
+
 }

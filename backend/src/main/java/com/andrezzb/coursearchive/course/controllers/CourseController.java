@@ -1,5 +1,6 @@
 package com.andrezzb.coursearchive.course.controllers;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -56,6 +57,26 @@ public class CourseController {
     Pageable p = createPageRequest(page, size, sortField, sortDirection);
     final var coursesPaged =
       courseService.findAllCoursesPaged(p, filterField, filterValueObj, programId);
+    return ResponseEntity.ok(coursesPaged);
+  }
+
+  @GetMapping("/favorites")
+  public ResponseEntity<Page<CourseDto>> getAllFavorites(
+    @PositiveOrZero @RequestParam(defaultValue = "0") int page,
+    @Positive @RequestParam(defaultValue = "5") int size,
+    @ValidEnum(enumClazz = Sort.Direction.class, ignoreCase = true)
+    @RequestParam(defaultValue = "asc") List<String> sortDirection,
+    @ValidEnum(enumClazz = Course.SortField.class) @RequestParam(defaultValue = "id")
+    List<String> sortField, @ValidEnum(enumClazz = Course.FilterField.class, required = false)
+  @RequestParam(required = false) List<String> filterField,
+    @RequestParam(required = false) List<String> filterValue,
+    Authentication authentication) {
+
+    var filterValueObj =
+      FilterValueMapper.mapFilterValue(Course.FilterField.class, filterField, filterValue);
+    Pageable p = createPageRequest(page, size, sortField, sortDirection);
+    final var coursesPaged =
+      courseService.findAllFavoritesPaged(p, filterField, filterValueObj, authentication.getName());
     return ResponseEntity.ok(coursesPaged);
   }
 

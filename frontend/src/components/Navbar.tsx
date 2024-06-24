@@ -101,7 +101,7 @@ const AuthNavbar = {
         to="/"
         className={({ isActive }) => (isActive ? "text-primary font-semibold" : undefined)}
       >
-        <SheetClose>Home</SheetClose>
+        <SheetClose>My Courses</SheetClose>
       </NavLink>
       <Separator />
       <NavLink
@@ -141,7 +141,7 @@ const AuthNavbar = {
         <li>
           <NavLink to="/" className={({ isActive }) => (isActive ? "text-primary" : undefined)}>
             <Button variant="ghost" className="font-semibold">
-              Home
+              My Courses
             </Button>
           </NavLink>
         </li>

@@ -40,7 +40,13 @@ public class CourseService {
     Page<Course> courses =
       courseRepository.findAllByFilterFieldAndValue(p, filterField, filterValue, programId);
     return courses.map(course -> modelMapper.map(course, CourseDto.class));
+  }
 
+  @PreAuthorize("hasRole('USER')")
+  public Page<CourseDto> findAllFavoritesPaged(Pageable p, List<String> filterField,
+    List<Object> filterValue, String username) {
+    Page<Course> courses = courseRepository.findAllByFilterFieldAndValue(p, filterField, filterValue, null, username);
+    return courses.map(course -> modelMapper.map(course, CourseDto.class));
   }
 
   @PreAuthorize("hasRole('USER')")

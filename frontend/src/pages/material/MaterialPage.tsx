@@ -46,7 +46,7 @@ const MaterialPage = () => {
       )}
       <div className="mt-4 space-y-4 md:max-w-[70%]">
         <CommentInput materialId={parseInt(materialId!, 10)} />
-        <div className="flex justify-between flex-col md:flex-row">
+        <div className="flex justify-between flex-col sm:flex-row sm:items-center">
           <h4 className="text-lg font-bold">Comments ({commentQuery.data?.totalElements})</h4>
           <Select onValueChange={setSortValue} defaultValue={sortValue}>
             <SelectTrigger className="max-w-[200px] overflow-hidden whitespace-nowrap">
@@ -186,9 +186,11 @@ const CommentItem = ({ comment }: CommentItemProps) => {
       onSubmit={form.handleSubmit(submitHandler)}
       className="flex flex-col space-x-2 p-4 border rounded-sm"
     >
-      <div className="flex justify-between flex-col md:flex-row">
+      <div className="flex justify-between flex-col sm:flex-row sm:items-center">
         <label className="flex items-center h-6">
-          <span className="md:text-lg font-bold">{comment.username} </span>
+          <span className="md:text-lg font-bold">
+            {comment.currentUser ? "Me" : comment.username}{" "}
+          </span>
           <Separator className="mx-2" orientation="vertical" />
           <span className="text-xs text-muted-foreground">{localTime}</span>
         </label>

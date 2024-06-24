@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.andrezzb.coursearchive.course.models.Course;
 import com.andrezzb.coursearchive.repository.FilterValueMapper;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -54,6 +55,14 @@ public class UserEntity {
     joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
     inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
   private Set<Role> roles = new HashSet<>();
+
+  @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+  @JoinTable(
+    name = "user_favorites",
+    joinColumns = @JoinColumn(name = "user_id"),
+    inverseJoinColumns = @JoinColumn(name = "course_id")
+  )
+  private Set<Course> favoriteCourses = new HashSet<>();
 
   public Collection<? extends GrantedAuthority> getAuthorities() {
     return this.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName()))

@@ -90,4 +90,16 @@ public class UserController {
     return ResponseEntity.ok(permissions);
   }
 
+  @PostMapping("/course/favorite/{courseId}")
+  public ResponseEntity<Void> addFavoriteCourse(@PathVariable Long courseId, Authentication authentication) {
+    userService.addFavoriteCourse(courseId, authentication.getName());
+    return ResponseEntity.noContent().build();
+  }
+
+  @DeleteMapping("/course/favorite/{courseId}")
+  public ResponseEntity<Void> removeFavoriteCourse(@PathVariable Long courseId, Authentication authentication) {
+    userService.removeFavoriteCourse(courseId, authentication.getName());
+    return ResponseEntity.noContent().build();
+  }
+
 }
