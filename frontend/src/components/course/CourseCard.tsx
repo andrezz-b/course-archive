@@ -28,7 +28,7 @@ const CourseCard = ({ item: course }: InfiniteCardProps<Course>) => {
         </p>
       </CardContent>
       <CardFooter className="flex justify-between flex-row-reverse">
-        <Link to={`./${course.id}`}>
+        <Link to={`/course/${course.id}`}>
           <Button className="place-self-end">More info</Button>
         </Link>
       </CardFooter>

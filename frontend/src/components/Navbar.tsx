@@ -27,10 +27,10 @@ const Navbar = () => {
   return (
     <nav className="flex justify-center bg-background items-center w-full border-b border-accent py-4 min-w-[350px] min-h-[80px] sticky top-0 z-10">
       <div className="flex justify-between items-center flex-grow px-4 md:p-0 md:max-w-[75vw]">
-        <div className="flex items-center gap-3">
+        <Link to="/" className="flex items-center gap-3">
           <Package />
           <h1 className="text-2xl font-bold">Course Archive</h1>
-        </div>
+        </Link>
         <div className="hidden md:flex items-center">
           <ul className="flex items-center gap-1 lg:gap-5 h-10">
             <Links logout={logout} />

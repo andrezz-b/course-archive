@@ -2,13 +2,32 @@ import { CourseService } from "@/api/course.service";
 import CourseCard from "@/components/course/CourseCard";
 import InfiniteCardList from "@/components/InfiniteCardList";
 import ListingSearchForm, { SearchData } from "@/components/ListingSearchForm";
-import { CourseFilter, CourseSort } from "@/types/Course";
-import { keepPreviousData } from "@tanstack/react-query";
+import { Course, CourseFilter, CourseSort } from "@/types/Course";
+import {
+  keepPreviousData,
+  UndefinedInitialDataOptions,
+  UseQueryResult,
+} from "@tanstack/react-query";
 import { useCallback, useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useSearchParams } from "react-router-dom";
+import { Page } from "@/types/Page";
+import { ApiError } from "@/api/config/ApiError.ts";
 
-const CourseListingPage = () => {
+interface CourseListingPageProps {
+  fetchFunction?: (
+    params?: Record<string, unknown>,
+    options?: Omit<UndefinedInitialDataOptions<Page<Course>, ApiError>, "queryKey" | "queryFn">,
+  ) => UseQueryResult<Page<Course>, ApiError>;
+  showProgramFilter?: boolean;
+  title?: string;
+}
+
+const CourseListingPage = ({
+  fetchFunction = CourseService.useGetAll,
+  showProgramFilter = true,
+  title = "Browse Courses",
+}: CourseListingPageProps) => {
   const [searchParams, setSearchParams] = useSearchParams({
     filterField: CourseFilter[0].field,
     filterValue: "",
@@ -16,7 +35,7 @@ const CourseListingPage = () => {
     sortDirection: CourseSort[0].direction,
     page: "0",
   });
-  const query = CourseService.useGetAll(Object.fromEntries(searchParams.entries()), {
+  const query = fetchFunction(Object.fromEntries(searchParams.entries()), {
     placeholderData: keepPreviousData,
   });
 
@@ -64,13 +83,13 @@ const CourseListingPage = () => {
   return (
     <div className="flex flex-col justify-center items-center">
       <div className="lg:w-[1000px] space-y-4 px-4 md:p-0">
-        <h2 className="text-2xl border-none">Browse Courses</h2>
+        <h2 className="text-2xl border-none">{title}</h2>
         <ListingSearchForm
           form={form}
           onSubmit={onSubmit}
           sortOptions={CourseSort}
           filterOptions={CourseFilter}
-          idFieldName="Program Id"
+          idFieldName={showProgramFilter ? "Program Id" : undefined}
         />
         <InfiniteCardList
           Card={CourseCard}

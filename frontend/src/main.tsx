@@ -16,6 +16,8 @@ import CollegeListingPage from "./pages/college/CollegeListingPage.tsx";
 import ProgramListingPage from "./pages/program/ProgramListingPage.tsx";
 import HomeLayout from "@/layouts/HomeLayout.tsx";
 import { ApiError } from "@/api/config/ApiError.ts";
+import CourseListingPage from "@/pages/course/CourseListingPage.tsx";
+import { CourseService } from "@/api/course.service.ts";
 
 const router = createBrowserRouter([
   {
@@ -24,6 +26,17 @@ const router = createBrowserRouter([
       {
         element: <HomeLayout />,
         children: [
+          {
+            index: true,
+            element: (
+              <CourseListingPage
+                fetchFunction={CourseService.useGetFavorites}
+                showProgramFilter={false}
+                title="My Courses"
+              />
+            ),
+            errorElement: <ErrorPage />,
+          },
           {
             path: "/college",
             element: <CollegeListingPage />,
@@ -94,11 +107,6 @@ const router = createBrowserRouter([
             ],
           },
         ],
-      },
-      {
-        index: true,
-        element: <div>Home</div>,
-        errorElement: <ErrorPage />,
       },
       {
         path: "/admin",
