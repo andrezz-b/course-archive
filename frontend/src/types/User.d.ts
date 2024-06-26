@@ -7,12 +7,7 @@ export interface User {
   firstName: string;
   lastName: string;
   email: string;
-  roles: Array<UserRole>;
-}
-
-interface UserRole {
-  id: number;
-  name: Role;
+  roles: Array<Role>;
 }
 
 export type ObjectPermission = Record<

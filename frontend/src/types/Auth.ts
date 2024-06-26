@@ -54,6 +54,13 @@ export enum Role {
   ADMIN = "ADMIN",
 }
 
+export interface ChangeRoleData {
+  userId: number;
+  username: string;
+  role: Role;
+  granting: boolean;
+}
+
 export interface ChangePermissionData {
   objectType: ObjectType;
   objectId: number;

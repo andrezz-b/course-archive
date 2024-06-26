@@ -46,6 +46,7 @@ public class UserService {
       .orElseThrow(() -> new UserNotFoundException("User not found with username: " + username));
   }
 
+  @PreAuthorize("hasRole('ADMIN')")
   public UserEntity findById(Long id) {
     return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id.toString()));
   }

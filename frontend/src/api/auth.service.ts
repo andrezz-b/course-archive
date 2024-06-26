@@ -1,6 +1,6 @@
 import type { User } from "@/types/User";
 import type {
-  ChangePermissionData,
+  ChangePermissionData, ChangeRoleData,
   LoginData,
   LoginResponse,
   RefreshResponse,
@@ -39,6 +39,14 @@ interface AuthService {
     Data extends undefined,
     Err extends ApiError,
     Args extends ChangePermissionData,
+  >(
+    mutationOptions?: Omit<UseMutationOptions<Data, Err, Args>, "mutationFn">,
+  ) => UseMutationResult<Data, Err, Args>;
+
+  useChangeRole: <
+    Data extends undefined,
+    Err extends ApiError,
+    Args extends ChangeRoleData,
   >(
     mutationOptions?: Omit<UseMutationOptions<Data, Err, Args>, "mutationFn">,
   ) => UseMutationResult<Data, Err, Args>;
@@ -146,6 +154,26 @@ const AuthService: AuthService = {
       ...mutationOptions,
     });
   },
+  useChangeRole: (mutationOptions) => {
+    const queryClient = useQueryClient();
+    const axios = useAxiosPrivate();
+    return useMutation({
+      mutationFn: async (data) => {
+        try {
+          const response = await axios.post("/auth/role", data);
+          return response.data;
+        } catch (e) {
+          throw new ApiError(e);
+        }
+      },
+      onSuccess: (_data, variables) => {
+        queryClient.invalidateQueries({
+          queryKey: ["user", variables.userId],
+        });
+      },
+      ...mutationOptions,
+    });
+  }
 };
 
 export default AuthService;

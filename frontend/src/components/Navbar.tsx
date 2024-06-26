@@ -4,7 +4,7 @@ import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
 import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "./ui/sheet";
 import { ChevronDown, LogOut, Menu, Package, Shield } from "lucide-react";
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import useAuth from "@/hooks/useAuth";
 import useLogout from "@/hooks/useLogout";
 import {
@@ -16,13 +16,14 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import useCurrentUser from "@/hooks/useCurrentUser.ts";
+import { showAdminButton } from "@/lib/utils.ts";
 
 const Navbar = () => {
   const { auth } = useAuth();
   const logout = useLogout();
 
-  const Links = auth ? AuthNavbar.links : NoAuthNavbar.links;
-  const SheetLinks = auth ? AuthNavbar.sheetLinks : NoAuthNavbar.sheetLinks;
+  const Links = auth ? AuthNavbar.Links : NoAuthNavbar.Links;
+  const SheetLinks = auth ? AuthNavbar.SheetLinks : NoAuthNavbar.SheetLinks;
 
   return (
     <nav className="flex justify-center bg-background items-center w-full border-b border-accent py-4 min-w-[350px] min-h-[80px] sticky top-0 z-10">
@@ -62,7 +63,7 @@ const Navbar = () => {
 };
 
 const NoAuthNavbar = {
-  sheetLinks: memo(() => (
+  SheetLinks: memo(() => (
     <>
       <NavLink
         to="/register"
@@ -78,7 +79,7 @@ const NoAuthNavbar = {
       </NavLink>
     </>
   )),
-  links: memo(() => (
+  Links: memo(() => (
     <>
       <li>
         <Link to="/login">
@@ -95,47 +96,54 @@ const NoAuthNavbar = {
 };
 
 const AuthNavbar = {
-  sheetLinks: memo(({ logout }: { logout: () => void }) => (
-    <>
-      <NavLink
-        to="/"
-        className={({ isActive }) => (isActive ? "text-primary font-semibold" : undefined)}
-      >
-        <SheetClose>My Courses</SheetClose>
-      </NavLink>
-      <Separator />
-      <NavLink
-        to="/college"
-        className={({ isActive }) => (isActive ? "text-primary font-semibold" : undefined)}
-      >
-        <SheetClose>Colleges</SheetClose>
-      </NavLink>
-      <NavLink
-        to="/program"
-        className={({ isActive }) => (isActive ? "text-primary font-semibold" : undefined)}
-      >
-        <SheetClose>Programs</SheetClose>
-      </NavLink>
-      <NavLink
-        to="/course"
-        className={({ isActive }) => (isActive ? "text-primary font-semibold" : undefined)}
-      >
-        <SheetClose>Courses</SheetClose>
-      </NavLink>
-      <Separator />
-      <NavLink
-        to="/admin"
-        className={({ isActive }) => (isActive ? "text-primary font-semibold" : undefined)}
-      >
-        <SheetClose>Admin</SheetClose>
-      </NavLink>
-      <span onClick={logout}>
-        <SheetClose>Logout</SheetClose>
-      </span>
-    </>
-  )),
-  links: memo(({ logout }: { logout: () => void }) => {
+  SheetLinks: ({ logout }: { logout: () => void }) => {
     const user = useCurrentUser();
+    const showAdmin = useMemo(() => showAdminButton(user), [user]);
+    return (
+      <>
+        <NavLink
+          to="/"
+          className={({ isActive }) => (isActive ? "text-primary font-semibold" : undefined)}
+        >
+          <SheetClose>My Courses</SheetClose>
+        </NavLink>
+        <Separator />
+        <NavLink
+          to="/college"
+          className={({ isActive }) => (isActive ? "text-primary font-semibold" : undefined)}
+        >
+          <SheetClose>Colleges</SheetClose>
+        </NavLink>
+        <NavLink
+          to="/program"
+          className={({ isActive }) => (isActive ? "text-primary font-semibold" : undefined)}
+        >
+          <SheetClose>Programs</SheetClose>
+        </NavLink>
+        <NavLink
+          to="/course"
+          className={({ isActive }) => (isActive ? "text-primary font-semibold" : undefined)}
+        >
+          <SheetClose>Courses</SheetClose>
+        </NavLink>
+        <Separator />
+        {showAdmin && (
+          <NavLink
+            to="/admin/college"
+            className={({ isActive }) => (isActive ? "text-primary font-semibold" : undefined)}
+          >
+            <SheetClose>Admin</SheetClose>
+          </NavLink>
+        )}
+        <span onClick={logout}>
+          <SheetClose>Logout</SheetClose>
+        </span>
+      </>
+    );
+  },
+  Links: ({ logout }: { logout: () => void }) => {
+    const user = useCurrentUser();
+    const showAdmin = useMemo(() => showAdminButton(user), [user]);
     return (
       <>
         <li>
@@ -184,10 +192,12 @@ const AuthNavbar = {
               <DropdownMenuLabel>{user.username}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link to="/admin" className="cursor-pointer">
-                  <Shield className="w-4 h-4 mt-1 mr-2" />
-                  Admin
-                </Link>
+                {showAdmin && (
+                  <Link to="/admin/college" className="cursor-pointer">
+                    <Shield className="w-4 h-4 mt-1 mr-2" />
+                    Admin
+                  </Link>
+                )}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={logout} className="cursor-pointer">
                 <LogOut className="mr-2 h-4 w-4" />
@@ -200,7 +210,7 @@ const AuthNavbar = {
         </li>
       </>
     );
-  }),
+  },
 };
 
 export default Navbar;

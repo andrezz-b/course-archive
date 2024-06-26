@@ -60,6 +60,15 @@ const AdminUserLayout = () => {
           >
             Courses
           </NavLink>
+          <Separator orientation="vertical" />
+          <NavLink
+            to={`/admin/user/${userId}/role`}
+            className={({ isActive }) =>
+              cn("py-1 px-3 border-b-2 border-transparent", { "border-primary": isActive })
+            }
+          >
+            Roles
+          </NavLink>
         </ul>
         <Outlet />
       </div>

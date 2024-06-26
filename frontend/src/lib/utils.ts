@@ -1,6 +1,8 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import type { ZodSchema } from 'zod';
+import {User} from "@/types/User";
+import {Role} from "@/types/Auth.ts";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -24,4 +26,8 @@ export function getZodSchemaFieldsShallow(schema: ZodSchema) {
   });
   schema.safeParse(proxy);
   return fields;
+}
+
+export function showAdminButton(user: User) {
+  return !!user.roles.find((role) => role === Role.ADMIN || role === Role.MANAGER);
 }

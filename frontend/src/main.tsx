@@ -182,6 +182,14 @@ const router = createBrowserRouter([
                 },
                 errorElement: <ErrorPage />,
               },
+              {
+                path: "role",
+                async lazy() {
+                  const component = await import("./pages/user/AdminUserRolePage.tsx");
+                  return { Component: component.default };
+                },
+                errorElement: <ErrorPage />,
+              },
             ],
           },
           {
