@@ -11,11 +11,12 @@ import { ColumnDef } from "@tanstack/react-table";
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Button } from "../ui/button";
-import { ExternalLink, Pencil } from "lucide-react";
-import { DataTable } from "../ui/data-table";
+import { ExternalLink, Pencil, Trash } from "lucide-react";
+import { DataTable, DataTableColumnHeader } from "../ui/data-table";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import GenericForm from "../GenericForm";
 import { useTableControls } from "@/hooks/useTableControls.ts";
+import { toast } from "sonner";
 
 type OnSubmit = (
   data: CourseYearCreateData | CourseYearEditData,
@@ -37,6 +38,17 @@ const AdminCourseYearListing = () => {
 
   const { mutate: createYear } = CourseYearService.useCreate();
   const { mutate: updateYear } = CourseYearService.useUpdateById();
+  const { mutate: deleteYear } = CourseYearService.useDeleteById();
+
+  const handleDelete = (id: number) => {
+    deleteYear(
+      { id },
+      {
+        onSuccess: () => toast.success("Course year deleted"),
+        onError: (error) => toast.error(error.getErrorMessage()),
+      },
+    );
+  };
 
   const handleEdit = (year: CourseYear) => {
     setSelectedRow(year);
@@ -82,7 +94,7 @@ const AdminCourseYearListing = () => {
         accessorKey: "id",
       },
       {
-        header: "Year",
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Academic Year" />,
         accessorKey: "academicYear",
       },
       {
@@ -99,6 +111,12 @@ const AdminCourseYearListing = () => {
         cell: ({ row }) => {
           return (
             <div className="flex items-center">
+              <Link to={`./course-year/${row.original.id}`} className="p-1 block cursor-pointer">
+                <Button variant="ghost" className="p-1 h-auto">
+                  <span className="sr-only">open course year</span>
+                  <ExternalLink className="h-4 w-4" />
+                </Button>
+              </Link>
               <Button
                 variant="ghost"
                 className="p-1 h-auto"
@@ -107,12 +125,14 @@ const AdminCourseYearListing = () => {
                 <span className="sr-only">edit course year</span>
                 <Pencil className="h-4 w-4" />
               </Button>
-              <Link to={`./course-year/${row.original.id}`} className="p-1 block cursor-pointer">
-                <Button variant="ghost" className="p-1 h-auto">
-                  <span className="sr-only">open course year</span>
-                  <ExternalLink className="h-4 w-4" />
-                </Button>
-              </Link>
+              <Button
+                variant="ghost"
+                className="p-1 h-auto"
+                onClick={() => handleDelete(row.original.id)}
+              >
+                <span className="sr-only">delete course year</span>
+                <Trash className="w-4 h-4 text-destructive" />
+              </Button>
             </div>
           );
         },

@@ -1,4 +1,4 @@
-import { Outlet, useNavigate, useParams } from "react-router-dom";
+import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import { CourseService } from "@/api/course.service.ts";
 import { CourseYearService } from "@/api/course-year.service.ts";
 import { Skeleton } from "@/components/ui/skeleton.tsx";
@@ -10,6 +10,7 @@ import { UserService } from "@/api/user.service.ts";
 import { toast } from "sonner";
 
 const CourseTitleLayout = () => {
+  const location = useLocation();
   const navigate = useNavigate();
   const { courseYearId, courseId } = useParams<{ courseYearId: string; courseId: string }>();
   const courseQuery = CourseService.useGetById(courseId ? parseInt(courseId) : undefined);
@@ -22,6 +23,8 @@ const CourseTitleLayout = () => {
   );
   const { mutate: addToFavorite } = UserService.useAddCourseToFavorite();
   const { mutate: removeFromFavorite } = UserService.useRemoveCourseFromFavorite();
+
+  const isAdminPage = useMemo(() => location.pathname.includes("admin"), [location.pathname]);
 
   const isFavorite = useMemo(() => {
     if (!favoriteCoursesQuery.data || courseYearId) return null;
@@ -66,7 +69,7 @@ const CourseTitleLayout = () => {
             <ChevronLeft />
           </Button>
           <h3 className="flex items-center gap-4 text-xl md:text-3xl">{displayName}</h3>
-          {!courseYearId && (
+          {!courseYearId && !isAdminPage && (
             <Button variant="ghost" className="p-0.5 h-fit" onClick={handleFavorite}>
               <Star
                 className={cn({

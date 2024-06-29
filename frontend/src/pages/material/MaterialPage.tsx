@@ -38,7 +38,7 @@ const MaterialPage = () => {
     },
   );
   return (
-    <div className="container min-w-[325px] ">
+    <div className="md:container md:min-w-[250px]">
       {materialQuery.data ? (
         <MaterialItem material={materialQuery.data} showCommentsLink={false} />
       ) : (

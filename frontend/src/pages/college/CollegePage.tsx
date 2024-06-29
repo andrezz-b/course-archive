@@ -33,17 +33,17 @@ const CollegePage = () => {
   const college = query.data;
   return (
     <>
-      <div className="flex items-center mb-4 gap-4 min-h-[60px]">
+      <div className="flex items-center mb-4 gap-3 md:gap-4 min-h-[60px]">
         <Button
           variant="outline"
-          className="w-8 h-8 p-0 flex-shrink-0"
+          className="w-7 h-7 md:w-8 md:h-8 p-0 flex-shrink-0"
           onClick={() => navigate(-1)}
         >
           <ChevronLeft />
         </Button>
-        <h3 className="flex items-center gap-4 text-xl md:text-3xl">{college.name}</h3>
+        <h3 className="text-lg md:text-3xl">{college.name}</h3>
         <Separator orientation="vertical" className="h-8" />
-        <span className="font-bold text-lg md:text-xl text-muted-foreground">
+        <span className="font-bold text-base md:text-xl text-muted-foreground">
           {college.acronym}
         </span>
       </div>

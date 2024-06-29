@@ -112,6 +112,12 @@ const CourseYearPage = () => {
     },
   );
 
+  // Ensure that state is updated if the url changes
+  useEffect(() => {
+    setSelectedTags(searchParams.getAll("tagIds"));
+    setMaterialName(searchParams.get("materialName") ?? "");
+  }, [searchParams]);
+
   const [isSearching, setIsSearching] = useState(false);
   useEffect(() => {
     if (searchParams.getAll("tagIds")?.length || searchParams.get("materialName")) {
@@ -150,7 +156,7 @@ const CourseYearPage = () => {
               Add new materials
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-w-[95vw] md:max-w-full">
             <DialogHeader>
               <DialogTitle>Add new material</DialogTitle>
             </DialogHeader>

@@ -98,6 +98,10 @@ const TagItem = ({ tag }: TagItemProps) => {
   };
 
   const onSubmit: SubmitHandler<TagItemForm> = (data) => {
+    if (data.name === tag.name) {
+      setIsEditing(false);
+      return;
+    }
     updateTag(
       {
         id: tag.id,
