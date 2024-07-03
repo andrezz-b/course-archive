@@ -44,14 +44,6 @@ const AdminUserProgramPage = () => {
         accessorKey: "duration",
       },
       {
-        header: "Degree Type",
-        accessorKey: "degreeType",
-      },
-      {
-        header: "Degree Title",
-        accessorKey: "degreeTitle",
-      },
-      {
         id: "actions",
         header: "Actions",
         cell: ({ row }) => {

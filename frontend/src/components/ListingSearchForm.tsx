@@ -46,7 +46,7 @@ const ListingSearchForm = ({
             <Input
               {...form.register("idField")}
               placeholder={`Enter ${idFieldName}`}
-              className="max-w-[70px] md:max-w-[150px]"
+              className="max-w-[70px] md:max-w-[120px]"
             />
           )}
           <FormField

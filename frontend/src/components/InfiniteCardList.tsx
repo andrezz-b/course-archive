@@ -61,7 +61,7 @@ const InfiniteCardList = <T extends WithId>({
 
   return (
     <>
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 justify-items-center">
         {query.data.content.map((item) => (
           <Card key={item.id} item={item} />
         ))}

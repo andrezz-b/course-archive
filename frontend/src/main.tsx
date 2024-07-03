@@ -18,6 +18,13 @@ import HomeLayout from "@/layouts/HomeLayout.tsx";
 import { ApiError } from "@/api/config/ApiError.ts";
 import CourseListingPage from "@/pages/course/CourseListingPage.tsx";
 import { CourseService } from "@/api/course.service.ts";
+import LoginPage from "@/pages/LoginPage.tsx";
+import CollegePage from "@/pages/college/CollegePage.tsx";
+import ProgramPage from "@/pages/program/ProgramPage.tsx";
+import CourseTitleLayout from "@/layouts/CourseTitleLayout.tsx";
+import CoursePage from "@/pages/course/CoursePage.tsx";
+import CourseYearPage from "@/pages/course/CourseYearPage.tsx";
+import MaterialPage from "@/pages/material/MaterialPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -44,10 +51,7 @@ const router = createBrowserRouter([
           },
           {
             path: "/college/:collegeId",
-            async lazy() {
-              const component = await import("./pages/college/CollegePage.tsx");
-              return { Component: component.default };
-            },
+            element: <CollegePage />,
             errorElement: <ErrorPage />,
           },
           {
@@ -57,51 +61,33 @@ const router = createBrowserRouter([
           },
           {
             path: "/program/:programId",
-            async lazy() {
-              const component = await import("./pages/program/ProgramPage.tsx");
-              return { Component: component.default };
-            },
+            element: <ProgramPage />,
             errorElement: <ErrorPage />,
           },
           {
             path: "/course",
-            async lazy() {
-              const component = await import("./pages/course/CourseListingPage.tsx");
-              return { Component: component.default };
-            },
+            element: <CourseListingPage />,
             errorElement: <ErrorPage />,
           },
           {
             path: "/course/:courseId",
-            async lazy() {
-              const component = await import("./layouts/CourseTitleLayout.tsx");
-              return { Component: component.default };
-            },
+            element: <CourseTitleLayout />,
             errorElement: <ErrorPage />,
             children: [
               {
                 index: true,
-                async lazy() {
-                  const component = await import("./pages/course/CoursePage.tsx");
-                  return { Component: component.default };
-                },
+                element: <CoursePage />,
                 errorElement: <ErrorPage />,
               },
               {
                 path: "course-year/:courseYearId",
-                async lazy() {
-                  const component = await import("./pages/course/CourseYearPage.tsx");
-                  return { Component: component.default };
-                },
+                element: <CourseYearPage />,
                 errorElement: <ErrorPage />,
                 children: [],
               },
               {
                 path: "course-year/:courseYearId/material/:materialId",
-                async lazy() {
-                  const component = await import("./pages/material/MaterialPage.tsx");
-                  return { Component: component.default };
-                },
+                element: <MaterialPage />,
                 errorElement: <ErrorPage />,
               },
             ],
@@ -235,10 +221,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/login",
-        async lazy() {
-          const component = await import("./pages/LoginPage.tsx");
-          return { Component: component.default };
-        },
+        element: <LoginPage />,
         errorElement: <ErrorPage />,
       },
       {
@@ -275,7 +258,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <RouterProvider router={router} />
         </ThemeProvider>
       </AuthProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
+      <ReactQueryDevtools initialIsOpen={false} buttonPosition="top-left" />
     </QueryClientProvider>
   </React.StrictMode>,
 );

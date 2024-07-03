@@ -44,14 +44,6 @@ const AdminUserCollegePage = () => {
         accessorKey: "acronym",
       },
       {
-        header: "Address",
-        accessorKey: "address",
-      },
-      {
-        header: "City",
-        accessorKey: "city",
-      },
-      {
         id: "actions",
         header: "Actions",
         cell: ({ row }) => {

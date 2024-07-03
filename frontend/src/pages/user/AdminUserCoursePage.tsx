@@ -44,14 +44,6 @@ const AdminUserCoursePage = () => {
         accessorKey: "acronym",
       },
       {
-        header: "Credits",
-        accessorKey: "credits",
-      },
-      {
-        header: "Year",
-        accessorKey: "year",
-      },
-      {
         id: "actions",
         header: "Actions",
         cell: ({ row }) => {

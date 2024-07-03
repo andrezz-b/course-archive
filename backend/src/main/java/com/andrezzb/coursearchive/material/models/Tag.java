@@ -23,7 +23,7 @@ public class Tag implements AclSecured {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(nullable = false, unique = true)
+  @Column(nullable = false)
   private String name;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
