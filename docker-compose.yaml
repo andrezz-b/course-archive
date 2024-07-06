@@ -48,6 +48,17 @@ services:
       - preview-network
     profiles:
       - preview
+  frontend-preview:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.preview
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    profiles:
+      - preview
 
 networks:
   preview-network:
