@@ -5,6 +5,7 @@ import { CircleChevronDown, CircleChevronUp, File, MessageSquareText } from "luc
 import { cn } from "@/lib/utils.ts";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge.tsx";
+import { toast } from "sonner";
 
 interface MaterialItemProps {
   material: Material;
@@ -20,6 +21,10 @@ const MaterialItem = ({ material, showCommentsLink = true }: MaterialItemProps) 
       onSuccess: (data) => {
         const url = window.URL.createObjectURL(data);
         if (newWindow) newWindow.location.href = url;
+      },
+      onError: () => {
+        toast.error("Failed to open file");
+        if (newWindow) newWindow.close();
       },
     });
   };
